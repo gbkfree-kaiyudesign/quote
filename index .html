@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>室內設計報價系統</title>
+<style>
+:root {
+  --bg: #0e0e11;
+  --bg2: #131318;
+  --surface: #1a1a20;
+  --surface2: #21212a;
+  --surface3: #28282f;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.12);
+  --text: #ddddd8;
+  --text2: #888888;
+  --text3: #484848;
+  --green: #50e88a;
+  --green-dim: rgba(80,232,138,0.1);
+  --green-border: rgba(80,232,138,0.22);
+  --gold: #e4b84a;
+  --gold-dim: rgba(228,184,74,0.1);
+  --blue: #5ba4f5;
+  --blue-dim: rgba(91,164,245,0.1);
+  --red: #f07070;
+  --red-dim: rgba(240,112,112,0.1);
+  --amber: #f5a623;
+  --amber-dim: rgba(245,166,35,0.1);
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'SF Pro Display', -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+
+/* ── TOPBAR ── */
+.topbar {
+  background: rgba(26,26,32,0.92);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border2);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 56px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+/* ── LOGO AREA: replace .logo-icon src with your image ── */
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #1e4d35 0%, #2d7a52 50%, #50e88a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(80,232,138,0.25);
+}
+/* To use your own logo image, add this inside .logo-icon or replace it:
+   <img src="YOUR_LOGO.png" style="width:36px;height:36px;border-radius:9px;object-fit:contain">
+*/
+.logo-text { line-height: 1.15; }
+.logo-name { font-size: 14px; font-weight: 700; letter-spacing: 0.06em; color: #fff; }
+.logo-sub  { font-size: 9.5px; letter-spacing: 0.14em; color: var(--text2); text-transform: uppercase; }
+
+.topbar-actions { display: flex; gap: 7px; align-items: center; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12.5px; padding: 7px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border2); cursor: pointer; font-weight: 500;
+  font-family: inherit; transition: all 0.15s; white-space: nowrap;
+}
+.btn-ghost  { background: var(--surface2); color: var(--text); }
+.btn-ghost:hover { background: var(--surface3); }
+.btn-green  { background: var(--green); color: #0a1f12; border-color: var(--green); font-weight: 700; }
+.btn-green:hover { background: #6df0a0; }
+.btn-amber  { background: var(--amber-dim); color: var(--amber); border-color: rgba(245,166,35,0.3); }
+.btn-amber:hover { background: rgba(245,166,35,0.18); }
+.btn-blue   { background: var(--blue-dim); color: var(--blue); border-color: rgba(91,164,245,0.3); }
+.btn-blue:hover { background: rgba(91,164,245,0.18); }
+.btn-red    { background: var(--red-dim); color: var(--red); border-color: rgba(240,112,112,0.3); }
+.btn-red:hover { background: rgba(240,112,112,0.18); }
+
+/* ── LAYOUT ── */
+.container { max-width: 940px; margin: 0 auto; padding: 20px 16px 80px; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.card-title {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text2);
+  margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+}
+.card-title-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green); flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(80,232,138,0.6);
+}
+
+/* ── FORM FIELDS ── */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.grid4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
+@media (max-width: 640px) { .grid2,.grid3,.grid4 { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 400px) { .grid2,.grid3,.grid4 { grid-template-columns: 1fr; } }
+
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field label { font-size: 10.5px; color: var(--text2); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+input[type=text], input[type=number], input[type=email], input[type=tel], input[type=date], select, textarea {
+  width: 100%; border: 1px solid var(--border2); border-radius: var(--radius-sm);
+  padding: 7px 10px; font-size: 13px; color: var(--text); background: var(--surface2);
+  outline: none; font-family: inherit; transition: border-color 0.15s, box-shadow 0.15s;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--green); box-shadow: 0 0 0 2.5px rgba(80,232,138,0.12);
+}
+textarea { resize: vertical; min-height: 64px; }
+select option { background: #1a1a20; color: var(--text); }
+
+/* ═══════════════════════════════════════════════
+   ★★★ COST SUMMARY BOX — MOST IMPORTANT ★★★
+═══════════════════════════════════════════════ */
+.cost-box {
+  background: var(--surface);
+  border: 1.5px solid var(--green);
+  border-radius: 14px;
+  margin-bottom: 14px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(80,232,138,0.08),
+    0 0 40px rgba(80,232,138,0.06),
+    0 8px 32px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(80,232,138,0.12);
+}
+.cost-box-header {
+  background: linear-gradient(90deg, rgba(80,232,138,0.07) 0%, transparent 100%);
+  border-bottom: 1px solid rgba(80,232,138,0.18);
+  padding: 10px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.cost-box-title {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--green);
+  display: flex; align-items: center; gap: 8px;
+}
+.cost-box-title::before {
+  content: '';
+  display: block; width: 3px; height: 14px;
+  background: var(--green);
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(80,232,138,0.6);
+}
+.cost-box-body { padding: 16px 18px; }
+
+.metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 16px; }
+@media (max-width: 640px) { .metrics { grid-template-columns: 1fr 1fr; } }
+.metric {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 9px;
+  padding: 13px 15px;
+  position: relative;
+  overflow: hidden;
+}
+.metric::after {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(80,232,138,0.35), transparent);
+}
+.metric-label { font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text2); margin-bottom: 6px; }
+.metric-val { font-size: 21px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.metric-val.v-green { color: var(--green); text-shadow: 0 0 24px rgba(80,232,138,0.3); }
+.metric-val.v-gold  { color: var(--gold);  text-shadow: 0 0 20px rgba(228,184,74,0.25); }
+
+.profit-row {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 9px; padding: 10px 14px;
+}
+.profit-row label { font-size: 11px; color: var(--text2); white-space: nowrap; font-weight: 600; letter-spacing: 0.04em; }
+.profit-row input[type=range] { flex: 1; min-width: 100px; accent-color: var(--green); cursor: pointer; height: 4px; }
+.profit-pct { font-size: 16px; font-weight: 800; color: var(--green); min-width: 44px; text-align: right; }
+
+/* ── GROUP DIVIDER ── */
+.group-divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 18px 0 8px;
+}
+.group-badge {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.1em;
+  padding: 3px 10px; border-radius: 20px;
+  background: var(--green-dim); color: var(--green);
+  border: 1px solid var(--green-border);
+  white-space: nowrap;
+}
+.group-badge.b { background: var(--blue-dim); color: var(--blue); border-color: rgba(91,164,245,0.25); }
+.group-line { flex: 1; height: 1px; background: var(--border2); }
+.group-total-label { font-size: 11px; color: var(--text2); white-space: nowrap; }
+.group-total-val { font-size: 12px; font-weight: 700; color: var(--green); font-variant-numeric: tabular-nums; }
+.group-total-val.b { color: var(--blue); }
+
+/* ── SECTION CARDS ── */
+.section-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 6px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.section-card:hover { border-color: var(--border2); }
+.section-head {
+  padding: 10px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; user-select: none;
+  background: var(--surface2);
+  transition: background 0.15s;
+}
+.section-head:hover { background: var(--surface3); }
+.section-head-left { display: flex; align-items: center; gap: 9px; }
+.sec-id {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.06em;
+  padding: 2px 7px; border-radius: 4px;
+  background: var(--green-dim); color: var(--green);
+  border: 1px solid var(--green-border);
+}
+.sec-id.b { background: var(--blue-dim); color: var(--blue); border-color: rgba(91,164,245,0.25); }
+.sec-id.gold { background: var(--gold-dim); color: var(--gold); border-color: rgba(228,184,74,0.3); }
+.sec-name { font-size: 13px; font-weight: 600; }
+.sec-icon { font-size: 14px; }
+.sec-right { display: flex; align-items: center; gap: 10px; }
+.sec-total { font-size: 12px; font-weight: 700; color: var(--green); font-variant-numeric: tabular-nums; }
+.sec-total.b { color: var(--blue); }
+.sec-total.gold { color: var(--gold); }
+.sub-cell.gold { color: var(--gold); }
+.group-badge.gold { background: var(--gold-dim); color: var(--gold); border-color: rgba(228,184,74,0.3); }
+.group-total-val.gold { color: var(--gold); }
+.print-hide { /* 螢幕可見，列印隱藏 */ }
+.caret { color: var(--text3); font-size: 10px; transition: transform 0.2s; }
+.caret.open { transform: rotate(90deg); }
+
+.section-body { padding: 12px 14px; }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { width: 100%; border-collapse: collapse; min-width: 520px; }
+thead th {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text3); text-align: left; padding: 5px 7px;
+  border-bottom: 1px solid var(--border2); white-space: nowrap;
+}
+tbody td { padding: 4.5px 6px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+tbody td input, tbody td select {
+  border: 1px solid var(--border); padding: 4px 7px;
+  font-size: 12px; background: var(--surface2); color: var(--text);
+  border-radius: 4px;
+}
+tbody td input:focus, tbody td select:focus { border-color: var(--green); outline: none; }
+.sub-cell { font-weight: 700; color: var(--green); white-space: nowrap; font-size: 12px; }
+.sub-cell.b { color: var(--blue); }
+.sub-cell.gold { color: var(--gold); }
+
+/* ── LOCK BUTTON ── */
+.lock-th { width: 28px; }
+.lock-td { width: 28px; text-align: center; padding: 2px !important; }
+.lock-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 13px; padding: 3px 4px; border-radius: 4px;
+  color: var(--text3); line-height: 1; transition: all 0.15s;
+}
+.lock-btn:hover { color: var(--green); background: var(--green-dim); }
+.lock-btn.locked { color: var(--green); }
+tr[data-locked="true"] { background: rgba(80,232,138,0.04) !important; }
+
+/* ── A03 grouped table ── */
+.a03-cat-hdr { background: rgba(228,184,74,0.07) !important; }
+.a03-cat-hdr td { padding: 6px 12px !important; border-bottom: 1px solid rgba(228,184,74,0.18) !important; border-top: 1px solid rgba(228,184,74,0.18) !important; }
+.a03-cat-label { font-size: 11px; font-weight: 800; color: var(--amber); letter-spacing: 0.08em; }
+.a03-sub-add-row td { padding: 3px 12px 8px 36px !important; border-bottom: none !important; }
+.a03-add-sub-btn { font-size: 11px; padding: 4px 12px; border-radius: 4px; border: 1px dashed rgba(228,184,74,0.4); background: none; color: var(--amber); cursor: pointer; font-family: inherit; }
+.a03-add-sub-btn:hover { background: rgba(228,184,74,0.1); }
+/* Picker panel */
+.a03-picker { background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 14px; margin-bottom: 8px; display: none; }
+.a03-picker-title { font-size: 11px; font-weight: 700; color: var(--text2); letter-spacing: 0.06em; margin-bottom: 10px; }
+.a03-cat-btns, .a03-sub-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.a03-cat-btn { font-size: 12px; padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(228,184,74,0.35); background: rgba(228,184,74,0.08); color: var(--amber); cursor: pointer; font-family: inherit; font-weight: 600; transition: all 0.15s; }
+.a03-cat-btn:hover, .a03-cat-btn.active { background: rgba(228,184,74,0.22); border-color: var(--amber); }
+.a03-sub-btn { font-size: 12px; padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.a03-sub-btn:hover { border-color: var(--amber); color: var(--amber); }
+/* Lock-disabled row */
+tr[data-locked="true"] input, tr[data-locked="true"] select, tr[data-locked="true"] button.rm-btn { pointer-events: none; opacity: 0.55; }
+tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offset: -1px; }
+.cost-col { color: #e84e88; font-weight: 700; }
+.cost-col input { color: #e84e88 !important; font-weight: 700; }
+.sub-cell.b { color: var(--blue); }
+.rm-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--text3); font-size: 15px; padding: 2px 5px;
+  border-radius: 4px; line-height: 1;
+}
+.rm-btn:hover { color: var(--red); background: var(--red-dim); }
+
+.add-btn {
+  display: flex; align-items: center; gap: 6px; font-size: 12px;
+  padding: 7px 14px; border-radius: var(--radius-sm);
+  border: 1px dashed var(--border2); background: none;
+  color: var(--text2); cursor: pointer; width: 100%;
+  justify-content: center; margin-top: 8px; transition: all 0.15s;
+}
+.add-btn:hover { background: var(--green-dim); color: var(--green); border-color: var(--green-border); }
+
+/* ── PIE CHART ── */
+.pie-wrap { display: flex; align-items: flex-start; gap: 28px; flex-wrap: wrap; }
+.pie-canvas-wrap { flex-shrink: 0; position: relative; }
+.pie-legend { flex: 1; min-width: 260px; }
+.gantt-group { margin-bottom: 12px; }
+.gantt-group-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.gantt-group-label { font-size: 11px; font-weight: 800; min-width: 18px; }
+.gantt-group-name { font-size: 12px; font-weight: 600; flex: 1; color: var(--text); }
+.gantt-pct { font-size: 12px; font-weight: 800; color: #fff; min-width: 34px; text-align: right; }
+.gantt-amt { font-size: 12px; color: #fff; min-width: 88px; text-align: right; }
+.gantt-bar-track { height: 8px; background: var(--border2); border-radius: 4px; overflow: hidden; margin-left: 26px; }
+.gantt-bar-fill { height: 100%; border-radius: 4px; transition: width 0.45s cubic-bezier(.4,0,.2,1); }
+.gantt-sub { margin-left: 26px; margin-top: 5px; }
+.gantt-sub-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+.gantt-sub-id { font-size: 9.5px; color: var(--text2); min-width: 28px; font-weight: 600; }
+.gantt-sub-name { font-size: 11px; color: var(--text2); flex: 1; }
+.gantt-sub-pct { font-size: 10.5px; font-weight: 700; color: #fff; min-width: 30px; text-align: right; }
+.gantt-sub-amt { font-size: 10.5px; color: #fff; min-width: 88px; text-align: right; }
+.gantt-sub-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.gantt-sub-fill { height: 100%; border-radius: 2px; opacity: 0.55; transition: width 0.45s cubic-bezier(.4,0,.2,1); }
+
+/* ── PAYMENT ── */
+.pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+@media (max-width: 500px) { .pay-grid { grid-template-columns: 1fr; } }
+
+/* ── SIGNATURE ── */
+.sig-wrap {
+  border: 1px solid var(--border2); border-radius: 8px;
+  background: var(--surface2); overflow: hidden;
+  cursor: crosshair; touch-action: none;
+}
+.sig-wrap canvas { display: block; width: 100%; }
+
+/* ── MODALS ── */
+.modal-bg {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75); z-index: 200;
+  align-items: center; justify-content: center;
+  padding: 16px; backdrop-filter: blur(6px);
+}
+.modal-bg.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 22px;
+  width: 100%; max-width: 520px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+}
+.modal-xl { max-width: 760px; }
+.modal-title { font-size: 15px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.modal-foot { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
+
+/* ── AI PRICE ── */
+.ai-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 10px 12px; background: var(--surface2);
+  border: 1px solid var(--border2); border-radius: 8px; margin-bottom: 8px;
+}
+.ai-id { font-size: 10px; font-weight: 800; color: var(--green); min-width: 34px; padding-top: 1px; }
+.ai-label { font-size: 12px; font-weight: 600; }
+.ai-price { font-size: 16px; font-weight: 800; color: var(--green); margin: 3px 0; }
+.ai-note { font-size: 11px; color: var(--text2); }
+.spinner {
+  display: inline-block; width: 18px; height: 18px;
+  border: 2px solid var(--border2); border-top-color: var(--green);
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── GALLERY ── */
+.gal-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.gal-tab {
+  font-size: 11px; padding: 4px 12px; border-radius: 20px;
+  border: 1px solid var(--border2); background: var(--surface2);
+  color: var(--text2); cursor: pointer; font-family: inherit; transition: all 0.15s;
+}
+.gal-tab.active { background: var(--green-dim); color: var(--green); border-color: var(--green-border); }
+.gal-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+@media (max-width: 500px) { .gal-grid { grid-template-columns: repeat(2,1fr); } }
+.gal-item {
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.15s;
+}
+.gal-item:hover { border-color: var(--green); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+.gal-thumb {
+  aspect-ratio: 4/3; display: flex; align-items: center;
+  justify-content: center; font-size: 30px;
+  background: linear-gradient(135deg, var(--surface3), var(--surface2));
+}
+.gal-info { padding: 8px 10px; }
+.gal-name { font-size: 11.5px; font-weight: 600; margin-bottom: 2px; }
+.gal-desc { font-size: 10px; color: var(--text2); }
+
+/* ── GALLERY PHOTO ── */
+.gal-style-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+.gal-photo-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+@media (max-width:500px) { .gal-photo-grid { grid-template-columns:repeat(2,1fr); } }
+.gal-photo-item {
+  position:relative; aspect-ratio:4/3; border-radius:8px; overflow:hidden;
+  cursor:pointer; background:var(--surface3);
+}
+.gal-photo-item img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .25s; }
+.gal-photo-item:hover img { transform:scale(1.06); }
+.gal-photo-overlay {
+  position:absolute; inset:0; background:rgba(0,0,0,0); transition:background .2s;
+  display:flex; align-items:flex-end; justify-content:space-between;
+  padding:6px 8px;
+}
+.gal-photo-item:hover .gal-photo-overlay { background:rgba(0,0,0,0.35); }
+.gal-photo-room {
+  font-size:10px; font-weight:600; color:#fff; opacity:0; transition:opacity .2s;
+  background:rgba(0,0,0,0.55); padding:2px 7px; border-radius:20px;
+}
+.gal-photo-by {
+  font-size:9px; color:#fff; opacity:0; transition:opacity .2s;
+}
+.gal-photo-item:hover .gal-photo-room,
+.gal-photo-item:hover .gal-photo-by { opacity:1; }
+/* Lightbox */
+.photo-lb {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92);
+  z-index:500; flex-direction:column; align-items:center; justify-content:center;
+  gap:14px; padding:20px;
+}
+.photo-lb.open { display:flex; }
+.photo-lb img { max-width:100%; max-height:72vh; border-radius:10px; object-fit:contain; }
+.lb-info-bar { color:#ccc; font-size:12px; text-align:center; }
+.lb-close { position:fixed; top:16px; right:20px; color:#fff; font-size:30px; cursor:pointer; background:none; border:none; line-height:1; z-index:501; }
+.lb-nav { display:flex; gap:12px; }
+.lb-nav button { background:rgba(255,255,255,0.15); border:none; color:#fff; padding:8px 22px; border-radius:6px; cursor:pointer; font-size:13px; font-family:inherit; }
+.lb-nav button:hover { background:rgba(255,255,255,0.3); }
+.unsplash-credit { font-size:10px; color:var(--text3); text-align:right; margin-top:6px; }
+
+/* ── HISTORY ── */
+.hist-item {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; margin-bottom: 7px;
+}
+.hist-meta { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.hist-btns { display: flex; gap: 5px; flex-shrink: 0; }
+.hist-btn {
+  font-size: 11px; padding: 4px 10px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border2); background: var(--surface);
+  color: var(--text); cursor: pointer;
+}
+.hist-btn:hover { background: var(--surface3); }
+.hist-btn.del:hover { background: var(--red-dim); color: var(--red); border-color: rgba(240,112,112,0.3); }
+.empty { text-align: center; padding: 28px; color: var(--text3); font-size: 13px; }
+
+/* ── ACTION BAR ── */
+.action-bar {
+  display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; margin-top: 6px;
+}
+
+/* ── PRINT / PDF ── */
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  :root {
+    --bg:#ffffff; --bg2:#f8f8f8; --surface:#ffffff; --surface2:#f4f4f4; --surface3:#eeeeee;
+    --border:rgba(0,0,0,0.12); --border2:rgba(0,0,0,0.22);
+    --text:#111111; --text2:#444444; --text3:#666666;
+    --green:#1a6b3a; --green-dim:#e8f5ee; --green-border:#a8d8bc;
+    --gold:#8a6200; --blue:#1a4a8a; --blue-dim:#e6f0fa;
+    --red:#8a1a1a; --amber:#8a5500; --amber-dim:#fdf3e0;
+  }
+  .cost-col { display:none !important; }
+  .lock-th, .lock-td { display:none !important; }
+  .topbar,.action-bar,.add-btn,.rm-btn,.profit-row,.btn,.modal-bg,
+  .caret,.sig-wrap,.group-divider .btn { display: none !important; }
+  .print-hide { display: none !important; }
+  body { background:#fff !important; color:#111 !important; font-size:12px !important; }
+  .container { padding:0 !important; max-width:100% !important; }
+  .cost-box { border:1.5px solid #1a6b3a !important; box-shadow:none !important; }
+  .cost-box-header { background:#f0f7f3 !important; border-bottom:1px solid #a8d8bc !important; }
+  .cost-box-title { color:#1a6b3a !important; }
+  .cost-box-title::before { background:#1a6b3a !important; box-shadow:none !important; }
+  .metric { background:#f4f4f4 !important; border:1px solid #ddd !important; }
+  .metric::after { display:none !important; }
+  .metric-val { color:#111 !important; text-shadow:none !important; font-size:16px !important; }
+  .metric-val.v-green { color:#1a6b3a !important; }
+  .metric-val.v-gold  { color:#8a6200 !important; }
+  .card { background:#fff !important; border:1px solid #ddd !important; box-shadow:none !important; page-break-inside:avoid; }
+  .card-title { color:#444 !important; }
+  .card-title-dot { background:#1a6b3a !important; box-shadow:none !important; }
+  .section-card { border:1px solid #ccc !important; box-shadow:none !important; page-break-inside:avoid; margin-bottom:4px !important; }
+  .section-head { background:#f4f4f4 !important; }
+  .section-body { display:block !important; padding:8px 10px !important; }
+  .sec-id { background:#e8f5ee !important; color:#1a6b3a !important; border-color:#a8d8bc !important; box-shadow:none !important; }
+  .sec-id.b    { background:#e6f0fa !important; color:#1a4a8a !important; }
+  .sec-id.gold { background:#fdf3e0 !important; color:#8a6200 !important; border-color:#e4c57a !important; }
+  .sec-name { color:#111 !important; }
+  .sec-total { color:#1a6b3a !important; }
+  .sec-total.b    { color:#1a4a8a !important; }
+  .sec-total.gold { color:#8a6200 !important; }
+  .sub-cell { color:#1a6b3a !important; }
+  .sub-cell.b    { color:#1a4a8a !important; }
+  .sub-cell.gold { color:#8a6200 !important; }
+  .group-badge { background:#e8f5ee !important; color:#1a6b3a !important; border-color:#a8d8bc !important; }
+  .group-badge.b    { background:#e6f0fa !important; color:#1a4a8a !important; }
+  .group-badge.gold { background:#fdf3e0 !important; color:#8a6200 !important; border-color:#e4c57a !important; }
+  .group-total-val { color:#1a6b3a !important; }
+  .group-total-val.b    { color:#1a4a8a !important; }
+  .group-total-val.gold { color:#8a6200 !important; }
+  .group-line { background:#ccc !important; }
+  thead th { color:#444 !important; border-bottom-color:#ccc !important; }
+  tbody td { border-bottom-color:#eee !important; color:#111 !important; }
+  tbody td input, tbody td select { background:#fff !important; color:#111 !important; border-color:#bbb !important; }
+  .custom-item, .custom-spec { background:#fff !important; color:#111 !important; border-color:#bbb !important; }
+  .pie-canvas-wrap { display:none !important; }
+  .gantt-amt, .gantt-pct, .gantt-sub-amt, .gantt-sub-pct { color:#111 !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">
+    <!-- ★ 請把 logo 圖片放在這裡，例如:
+         <img src="logo.png" style="width:36px;height:36px;border-radius:9px;object-fit:contain">
+         目前使用的是文字佔位 logo -->
+    <svg width="36" height="36" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="border-radius:6px;flex-shrink:0">
+  <rect width="100" height="100" fill="#111"/>
+  <polygon points="28,18 72,18 28,62" fill="white"/>
+  <rect x="28" y="62" width="44" height="22" fill="white"/>
+  <polygon points="52,84 72,84 72,62" fill="#111"/>
+  <polygon points="72,18 72,36 54,18" fill="#111"/>
+  <line x1="30" y1="60" x2="70" y2="20" stroke="#111" stroke-width="8" stroke-linecap="round"/>
+</svg>
+    <div class="logo-text">
+      <div class="logo-name">INTERIOR DESIGN</div>
+      <div class="logo-sub">室內設計報價系統</div>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn btn-ghost" onclick="showHistory()">📋 歷史報價</button>
+    <button class="btn btn-amber" onclick="saveQuote()">💾 存檔</button>
+    <button class="btn btn-green" onclick="window.print()">🖨️ 列印 / PDF</button>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- 客戶資訊 -->
+<div class="card">
+  <div class="card-title"><div class="card-title-dot"></div>客戶與專案資訊</div>
+  <div class="grid3" style="margin-bottom:10px">
+    <div class="field"><label>客戶姓名</label><input type="text" id="client-name" placeholder="例：林先生"></div>
+    <div class="field"><label>聯絡電話</label><input type="tel" id="client-phone" placeholder="0912-345-678"></div>
+    <div class="field"><label>電子信箱</label><input type="email" id="client-email" placeholder="name@example.com"></div>
+  </div>
+  <div class="grid3" style="margin-bottom:10px">
+    <div class="field"><label>專案地址</label><input type="text" id="project-addr" placeholder="台北市大安區..."></div>
+    <div class="field">
+      <label>空間類型</label>
+      <select id="space-type" onchange="updateSpaceType()">
+        <option value="apartment">一般住宅公寓</option>
+        <option value="house">透天厝</option>
+        <option value="office">辦公室</option>
+        <option value="shop">商業空間</option>
+        <option value="new">新成屋</option>
+        <option value="old">老屋翻新</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>設計風格</label>
+      <select id="style-type">
+        <option>現代簡約</option><option>北歐風</option><option>日式無印</option>
+        <option>工業風</option><option>古典歐式</option><option>輕奢風</option>
+      </select>
+    </div>
+  </div>
+  <div class="grid2" style="margin-bottom:10px">
+    <div class="field"><label>坪數</label><input type="number" id="area" value="30" min="1" max="999" step="0.5" onchange="recalc()"></div>
+    <div class="field"><label>備註（客戶可見）</label><input type="text" id="note" placeholder="例：本報價有效期 30 天，不含家電採購..."></div>
+  </div>
+</div>
+
+<!-- ★★★ 報價總覽 (最重要) ★★★ -->
+<div class="cost-box">
+  <div class="cost-box-header">
+    <div class="cost-box-title">報價總覽</div>
+    <div style="font-size:11px;color:var(--text2)" id="quote-date"></div>
+  </div>
+  <div class="cost-box-body">
+    <div class="metrics">
+      <div class="metric print-hide">
+        <div class="metric-label">工料總成本</div>
+        <div class="metric-val" id="cost-total">NT$ 0</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">利潤率</div>
+        <div class="metric-val v-green" id="actual-profit-label">0.0%</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">每坪單價</div>
+        <div class="metric-val v-gold" id="per-ping">NT$ 0</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">總價</div>
+        <div class="metric-val v-green" id="quote-total">NT$ 0</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 工程分類 -->
+<div id="sections-container"></div>
+
+<!-- 費用分析圓餅圖 -->
+<div class="card">
+  <div class="card-title"><div class="card-title-dot"></div>費用結構分析</div>
+  <div class="pie-wrap">
+    <div class="pie-canvas-wrap">
+      <canvas id="pie-chart" width="200" height="200"></canvas>
+    </div>
+    <div class="pie-legend" id="pie-legend"></div>
+  </div>
+</div>
+
+<!-- 匯款資訊 -->
+<div class="card">
+  <div class="card-title"><div class="card-title-dot"></div>匯款資訊</div>
+  <div class="pay-grid" style="margin-bottom:10px">
+    <div class="field"><label>銀行名稱</label><input type="text" id="bank-name" placeholder="例：台灣銀行"></div>
+    <div class="field"><label>分行</label><input type="text" id="bank-branch" placeholder="例：大安分行"></div>
+    <div class="field"><label>戶名</label><input type="text" id="bank-holder" placeholder="例：林OO設計有限公司"></div>
+    <div class="field"><label>帳號</label><input type="text" id="bank-account" placeholder="例：0123-456-789012"></div>
+  </div>
+  <div class="grid3">
+    <div class="field">
+      <label>付款條件</label>
+      <select id="pay-terms" onchange="onPayTermsChange(this)">
+        <option>簽約30% / 進場30% / 完工40%</option>
+        <option>簽約50% / 完工50%</option>
+        <option>簽約30% / 中期40% / 完工30%</option>
+        <option>簽約30% / 中期30% / 完工30% / 驗收10%</option>
+        <option>一次付清</option>
+        <option value="__custom_pay__">✏️ 自訂輸入</option>
+      </select>
+      <input type="text" id="pay-terms-custom"
+        placeholder="請輸入自訂付款條件"
+        style="display:none;margin-top:6px;width:100%"
+        onchange="syncCustomPayTerms(this)">
+    </div>
+    <div class="field"><label>報價有效期（天）</label><input type="number" id="valid-days" value="30" min="1"></div>
+    <div class="field"><label>預計開工日</label><input type="text" id="start-date" placeholder="2025/09/01"></div>
+  </div>
+</div>
+
+<!-- 客戶簽名 -->
+<div class="card">
+  <div class="card-title"><div class="card-title-dot"></div>客戶確認簽名</div>
+  <div class="grid2" style="margin-bottom:12px">
+    <div class="field"><label>確認人姓名</label><input type="text" id="sig-name" placeholder="請填寫確認人姓名"></div>
+    <div class="field"><label>確認日期</label><input type="text" id="sig-date" placeholder="2025/08/15"></div>
+  </div>
+  <div class="field" style="margin-bottom:8px"><label>簽名欄（請在下方手寫簽名）</label></div>
+  <div class="sig-wrap">
+    <canvas id="sig-canvas" height="130"></canvas>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end">
+    <button class="btn btn-ghost" onclick="clearSig()">清除簽名</button>
+    <button class="btn btn-ghost" onclick="saveSigImage()">📥 下載簽名圖</button>
+  </div>
+</div>
+
+<div class="action-bar">
+  <button class="btn btn-ghost" onclick="clearAll()">🗑 清除全部</button>
+  <button class="btn btn-ghost" onclick="copyText()">📋 複製文字報價</button>
+  <button class="btn btn-amber" onclick="saveQuote()">💾 存入歷史</button>
+  <button class="btn btn-green" onclick="window.print()">🖨️ 列印 / 輸出 PDF</button>
+</div>
+
+</div><!-- /container -->
+
+<!-- Modal: A03 水電選項 -->
+<div class="modal-bg" id="a03-modal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title">⚡ 新增水電項目</div>
+    <div id="a03-modal-body" style="min-height:80px"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal()">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: 歷史 -->
+<div class="modal-bg" id="history-modal">
+  <div class="modal">
+    <div class="modal-title">📋 歷史報價記錄</div>
+    <div id="history-content"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal()">關閉</button>
+      <button class="btn btn-red" onclick="clearHistory()">清除全部記錄</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: 複製 -->
+<div class="modal-bg" id="copy-modal">
+  <div class="modal">
+    <div class="modal-title">📋 複製文字報價 / LINE</div>
+    <textarea id="copy-text" style="width:100%;height:300px;font-size:12px;font-family:monospace" readonly></textarea>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal()">關閉</button>
+      <button class="btn btn-green" onclick="doCopy()">複製文字</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// 分類定義
+// ══════════════════════════════════════════
+const GROUPS = [
+  { id:'D', label:'A類 設計及申請費', icon:'📋' },
+  { id:'A', label:'B類 基礎工程類', icon:'🏗️' },
+  { id:'B', label:'C類 材料道具類', icon:'📦' },
+];
+
+const SECTIONS = [
+  { id:'D01', dispId:'A01', group:'D', label:'設計費', icon:'✏️',
+    items:['室內設計費','平面圖繪製','3D透視圖','施工圖繪製','設計監造費','現場丈量費','顧問費','色彩計畫'],
+    specs:['一般','含3D','全案設計'], units:['式','坪','m²'] },
+  { id:'D02', dispId:'A02', group:'D', label:'建築物施工許可', icon:'📜',
+    items:['室內裝修申請','施工許可申請','竣工查驗申請','消防申請','建管申請','代辦費用','審查費','圖說規費'],
+    specs:['代辦','自辦','協助'], units:['式','件','組'] },
+  { id:'A01', dispId:'B01', group:'A', label:'拆除保護', icon:'🔨',
+    items:['拆除舊裝潢','拆除牆面','地板拆除','木作拆除','保護工程','廢棄物清運','隔音棉拆除'],
+    specs:['一般','加強','特殊'], units:['式','m²','坪','車'] },
+  { id:'A02', dispId:'B02', group:'A', label:'消防', icon:'🔴',
+    items:['消防灑水頭移位','消防偵煙器','緊急照明燈','消防管線配置','消防箱移位','消防閘門'],
+    specs:['一般','加強'], units:['式','個','組'] },
+  { id:'A03', dispId:'B03', group:'A', label:'水電', icon:'⚡',
+    items:['電路配線','插座增設','開關工程','給排水配管','熱水器配管','浴室給水','空調電源','照明迴路'],
+    specs:['一般','加強','加大'], units:['式','m','個','組','只','迴','開','口','工'] },
+  { id:'A04', dispId:'B04', group:'A', label:'弱電', icon:'📡',
+    items:['網路線配線','電話線配管','監視系統','門禁系統','音響配線','智慧家居','對講機'],
+    specs:['一般','進口','智能'], units:['式','m','個','組'] },
+  { id:'A05', dispId:'B05', group:'A', label:'泥作', icon:'🧱',
+    items:['泥作地坪','泥作牆面','防水工程','磁磚貼附','浴室防水','廚房防水','浴室打底','地坪整平'],
+    specs:['一般','加強','進口'], units:['式','m²','坪'] },
+  { id:'A06', dispId:'B06', group:'A', label:'輕隔間', icon:'🪟',
+    items:['輕隔間牆','矽酸鈣板','石膏板隔間','玻璃輕隔間','木作隔間','活動隔間'],
+    specs:['一般','隔音','防火'], units:['式','m²','坪'] },
+  { id:'A07', dispId:'B07', group:'A', label:'木作', icon:'🪵',
+    items:['天花板木作','電視牆木作','床頭背板','門片工程','木作造型牆','包柱工程','走道天花板'],
+    specs:['一般','訂製','精品'], units:['式','m²','坪','尺','樘','cm'] },
+  { id:'A08', dispId:'B08', group:'A', label:'系統櫃', icon:'🗄️',
+    items:['主臥衣櫃','玄關鞋櫃','廚具系統','系統書櫃','餐廚收納','儲藏室規劃','洗衣機台'],
+    specs:['國產系統','進口系統','訂製'], units:['式','組','m','隻','cm'] },
+  { id:'A09', dispId:'B09', group:'A', label:'金屬', icon:'🔩',
+    items:['不鏽鋼工程','鐵件造型','金屬收邊','扶手工程','鐵件書架','金屬門框','鍍鈦件'],
+    specs:['一般','不鏽鋼','鍍鈦'], units:['式','m','組','才','片'] },
+  { id:'A10', dispId:'B10', group:'A', label:'玻璃', icon:'💎',
+    items:['玻璃隔間','強化玻璃','玻璃門','鏡面工程','噴砂玻璃','長虹玻璃','玻璃展示櫃'],
+    specs:['一般','強化','超白'], units:['式','m²','片','才'] },
+  { id:'A11', dispId:'B11', group:'A', label:'地面', icon:'🏁',
+    items:['拋光石英磚','木地板','塑膠地磚','環氧樹脂地板','超耐磨地板','天然石材','SPC地板'],
+    specs:['一般','進口','訂製'], units:['式','m²','坪'] },
+  { id:'A12', dispId:'B12', group:'A', label:'油漆', icon:'🎨',
+    items:['牆面油漆','天花板油漆','特殊塗料','噴漆工程','樂土漆','珪藻土','礦物塗料'],
+    specs:['一般','進口','特殊'], units:['式','m²','坪'] },
+  { id:'A13', dispId:'B13', group:'A', label:'空調', icon:'❄️',
+    items:['冷氣主機','室外機配置','風管工程','冷媒配管','全熱交換機','除濕機','吊隱式冷氣'],
+    specs:['一般','變頻','智能'], units:['式','台','組'] },
+  { id:'A14', dispId:'B14', group:'A', label:'清潔', icon:'🧹',
+    items:['工程清潔','細部清潔','窗戶清潔','地板打蠟','消毒除菌','廚具清潔'],
+    specs:['一般','精緻','深層'], units:['式','坪','次'] },
+  { id:'B01', dispId:'C01', group:'B', label:'磁磚', icon:'⬜',
+    items:['拋光石英磚','復古磚','馬賽克磚','木紋磚','大理石磚','花磚','地鐵磚','大板磚'],
+    specs:['國產','進口','手工'], units:['m²','坪','箱'] },
+  { id:'B02', dispId:'C02', group:'B', label:'衛浴設備', icon:'🚿',
+    items:['馬桶','洗臉盆','浴缸','淋浴拉門','浴室鏡','浴室配件','馬桶蓋','龍頭組'],
+    specs:['國產','進口','精品'], units:['套','個','組'] },
+  { id:'B03', dispId:'C03', group:'B', label:'燈具', icon:'💡',
+    items:['主燈','間接照明','崁燈','立燈','壁燈','軌道燈','戶外燈','夜燈'],
+    specs:['國產','進口','設計師款'], units:['套','個','組','盞'] },
+  { id:'B04', dispId:'C04', group:'B', label:'窗簾', icon:'🪟',
+    items:['捲簾','百葉簾','布簾','木百葉','紗簾','蜂巢簾','羅馬簾','防曬簾'],
+    specs:['國產','進口','訂製'], units:['式','組','窗','才','cm'] },
+  { id:'B05', dispId:'C05', group:'B', label:'軟裝家具', icon:'🛋️',
+    items:['沙發','餐桌椅','主臥床架','床頭燈','地毯','裝飾掛畫','植栽佈置','抱枕組','邊几'],
+    specs:['國產','進口','訂製'], units:['式','件','套'] },
+];
+
+const PIE_COLORS = ['#e4b84a','#50e88a','#5ba4f5'];
+const SEC_COLORS = { D:'gold', A:'green', B:'b' };
+
+function fmt(n){ return 'NT$\u00a0'+Math.round(n).toLocaleString('zh-TW'); }
+
+// ══ BUILD SECTIONS ══
+function buildSections(){
+  const cont = document.getElementById('sections-container');
+  cont.innerHTML = '';
+  GROUPS.forEach(grp => {
+    const divider = document.createElement('div');
+    divider.className = 'group-divider';
+    const cls = grp.id==='B' ? ' b' : grp.id==='D' ? ' gold' : '';
+    divider.innerHTML = `
+      <span class="group-badge${cls}">${grp.icon} ${grp.label}</span>
+      <div class="group-line"></div>
+      <span class="group-total-label">小計</span>
+      <span class="group-total-val${cls}" id="grp-total-${grp.id}">NT$\u00a00</span>`;
+    cont.appendChild(divider);
+
+    SECTIONS.filter(s=>s.group===grp.id).forEach(sec => {
+      const color = SEC_COLORS[sec.group];
+      const el = document.createElement('div');
+      el.className = 'section-card';
+      el.id = 'sec-'+sec.id;
+      const idCls = color==='b' ? ' b' : color==='gold' ? ' gold' : '';
+      el.innerHTML = `
+        <div class="section-head" onclick="toggleSec('${sec.id}')">
+          <div class="section-head-left">
+            <span class="sec-id${idCls}">${sec.dispId||sec.id}</span>
+            <span class="sec-icon">${sec.icon}</span>
+            <span class="sec-name">${sec.label}</span>
+          </div>
+          <div class="sec-right">
+            <span class="sec-total${idCls}" id="total-${sec.id}">NT$\u00a00</span>
+            <span class="caret" id="caret-${sec.id}">▶</span>
+          </div>
+        </div>
+        <div class="section-body" id="body-${sec.id}" style="display:none">
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th class="lock-th"></th>
+                <th style="min-width:130px">項目</th>
+                <th style="min-width:58px">數量</th>
+                <th style="min-width:52px">單位</th>
+                <th style="min-width:88px">單價（元）</th>
+                <th class="cost-col" style="min-width:88px;color:#e84e88">成本（元）</th>
+                <th style="min-width:96px">總價</th>
+                <th style="min-width:76px">規格</th>
+                <th></th>
+              </tr></thead>
+              <tbody id="tbody-${sec.id}"></tbody>
+            </table>
+          </div>
+          <button class="add-btn" onclick="${sec.id==='A03'?`showA03Picker('${sec.id}')`: `addRow('${sec.id}')`}">＋ 新增項目</button>
+        </div>`;
+      cont.appendChild(el);
+    });
+  });
+}
+
+function toggleSec(id){
+  const body = document.getElementById('body-'+id);
+  const caret = document.getElementById('caret-'+id);
+  const hidden = body.style.display === 'none';
+  body.style.display = hidden ? '' : 'none';
+  if(caret){ caret.classList.toggle('open', hidden); }
+}
+
+function addRow(secId, data){
+  const sec = SECTIONS.find(s=>s.id===secId);
+  const tbody = document.getElementById('tbody-'+secId);
+  const tr = document.createElement('tr');
+  const d = data||{};
+  const color = SEC_COLORS[sec.group]||'green';
+  const cls = color==='b' ? ' b' : color==='gold' ? ' gold' : '';
+
+  // item — detect if saved value is custom (not in list)
+  const isCustomItem = d.item && !sec.items.includes(d.item);
+  if(isCustomItem) sec.items.push(d.item); // restore into list
+  const itemOpts = sec.items.map(it=>`<option${d.item===it?' selected':''}>${it}</option>`).join('');
+  const itemSel = `<select class="item-sel" onchange="onItemChange(this);recalc()" style="width:100%">
+    ${itemOpts}
+    <option value="__custom__">✏️ 手動輸入</option>
+  </select>
+  <input type="text" class="custom-item" placeholder="輸入後按 Enter 加入選單"
+    style="display:none;margin-top:3px;width:100%"
+    onkeydown="if(event.key==='Enter'){confirmCustomItem(this);event.preventDefault();}"
+    onblur="confirmCustomItem(this)" onchange="recalc()">`;
+
+  // spec — detect if saved value is custom
+  const isCustomSpec = d.spec && !sec.specs.includes(d.spec);
+  if(isCustomSpec) sec.specs.push(d.spec);
+  const specOpts = sec.specs.map(sp=>`<option${d.spec===sp?' selected':''}>${sp}</option>`).join('');
+  const specSel = `<select class="spec-sel" onchange="onSpecChange(this);recalc()" style="width:100%">
+    ${specOpts}
+    <option value="__custom__">自訂</option>
+  </select>
+  <input type="text" class="custom-spec" placeholder="輸入後按 Enter 加入選單"
+    style="display:none;margin-top:3px;width:100%"
+    onkeydown="if(event.key==='Enter'){confirmCustomSpec(this);event.preventDefault();}"
+    onblur="confirmCustomSpec(this)" onchange="recalc()">`;
+
+  // Load saved custom units for this section
+  const _saved_units = JSON.parse(localStorage.getItem('cu_'+secId)||'[]');
+  _saved_units.forEach(u=>{ if(!sec.units.includes(u)) sec.units.push(u); });
+  const _uOpts = sec.units.map(u=>`<option${(d.unit===u)?' selected':''}>${u}</option>`).join('');
+  const _firstSel = !d.unit ? ' selected' : '';
+  const unitSel = `<select class="unit-sel" onchange="onUnitChange(this,'${secId}');recalc()" style="width:100%">
+    ${sec.units.map((u,i)=>`<option${(d.unit===u||(i===0&&!d.unit))?' selected':''}>${u}</option>`).join('')}
+    <option value="__cu__">✏️ 自訂</option>
+  </select>
+  <input type="text" class="custom-unit" placeholder="輸入後按 Enter"
+    style="display:none;margin-top:3px;width:100%"
+    onkeydown="if(event.key==='Enter'){confirmCustomUnit(this,'${secId}');event.preventDefault();}"
+    onblur="confirmCustomUnit(this,'${secId}')">`;
+
+  const defCost=d.cost!==undefined?d.cost:(d.price||3000);
+
+  // Lock cell
+  const lockTd=`<td class="lock-td"><button class="lock-btn" onclick="toggleLock(this,'${secId}')" title="🔒 鎖定保留此列">🔓</button></td>`;
+
+  // Item cell
+  if(secId==='A03'){
+    a03AddItemInGroup(secId, d.cat||Object.keys(A03_CATS)[0], d);
+    return;
+  }
+  const itemTd=`<td style="min-width:140px">${itemSel}</td>`;
+  tr.innerHTML = `
+    ${lockTd}
+    ${itemTd}
+    <td><input class="qty-inp" type="number" value="${d.qty||1}" min="0.1" step="0.5" onchange="recalc()" style="width:56px"></td>
+    <td>${unitSel}</td>
+    <td><input class="price-inp" type="number" value="${d.price||3000}" min="0" step="100" onchange="recalc()" style="width:84px"></td>
+    <td class="cost-col"><input class="cost-inp" type="number" value="${defCost}" min="0" step="100" onchange="recalc()" style="width:84px;color:#e84e88;font-weight:700"></td>
+    <td class="sub-cell${cls}">NT$\u00a00</td>
+    <td style="min-width:90px">${specSel}</td>
+    <td><button class="rm-btn" onclick="this.closest('tr').remove();saveLockedRows(secId);recalc()" title="刪除">×</button></td>`;
+  tbody.appendChild(tr);
+  // Apply locked state
+  if(d.locked){
+    tr.dataset.locked='true';
+    const lb=tr.querySelector('.lock-btn');
+    if(lb){lb.textContent='🔒';lb.classList.add('locked');}
+    tr.style.background='rgba(80,232,138,0.04)';
+    tr.querySelectorAll('input,select').forEach(el=>{ el.disabled=true; });
+    const rmBtn2=tr.querySelector('.rm-btn');
+    if(rmBtn2) rmBtn2.disabled=true;
+  }
+  recalc();
+}
+
+// ══ A03 HIERARCHICAL DROPDOWN ══
+const A03_CATS = {
+  '迴路':    ['新增迴路8mm','新增迴路5.5mm','新增迴路2.0','新增總切迴路','新增雙切迴路'],
+  '出線':    ['電燈出線','開關出線','插座出線','網路出線','電話出線','電視出線','門鈴出線','HDMI出線','緊急壓扣出線'],
+  '開關插座':['新增開關','新增插座','新增網路插座','新增電話插座','新增電視插座','新增門鈴開關','新增HDMI插座','新增緊急壓扣'],
+  '給排水':  ['給水幹管','排水幹管','新增冷水出口(PVC)','新增熱水出口(壓接)','新增排水出口','糞管位移','糞管延長','糞管出口'],
+  '衛浴':    ['馬桶安裝','洗手台安裝','淋浴設備安裝','暖風機安裝','電毛巾架安裝','毛巾架安裝','風管延長配置'],
+  '燈光':    ['燈具安裝','崁燈挖孔','崁燈安裝'],
+  '現場':    ['打鑿管溝','水泥填補'],
+  '自訂':    [],
+};
+function getA03SubItems(cat){
+  const base=A03_CATS[cat]||[];
+  const saved=JSON.parse(localStorage.getItem('a03s_'+cat)||'[]');
+  return [...new Set([...base,...saved])];
+}
+// ── A03 grouped-table functions ──
+function a03EnsureCatGroup(secId, cat){
+  const tbody=document.getElementById('tbody-'+secId);
+  if(tbody.querySelector(`tr.a03-cat-hdr[data-cat="${cat}"]`)) return;
+  // Category header row
+  const hdr=document.createElement('tr');
+  hdr.className='a03-cat-hdr'; hdr.dataset.cat=cat;
+  hdr.innerHTML=`<td class="lock-td"></td><td colspan="7" class="a03-cat-label">⬡ ${cat}</td><td></td>`;
+  tbody.appendChild(hdr);
+  // Sub-add row
+  const subAdd=document.createElement('tr');
+  subAdd.className='a03-sub-add-row'; subAdd.dataset.cat=cat;
+  subAdd.innerHTML=`<td colspan="9"><button class="a03-add-sub-btn" onclick="a03ShowSubPicker('${secId}','${cat}',this)">＋ 新增子項目</button></td>`;
+  tbody.appendChild(subAdd);
+}
+function a03AddItemInGroup(secId, cat, d){
+  a03EnsureCatGroup(secId, cat);
+  const tbody=document.getElementById('tbody-'+secId);
+  const subAddRow=tbody.querySelector(`tr.a03-sub-add-row[data-cat="${cat}"]`);
+  const sec=SECTIONS.find(s=>s.id===secId);
+  const color=SEC_COLORS[sec.group]||'green';
+  const cls=color==='b'?' b':color==='gold'?' gold':'';
+  const defCost=d.cost!==undefined?d.cost:(d.price||3000);
+  // sub-item select for this category
+  const subItems=getA03SubItems(cat);
+  const subOpts=subItems.map(i=>`<option${d.item===i?' selected':''}>${i}</option>`).join('');
+  // spec select
+  const specOpts=sec.specs.map(sp=>`<option${d.spec===sp?' selected':''}>${sp}</option>`).join('');
+  const specSel=`<select class="spec-sel" onchange="recalc()" style="width:100%">${specOpts}<option value="__custom__">自訂</option></select>`;
+  // unit select
+  const uSaved=JSON.parse(localStorage.getItem('cu_'+secId)||'[]');
+  uSaved.forEach(u=>{if(!sec.units.includes(u)) sec.units.push(u);});
+  const unitOpts=sec.units.map((u,i)=>`<option${(d.unit===u||(i===0&&!d.unit))?' selected':''}>${u}</option>`).join('');
+  const unitSel=`<select class="unit-sel" onchange="onUnitChange(this,'${secId}');recalc()" style="width:100%">${unitOpts}<option value="__cu__">✏️ 自訂</option></select><input type="text" class="custom-unit" placeholder="輸入後按 Enter" style="display:none;margin-top:3px;width:100%" onkeydown="if(event.key==='Enter'){confirmCustomUnit(this,'${secId}');event.preventDefault();}" onblur="confirmCustomUnit(this,'${secId}')">`;
+  const tr=document.createElement('tr');
+  tr.className='a03-item-row'; tr.dataset.cat=cat;
+  tr.innerHTML=`
+    <td class="lock-td"><button class="lock-btn" onclick="toggleLock(this,'${secId}')" title="🔒 鎖定保留此列">🔓</button></td>
+    <td style="min-width:150px"><select class="a03-sub-sel item-sel" onchange="recalc()" style="width:100%">${subOpts}</select></td>
+    <td><input class="qty-inp" type="number" value="${d.qty||1}" min="0.1" step="0.5" onchange="recalc()" style="width:56px"></td>
+    <td>${unitSel}</td>
+    <td><input class="price-inp" type="number" value="${d.price||0}" min="0" step="100" onchange="recalc()" style="width:84px"></td>
+    <td class="cost-col"><input class="cost-inp" type="number" value="${defCost}" min="0" step="100" onchange="recalc()" style="width:84px;color:#e84e88;font-weight:700"></td>
+    <td class="sub-cell${cls}">NT$ 0</td>
+    <td>${specSel}</td>
+    <td><button class="rm-btn" onclick="a03RemoveRow(this,'${secId}','${cat}')" title="刪除">×</button></td>`;
+  tbody.insertBefore(tr, subAddRow);
+  if(d.locked){
+    tr.dataset.locked='true';
+    const lb=tr.querySelector('.lock-btn');
+    if(lb){lb.textContent='🔒';lb.classList.add('locked');}
+    tr.style.background='rgba(80,232,138,0.04)';
+    tr.querySelectorAll('input,select').forEach(el=>{ el.disabled=true; });
+    tr.querySelector('.rm-btn').disabled=true;
+  }
+  recalc();
+}
+function a03RemoveRow(btn, secId, cat){
+  const tr=btn.closest('tr');
+  tr.remove();
+  // If no more item rows for this cat, remove header + sub-add-row
+  const tbody=document.getElementById('tbody-'+secId);
+  if(!tbody.querySelector(`tr.a03-item-row[data-cat="${cat}"]`)){
+    tbody.querySelector(`tr.a03-cat-hdr[data-cat="${cat}"]`)?.remove();
+    tbody.querySelector(`tr.a03-sub-add-row[data-cat="${cat}"]`)?.remove();
+  }
+  saveLockedRows(secId);
+  recalc();
+}
+// Picker state
+let _a03PickerSecId='', _a03PickerCat='', _a03PickerSubBtn=null;
+function showA03Picker(secId){
+  _a03PickerSecId=secId; _a03PickerCat=''; _a03PickerSubBtn=null;
+  const body=document.getElementById('a03-modal-body');
+  body.innerHTML='<div class="a03-picker-title">選擇類別</div><div class="a03-cat-btns">'+
+    Object.keys(A03_CATS).map(c=>`<button class="a03-cat-btn" onclick="a03PickCat('${c}')">${c}</button>`).join('')+
+    `<button class="a03-cat-btn" onclick="a03PickCat('__new_cat__')" style="border-style:dashed">＋ 新增類別</button>`+
+  '</div>';
+  document.getElementById('a03-modal').classList.add('open');
+}
+function a03ShowSubPicker(secId, cat, btn){
+  _a03PickerSecId=secId; _a03PickerCat=cat; _a03PickerSubBtn=btn;
+  a03PickCat(cat);
+  document.getElementById('a03-modal').classList.add('open');
+}
+function a03PickCat(cat){
+  if(cat==='__new_cat__'){
+    const v=prompt('新增類別名稱：');
+    if(!v||!v.trim()) return;
+    const nc=v.trim();
+    if(!A03_CATS[nc]) A03_CATS[nc]=[];
+    a03PickCat(nc); return;
+  }
+  _a03PickerCat=cat;
+  const items=getA03SubItems(cat);
+  const body=document.getElementById('a03-modal-body');
+  body.innerHTML=`<div class="a03-picker-title" style="cursor:pointer" onclick="showA03Picker('${_a03PickerSecId}')">‹ 返回類別 &nbsp;|&nbsp; <span style="color:var(--amber)">${cat}</span></div>`+
+    '<div class="a03-sub-btns">'+
+    items.map(i=>`<button class="a03-sub-btn" onclick="a03PickItem('${i.replace(/'/g,"\\'")}')"> ${i}</button>`).join('')+
+    `<button class="a03-sub-btn" style="border-style:dashed;color:var(--text2)" onclick="a03AddCustomSub()">＋ 自訂項目</button>`+
+    '</div>';
+}
+function a03PickItem(item){
+  a03AddItemInGroup(_a03PickerSecId, _a03PickerCat, {item:item, price:0, qty:1, unit:'式'});
+  // Open the section if closed
+  const body=document.getElementById('body-'+_a03PickerSecId);
+  const caret=document.getElementById('caret-'+_a03PickerSecId);
+  if(body&&body.style.display==='none'){body.style.display='';caret?.classList.add('open');}
+  closeModal();
+}
+function a03AddCustomSub(){
+  const v=prompt('新增「'+_a03PickerCat+'」自訂項目：');
+  if(!v||!v.trim()) return;
+  const item=v.trim();
+  const saved=JSON.parse(localStorage.getItem('a03s_'+_a03PickerCat)||'[]');
+  if(!saved.includes(item)){saved.push(item);localStorage.setItem('a03s_'+_a03PickerCat,JSON.stringify(saved));}
+  if(!A03_CATS[_a03PickerCat]) A03_CATS[_a03PickerCat]=[];
+  if(!A03_CATS[_a03PickerCat].includes(item)) A03_CATS[_a03PickerCat].push(item);
+  a03PickItem(item);
+}
+// Keep for compatibility
+function updateA03Sub(){}
+function a03SubChange(){}
+
+// ══ LOCK ROWS ══
+function toggleLock(btn, secId){
+  const tr=btn.closest('tr');
+  const locked=tr.dataset.locked==='true';
+  const newLocked=!locked;
+  tr.dataset.locked=String(newLocked);
+  btn.textContent=newLocked?'🔒':'🔓';
+  btn.classList.toggle('locked',newLocked);
+  tr.style.background=newLocked?'rgba(80,232,138,0.04)':'';
+  // Disable/enable all fields in this row
+  tr.querySelectorAll('input,select').forEach(el=>{
+    el.disabled=newLocked;
+  });
+  const rmBtn=tr.querySelector('.rm-btn');
+  if(rmBtn) rmBtn.disabled=newLocked;
+  saveLockedRows(secId);
+}
+function getRowDataForLock(tr, secId){
+  const priceEl=tr.querySelector('.price-inp');
+  const qtyEl=tr.querySelector('.qty-inp');
+  const costEl=tr.querySelector('.cost-inp');
+  const unitSel=tr.querySelector('.unit-sel');
+  const specSel=tr.querySelector('.spec-sel');
+  const itemSel=tr.querySelector('.a03-sub-sel')||tr.querySelector('.item-sel');
+  const itemVal=itemSel?.value==='__custom__'?(tr.querySelector('.custom-item')?.value||'')
+    :(itemSel?.value==='__a03add__'?'':(itemSel?.value||''));
+  const specVal=specSel?.value==='__custom__'?(tr.querySelector('.custom-spec')?.value||''):(specSel?.value||'');
+  const unitVal=unitSel?.value==='__cu__'?(tr.querySelector('.custom-unit')?.value||''):(unitSel?.value||'式');
+  return {
+    item:itemVal, cat:tr.dataset?.cat||'',
+    spec:specVal, price:parseFloat(priceEl?.value)||0,
+    qty:parseFloat(qtyEl?.value)||1,
+    cost:parseFloat(costEl?.value)||0,
+    unit:unitVal, locked:true
+  };
+}
+function saveLockedRows(secId){
+  const locked=[];
+  document.querySelectorAll('#tbody-'+secId+' tr[data-locked="true"]').forEach(tr=>{
+    locked.push(getRowDataForLock(tr,secId));
+  });
+  localStorage.setItem('lk_'+secId,JSON.stringify(locked));
+}
+function loadLockedRows(secId){
+  const rows=JSON.parse(localStorage.getItem('lk_'+secId)||'[]');
+  rows.forEach(d=>{
+    if(secId==='A03') a03AddItemInGroup(secId, d.cat||Object.keys(A03_CATS)[0], d);
+    else addRow(secId,d);
+  });
+  if(rows.length>0){
+    const body=document.getElementById('body-'+secId);
+    const caret=document.getElementById('caret-'+secId);
+    if(body&&body.style.display==='none'){body.style.display='';caret?.classList.add('open');}
+  }
+}
+
+
+function onPayTermsChange(sel){
+  const ci = document.getElementById('pay-terms-custom');
+  if(sel.value === '__custom_pay__'){
+    ci.style.display = 'block';
+    ci.focus();
+  } else {
+    ci.style.display = 'none';
+  }
+}
+function syncCustomPayTerms(input){
+  // value is read dynamically in getQuoteData — nothing extra needed
+}
+
+
+function onUnitChange(sel, secId){
+  const td = sel.closest('td');
+  const cu = td.querySelector('.custom-unit');
+  const isC = sel.value==='__cu__';
+  cu.style.display = isC ? 'block' : 'none';
+  if(isC){ cu.value=''; cu.focus(); }
+}
+function confirmCustomUnit(input, secId){
+  const val = input.value.trim();
+  if(!val){ input.style.display='none'; return; }
+  const sec = SECTIONS.find(s=>s.id===secId);
+  if(!sec) return;
+  if(!sec.units.includes(val)) sec.units.push(val);
+  const saved = JSON.parse(localStorage.getItem('cu_'+secId)||'[]');
+  if(!saved.includes(val)){
+    saved.push(val);
+    localStorage.setItem('cu_'+secId, JSON.stringify(saved));
+  }
+  const sel = input.previousElementSibling;
+  // Insert new option before __cu__
+  const customOpt = Array.from(sel.options).find(o=>o.value==='__cu__');
+  // Check if already there
+  if(!Array.from(sel.options).find(o=>o.value===val)){
+    const opt = document.createElement('option');
+    opt.value = val; opt.textContent = val; opt.selected = true;
+    sel.insertBefore(opt, customOpt);
+  } else {
+    sel.value = val;
+  }
+  input.style.display='none';
+  recalc();
+}
+
+function onItemChange(sel){
+  const td = sel.closest('td');
+  const ci = td.querySelector('.custom-item');
+  const isCustom = sel.value === '__custom__';
+  ci.style.display = isCustom ? 'block' : 'none';
+  if(isCustom){ ci.value=''; ci.focus(); }
+}
+function onSpecChange(sel){
+  const td = sel.closest('td');
+  const cs = td.querySelector('.custom-spec');
+  const isCustom = sel.value === '__custom__';
+  cs.style.display = isCustom ? 'block' : 'none';
+  if(isCustom){ cs.value=''; cs.focus(); }
+}
+
+// 確認自訂項目 → 加入下拉選單並切換回 select
+function confirmCustomItem(input){
+  const val = input.value.trim();
+  if(!val) return;
+  const td = input.closest('td');
+  const sel = td.querySelector('.item-sel');
+  const secId = input.closest('tbody').id.replace('tbody-','');
+  const sec = SECTIONS.find(s=>s.id===secId);
+  // 加入 section items（讓之後新增的列也能選到）
+  if(!sec.items.includes(val)) sec.items.push(val);
+  // 在所有同 section 的 item-sel 加入這個選項（如果還沒有）
+  document.querySelectorAll(`#tbody-${secId} .item-sel`).forEach(s=>{
+    if(![...s.options].some(o=>o.value===val)){
+      const opt = document.createElement('option');
+      opt.value = val; opt.text = val;
+      s.insertBefore(opt, s.lastElementChild); // 插在「手動輸入」前
+    }
+    s.value = val; // 切換到新選項
+  });
+  input.style.display = 'none';
+  recalc();
+}
+function confirmCustomSpec(input){
+  const val = input.value.trim();
+  if(!val) return;
+  const td = input.closest('td');
+  const sel = td.querySelector('.spec-sel');
+  const secId = input.closest('tbody').id.replace('tbody-','');
+  const sec = SECTIONS.find(s=>s.id===secId);
+  if(!sec.specs.includes(val)) sec.specs.push(val);
+  document.querySelectorAll(`#tbody-${secId} .spec-sel`).forEach(s=>{
+    if(![...s.options].some(o=>o.value===val)){
+      const opt = document.createElement('option');
+      opt.value = val; opt.text = val;
+      s.insertBefore(opt, s.lastElementChild);
+    }
+    s.value = val;
+  });
+  input.style.display = 'none';
+  recalc();
+}
+
+function getSectionTotal(secId){
+  let quoteT=0, costT=0;
+  document.querySelectorAll(`#tbody-${secId} tr`).forEach(tr=>{
+    if(tr.classList.contains('a03-cat-hdr')||tr.classList.contains('a03-sub-add-row')) return;
+    const priceEl=tr.querySelector('.price-inp');
+    const qtyEl=tr.querySelector('.qty-inp');
+    const costEl=tr.querySelector('.cost-inp');
+    const sc=tr.querySelector('.sub-cell');
+    if(priceEl&&qtyEl){
+      const qty=parseFloat(qtyEl.value)||1;
+      const sub=(parseFloat(priceEl.value)||0)*qty;
+      if(sc) sc.textContent=fmt(sub);
+      quoteT+=sub;
+      if(costEl) costT+=(parseFloat(costEl.value)||0)*qty;
+    }
+  });
+  document.getElementById('total-'+secId).textContent=fmt(quoteT);
+  return {quoteT,costT};
+}
+
+function recalc(){
+  const results=SECTIONS.map(s=>getSectionTotal(s.id));
+  const quoteSum=results.reduce((a,r)=>a+r.quoteT,0);
+  const costSum=results.reduce((a,r)=>a+r.costT,0);
+  const area=parseFloat(document.getElementById('area').value)||1;
+  document.getElementById('cost-total').textContent=fmt(costSum);
+  document.getElementById('quote-total').textContent=fmt(quoteSum);
+  document.getElementById('per-ping').textContent=fmt(quoteSum/area);
+  const ap=costSum>0?((quoteSum-costSum)/costSum*100):0;
+  const apEl=document.getElementById('actual-profit-label');
+  if(apEl) apEl.textContent=ap.toFixed(1)+'%';
+  GROUPS.forEach(grp=>{
+    const secs=SECTIONS.filter(s=>s.group===grp.id);
+    const gt=secs.reduce((a,s)=>a+(results[SECTIONS.indexOf(s)]?.quoteT||0),0);
+    const el=document.getElementById('grp-total-'+grp.id);
+    if(el) el.textContent=fmt(gt);
+  });
+  drawPie(results.map(r=>r.quoteT));
+}
+
+function drawPie(vals){
+  const canvas = document.getElementById('pie-chart');
+  const ctx = canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  const cx=W/2, cy=H/2, r=W*0.43, ri=W*0.21;
+  ctx.clearRect(0,0,W,H);
+
+  const total = vals.reduce((a,b)=>a+b,0)||1;
+
+  // Per-section shade variants within each group (for visual differentiation)
+  const grpSecCount = {};
+  const grpSecIdx = {};
+  SECTIONS.forEach(s=>{
+    grpSecCount[s.group]=(grpSecCount[s.group]||0)+1;
+    grpSecIdx[s.id] = (grpSecIdx[s.group]||0);
+    grpSecIdx[s.group] = (grpSecIdx[s.group]||0)+1;
+  });
+
+  // Draw slices with thin separators
+  let angle=-Math.PI/2;
+  const sliceAngles=[];
+  SECTIONS.forEach((s,i)=>{
+    const v=vals[i]||0;
+    const gIdx=GROUPS.findIndex(g=>g.id===s.group);
+    const sweep=v/total*Math.PI*2;
+    sliceAngles.push({start:angle,sweep,gIdx,v});
+    if(v>0 && sweep>0.008){
+      const gap=0.012;
+      ctx.beginPath(); ctx.moveTo(cx,cy);
+      ctx.arc(cx,cy,r,angle+gap,angle+sweep-gap);
+      ctx.closePath();
+      // Slight brightness variation per sub-item
+      const idx=grpSecIdx[s.id]||0;
+      const cnt=grpSecCount[s.group]||1;
+      const t=cnt>1?idx/(cnt-1)*0.28:0;
+      const base=PIE_COLORS[gIdx];
+      ctx.fillStyle=base;
+      ctx.globalAlpha=0.72+t*0.28;
+      ctx.fill();
+    }
+    angle+=sweep;
+  });
+  ctx.globalAlpha=1;
+
+  // Inner hole
+  ctx.beginPath(); ctx.arc(cx,cy,ri,0,Math.PI*2);
+  ctx.fillStyle='#1a1a20'; ctx.fill();
+
+  // Group labels A/B/C on outer rim
+  const groupLabels=['A','B','C'];
+  GROUPS.forEach((grp,gi)=>{
+    const secs=SECTIONS.filter(s=>s.group===grp.id);
+    const grpTotal=secs.reduce((a,s)=>a+(vals[SECTIONS.indexOf(s)]||0),0);
+    if(grpTotal===0) return;
+    const firstI=SECTIONS.findIndex(s=>s.group===grp.id);
+    let lastI=firstI;
+    SECTIONS.forEach((s,i)=>{ if(s.group===grp.id&&vals[i]>0) lastI=i; });
+    const startA=sliceAngles[firstI]?.start||0;
+    const endA=(sliceAngles[lastI]?.start||0)+(sliceAngles[lastI]?.sweep||0);
+    const midA=(startA+endA)/2;
+    const lR=(r+ri)/2;
+    const lx=cx+lR*Math.cos(midA);
+    const ly=cy+lR*Math.sin(midA);
+    const sweep=grpTotal/total*Math.PI*2;
+    if(sweep>0.3){
+      ctx.font='bold 13px -apple-system,sans-serif';
+      ctx.textAlign='center';
+      ctx.textBaseline='middle';
+      ctx.fillStyle='rgba(0,0,0,0.7)';
+      ctx.fillText(groupLabels[gi],lx+0.5,ly+0.5);
+      ctx.fillStyle='#fff';
+      ctx.fillText(groupLabels[gi],lx,ly);
+    }
+  });
+
+  // ── GANTT LEGEND ──
+  const legend=document.getElementById('pie-legend');
+  let lHtml='';
+  GROUPS.forEach((grp,gi)=>{
+    const secs=SECTIONS.filter(s=>s.group===grp.id);
+    const grpTotal=secs.reduce((a,s)=>a+(vals[SECTIONS.indexOf(s)]||0),0);
+    if(grpTotal===0) return;
+    const gpct=Math.round(grpTotal/total*100);
+    const color=PIE_COLORS[gi];
+    const lbl=groupLabels[gi];
+    lHtml+=`<div class="gantt-group">
+      <div class="gantt-group-row">
+        <span class="gantt-group-label" style="color:${color}">${lbl}</span>
+        <span class="gantt-group-name">${grp.label}</span>
+        <span class="gantt-pct">${gpct}%</span>
+        <span class="gantt-amt">${fmt(grpTotal)}</span>
+      </div>
+      <div class="gantt-bar-track">
+        <div class="gantt-bar-fill" style="width:${gpct}%;background:${color}"></div>
+      </div>`;
+    secs.forEach(s=>{
+      const si=SECTIONS.indexOf(s);
+      const sv=vals[si]||0;
+      if(sv===0) return;
+      const spct=Math.round(sv/total*100);
+      const dispId=s.dispId||s.id;
+      lHtml+=`<div class="gantt-sub">
+        <div class="gantt-sub-row">
+          <span class="gantt-sub-id">${dispId}</span>
+          <span class="gantt-sub-name">${s.label}</span>
+          <span class="gantt-sub-pct">${spct}%</span>
+          <span class="gantt-sub-amt">${fmt(sv)}</span>
+        </div>
+        <div class="gantt-sub-track">
+          <div class="gantt-sub-fill" style="width:${spct}%;background:${color}"></div>
+        </div>
+      </div>`;
+    });
+    lHtml+='</div>';
+  });
+  legend.innerHTML=lHtml||'<div style="color:var(--text3);font-size:13px;padding:20px 0">尚未輸入任何費用</div>';
+}
+
+function updateSpaceType(){
+  const m={apartment:30,house:55,office:60,shop:40,new:35,old:28};
+  document.getElementById('area').value=m[document.getElementById('space-type').value]||30;
+  recalc();
+}
+
+// ══ QUOTE DATA ══
+function getQuoteData(){
+  const rows={};
+  SECTIONS.forEach(sec=>{
+    rows[sec.id]=[];
+    document.querySelectorAll(`#tbody-${sec.id} tr`).forEach(tr=>{
+      if(tr.classList.contains('a03-cat-hdr')||tr.classList.contains('a03-sub-add-row')) return;
+      const catSel2=null; // cat now in tr.dataset.cat
+      const rawItemSel=tr.querySelector('.a03-sub-sel')||tr.querySelector('.item-sel');
+      const specSel=tr.querySelector('.spec-sel');
+      const unitSel=tr.querySelector('.unit-sel');
+      const itemVal = rawItemSel?.value==='__custom__'?(tr.querySelector('.custom-item')?.value||'')
+        :(rawItemSel?.value==='__a03add__'?'':(rawItemSel?.value||''));
+      const specVal = specSel?.value==='__custom__'
+        ? (tr.querySelector('.custom-spec')?.value||'')
+        : (specSel?.value||'');
+      const priceEl2=tr.querySelector('.price-inp');
+      const qtyEl2=tr.querySelector('.qty-inp');
+      const costEl2=tr.querySelector('.cost-inp');
+      if(priceEl2&&qtyEl2&&itemVal) rows[sec.id].push({
+        item:itemVal, cat:tr.dataset.cat||'', spec:specVal,
+        price:parseFloat(priceEl2.value)||0,
+        qty:parseFloat(qtyEl2.value)||1,
+        cost:parseFloat(costEl2?.value)||0,
+        unit:unitSel?.value
+      });
+    });
+  });
+  return {
+    client:document.getElementById('client-name').value,
+    phone:document.getElementById('client-phone').value,
+    email:document.getElementById('client-email').value,
+    addr:document.getElementById('project-addr').value,
+    area:document.getElementById('area').value,
+    style:document.getElementById('style-type').value,
+    spaceType:document.getElementById('space-type').value,
+    note:document.getElementById('note').value,
+    bankName:document.getElementById('bank-name').value,
+    bankBranch:document.getElementById('bank-branch').value,
+    bankHolder:document.getElementById('bank-holder').value,
+    bankAccount:document.getElementById('bank-account').value,
+    payTerms:(()=>{
+      const sel=document.getElementById('pay-terms');
+      if(sel.value==='__custom_pay__'){
+        return document.getElementById('pay-terms-custom').value||'自訂';
+      }
+      return sel.value;
+    })(),
+    validDays:document.getElementById('valid-days').value,
+    startDate:document.getElementById('start-date').value,
+    sigName:document.getElementById('sig-name').value,
+    sigDate:document.getElementById('sig-date').value,
+    rows, date:new Date().toLocaleDateString('zh-TW')
+  };
+}
+
+function saveQuote(){
+  const data=getQuoteData();
+  if(!data.client){ alert('請先填入客戶姓名再存檔'); return; }
+  const list=JSON.parse(localStorage.getItem('id_quotes_v3')||'[]');
+  list.unshift({id:Date.now(),...data});
+  localStorage.setItem('id_quotes_v3',JSON.stringify(list.slice(0,30)));
+  alert(`✅ 已存檔：${data.client}（${data.date}）`);
+}
+
+function loadQuote(data){
+  ['client-name','client-phone','client-email','project-addr','area','note',
+   'bank-name','bank-branch','bank-holder','bank-account','valid-days','start-date',
+   'sig-name','sig-date'].forEach(id=>{
+    const el=document.getElementById(id);
+    const key=id.replace(/-([a-z])/g,(_,c)=>c.toUpperCase())
+               .replace('clientName','client').replace('clientPhone','phone')
+               .replace('clientEmail','email').replace('projectAddr','addr')
+               .replace('bankName','bankName').replace('bankBranch','bankBranch')
+               .replace('bankHolder','bankHolder').replace('bankAccount','bankAccount')
+               .replace('validDays','validDays').replace('startDate','startDate')
+               .replace('sigName','sigName').replace('sigDate','sigDate');
+    if(el) el.value=data[key]||'';
+  });
+  // manual
+  document.getElementById('client-name').value=data.client||'';
+  document.getElementById('client-phone').value=data.phone||'';
+  document.getElementById('client-email').value=data.email||'';
+  document.getElementById('project-addr').value=data.addr||'';
+  document.getElementById('area').value=data.area||30;
+  document.getElementById('note').value=data.note||'';
+  document.getElementById('bank-name').value=data.bankName||'';
+  document.getElementById('bank-branch').value=data.bankBranch||'';
+  document.getElementById('bank-holder').value=data.bankHolder||'';
+  document.getElementById('bank-account').value=data.bankAccount||'';
+  document.getElementById('valid-days').value=data.validDays||30;
+  document.getElementById('start-date').value=data.startDate||'';
+  // Restore pay-terms
+  (function(){
+    const sel=document.getElementById('pay-terms');
+    const presets=Array.from(sel.options).map(o=>o.value).filter(v=>v!=='__custom_pay__');
+    if(data.payTerms && !presets.includes(data.payTerms)){
+      sel.value='__custom_pay__';
+      const ci=document.getElementById('pay-terms-custom');
+      ci.style.display='block'; ci.value=data.payTerms;
+    } else if(data.payTerms){
+      sel.value=data.payTerms;
+      document.getElementById('pay-terms-custom').style.display='none';
+    }
+  })();
+  document.getElementById('sig-name').value=data.sigName||'';
+  document.getElementById('sig-date').value=data.sigDate||'';
+  SECTIONS.forEach(sec=>{
+    document.getElementById('tbody-'+sec.id).innerHTML='';
+    (data.rows?.[sec.id]||[]).forEach(r=>addRow(sec.id,r));
+  });
+  closeModal(); recalc();
+}
+
+function showHistory(){
+  const list=JSON.parse(localStorage.getItem('id_quotes_v3')||'[]');
+  const cont=document.getElementById('history-content');
+  if(!list.length){ cont.innerHTML='<div class="empty">尚無歷史記錄</div>'; }
+  else {
+    cont.innerHTML='<div>'+list.map(q=>{
+      const quote=SECTIONS.reduce((a,s)=>a+(q.rows?.[s.id]||[]).reduce((b,r)=>b+r.price*r.qty,0),0);
+      const cost=quote;
+      return `<div class="hist-item">
+        <div>
+          <div style="font-size:13px;font-weight:600">${q.client} — ${q.addr||'未填地址'}</div>
+          <div class="hist-meta">${q.date} · ${q.area}坪 · ${q.style||''} · 報價 ${fmt(quote)}</div>
+        </div>
+        <div class="hist-btns">
+          <button class="hist-btn" onclick="loadQuote(${JSON.stringify(q).replace(/"/g,'&quot;')})">載入</button>
+          <button class="hist-btn del" onclick="deleteQuote(${q.id})">刪除</button>
+        </div>
+      </div>`;
+    }).join('')+'</div>';
+  }
+  document.getElementById('history-modal').classList.add('open');
+}
+
+function deleteQuote(id){
+  if(!confirm('確定刪除？')) return;
+  const list=JSON.parse(localStorage.getItem('id_quotes_v3')||'[]').filter(q=>q.id!==id);
+  localStorage.setItem('id_quotes_v3',JSON.stringify(list)); showHistory();
+}
+function clearHistory(){
+  if(!confirm('確定清除所有歷史？')) return;
+  localStorage.removeItem('id_quotes_v3'); showHistory();
+}
+function closeModal(){ document.querySelectorAll('.modal-bg').forEach(m=>m.classList.remove('open')); }
+document.addEventListener('click',e=>{ if(e.target.classList.contains('modal-bg')) closeModal(); });
+
+function clearAll(){
+  if(!confirm('確定清除所有資料？')) return;
+  SECTIONS.forEach(s=>{ document.getElementById('tbody-'+s.id).innerHTML=''; });
+  ['client-name','client-phone','client-email','project-addr','note',
+   'bank-name','bank-branch','bank-holder','bank-account','start-date','sig-name','sig-date']
+    .forEach(id=>{ document.getElementById(id).value=''; });
+  document.getElementById('area').value=30;
+  clearSig(); recalc();
+}
+
+function copyText(){
+  const data=getQuoteData();
+  const quoteSum=SECTIONS.reduce((a,s)=>a+(data.rows[s.id]||[]).reduce((b,r)=>b+r.price*r.qty,0),0);
+  const costSum=SECTIONS.reduce((a,s)=>a+(data.rows[s.id]||[]).reduce((b,r)=>b+(r.cost||0)*r.qty,0),0);
+  const ap=costSum>0?((quoteSum-costSum)/costSum*100):0;
+  const quote=quoteSum; const cost=costSum;
+  const area=parseFloat(data.area)||1;
+  let txt=`【室內設計報價單】\n━━━━━━━━━━━━━━━━\n`;
+  txt+=`客戶：${data.client||'—'}　電話：${data.phone||'—'}\n`;
+  txt+=`地址：${data.addr||'—'}\n`;
+  txt+=`坪數：${data.area} 坪 ｜ 風格：${data.style||'—'}\n`;
+  txt+=`日期：${data.date}\n\n`;
+  GROUPS.forEach(grp=>{
+    const secs=SECTIONS.filter(s=>s.group===grp.id&&(data.rows[s.id]||[]).length>0);
+    if(!secs.length) return;
+    txt+=`▌▌ ${grp.label}\n`;
+    secs.forEach(sec=>{
+      txt+=`  ▸ ${sec.id} ${sec.label}\n`;
+      (data.rows[sec.id]||[]).forEach(r=>{ txt+=`    ${r.item}（${r.spec}）× ${r.qty} ${r.unit}  總價:${fmt(r.price*r.qty)}\n`; });
+    });
+    txt+='\n';
+  });
+  txt+=`━━━━━━━━━━━━━━━━\n`;
+  txt+=`工料總成本：${fmt(cost)}\n利潤率：${ap.toFixed(1)}%\n`;
+  txt+=`📌 建議報價：${fmt(quote)}\n每坪單價：${fmt(quote/area)}\n`;
+  if(data.bankAccount) txt+=`\n匯款：${data.bankHolder} ${data.bankAccount}（${data.bankName} ${data.bankBranch}）\n`;
+  txt+=`付款：${data.payTerms||'—'}　有效期：${data.validDays||30}天\n`;
+  if(data.note) txt+=`\n備註：${data.note}\n`;
+  document.getElementById('copy-text').value=txt;
+  document.getElementById('copy-modal').classList.add('open');
+}
+function doCopy(){
+  const ta=document.getElementById('copy-text');
+  ta.select(); ta.setSelectionRange(0,99999);
+  navigator.clipboard.writeText(ta.value).then(()=>alert('✅ 已複製！'));
+}
+
+// ══ SIGNATURE ══
+const sigCanvas = document.getElementById('sig-canvas');
+const sigCtx = sigCanvas.getContext('2d');
+let sigDrawing = false;
+
+function resizeSigCanvas(){
+  const w = sigCanvas.parentElement.clientWidth;
+  sigCanvas.width = w;
+  sigCanvas.height = 130;
+  sigCtx.strokeStyle = '#c8e6c9';
+  sigCtx.lineWidth = 2.2;
+  sigCtx.lineCap = 'round';
+  sigCtx.lineJoin = 'round';
+}
+resizeSigCanvas();
+window.addEventListener('resize', resizeSigCanvas);
+
+function getSigPos(e){
+  const rect=sigCanvas.getBoundingClientRect();
+  const sx=sigCanvas.width/rect.width, sy=sigCanvas.height/rect.height;
+  const src=e.touches?.[0]||e;
+  return{x:(src.clientX-rect.left)*sx,y:(src.clientY-rect.top)*sy};
+}
+sigCanvas.addEventListener('mousedown',e=>{sigDrawing=true;const p=getSigPos(e);sigCtx.beginPath();sigCtx.moveTo(p.x,p.y);});
+sigCanvas.addEventListener('mousemove',e=>{if(!sigDrawing)return;const p=getSigPos(e);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();});
+sigCanvas.addEventListener('mouseup',()=>sigDrawing=false);
+sigCanvas.addEventListener('mouseleave',()=>sigDrawing=false);
+sigCanvas.addEventListener('touchstart',e=>{e.preventDefault();sigDrawing=true;const p=getSigPos(e);sigCtx.beginPath();sigCtx.moveTo(p.x,p.y);});
+sigCanvas.addEventListener('touchmove',e=>{e.preventDefault();if(!sigDrawing)return;const p=getSigPos(e);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();});
+sigCanvas.addEventListener('touchend',()=>sigDrawing=false);
+function clearSig(){ sigCtx.clearRect(0,0,sigCanvas.width,sigCanvas.height); }
+function saveSigImage(){
+  const link=document.createElement('a'); link.download='signature.png'; link.href=sigCanvas.toDataURL(); link.click();
+}
+
+
+
+// ══ DEFAULTS ══
+function initDefaults(){
+  // First: restore all locked rows
+  SECTIONS.forEach(s=>loadLockedRows(s.id));
+
+  // Then: add sample defaults only for sections still empty
+  const defaults=[
+    {secId:'D01',rows:[{item:'室內設計費',spec:'全案設計',price:0,qty:1,unit:'式'},{item:'3D透視圖',spec:'含3D',price:0,qty:3,unit:'式'}]},
+    {secId:'D02',rows:[{item:'室內裝修申請',spec:'代辦',price:0,qty:1,unit:'式'}]},
+    {secId:'A03',rows:[{item:'新增迴路8mm',cat:'迴路',spec:'一般',price:1200,qty:3,unit:'式'},{item:'新增冷水出口(PVC)',cat:'給排水',spec:'一般',price:800,qty:4,unit:'個'}]}, // uses a03AddItemInGroup
+    {secId:'A05',rows:[{item:'泥作地坪',spec:'一般',price:2500,qty:8,unit:'m²'},{item:'防水工程',spec:'加強',price:5000,qty:1,unit:'式'}]},
+    {secId:'A07',rows:[{item:'天花板木作',spec:'一般',price:3500,qty:8,unit:'m²'},{item:'電視牆木作',spec:'訂製',price:45000,qty:1,unit:'式'}]},
+    {secId:'A08',rows:[{item:'主臥衣櫃',spec:'國產系統',price:55000,qty:1,unit:'式'}]},
+    {secId:'B03',rows:[{item:'崁燈',spec:'國產',price:800,qty:20,unit:'個'}]},
+    {secId:'B05',rows:[{item:'沙發',spec:'國產',price:28000,qty:1,unit:'套'}]},
+  ];
+  defaults.forEach(d=>{
+    if(document.querySelectorAll('#tbody-'+d.secId+' tr').length===0){
+      d.rows.forEach(r=>addRow(d.secId,r));
+    }
+    if(document.querySelectorAll('#tbody-'+d.secId+' tr').length>0){
+      const body=document.getElementById('body-'+d.secId);
+      const caret=document.getElementById('caret-'+d.secId);
+      if(body&&body.style.display==='none'){ body.style.display=''; caret?.classList.add('open'); }
+    }
+  });
+}
+
+// ══ DATE ══
+document.getElementById('quote-date').textContent='報價日期：'+new Date().toLocaleDateString('zh-TW');
+
+buildSections();
+initDefaults();
+recalc();
+</script>
+</body>
+</html>
