@@ -553,7 +553,34 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   .pie-canvas-wrap { display:none !important; }
   .gantt-amt, .gantt-pct, .gantt-sub-amt, .gantt-sub-pct { color:#111 !important; }
 }
+
+
+/* ── Cloud sync ── */
+.cloud-banner { display:none; align-items:center; gap:10px; padding:9px 14px; background:var(--blue-dim); border:1px solid rgba(91,164,245,0.3); border-radius:8px; margin-bottom:10px; font-size:12px; color:var(--blue); }
+.cloud-banner.show { display:flex; }
+.cloud-banner button { font-size:11px; padding:3px 12px; border-radius:5px; border:1px solid rgba(91,164,245,0.4); background:none; color:var(--blue); cursor:pointer; font-family:inherit; white-space:nowrap; }
+.cloud-banner button:hover { background:rgba(91,164,245,0.1); }
+/* ── Price validation ── */
+.price-error { border-color:#f87171 !important; box-shadow:0 0 0 2px rgba(240,112,112,0.22) !important; }
+.validate-banner {
+  display:none; background:rgba(240,112,112,0.1); border:1px solid rgba(240,112,112,0.3);
+  border-radius:8px; padding:10px 14px; margin-bottom:10px;
+  font-size:12px; color:#f87171; line-height:1.6;
+}
+.validate-banner.show { display:block; }
+/* ── Templates ── */
+.tpl-item { display:flex; align-items:center; gap:10px; padding:10px 14px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; margin-bottom:7px; }
+.tpl-name { flex:1; font-size:13px; font-weight:600; }
+.tpl-date { font-size:11px; color:var(--text2); }
+.tpl-btns { display:flex; gap:5px; flex-shrink:0; }
+.tpl-btn { font-size:11px; padding:4px 10px; border-radius:5px; border:1px solid var(--border2); background:var(--surface); color:var(--text); cursor:pointer; font-family:inherit; transition:all 0.15s; }
+.tpl-btn.load { color:var(--green); border-color:rgba(80,232,138,0.3); background:rgba(80,232,138,0.06); }
+.tpl-btn.load:hover { background:rgba(80,232,138,0.14); }
+.tpl-btn.del:hover { color:var(--red); border-color:rgba(240,112,112,0.3); background:var(--red-dim); }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -576,7 +603,13 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
       <div class="logo-sub">室內設計報價系統</div>
     </div>
   </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span id="cloud-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--text3);flex-shrink:0" title="雲端狀態"></span>
+    <span id="cloud-status" style="font-size:11px;color:var(--text2);white-space:nowrap">連線中…</span>
+  </div>
   <div class="topbar-actions">
+    <button class="btn btn-blue" onclick="showSync()">☁️ 跨裝置</button>
+    <button class="btn btn-ghost" onclick="showTemplates()">📁 模板</button>
     <button class="btn btn-ghost" onclick="showHistory()">📋 歷史報價</button>
     <button class="btn btn-amber" onclick="saveQuote()">💾 存檔</button>
     <button class="btn btn-green" onclick="window.print()">🖨️ 列印 / PDF</button>
@@ -620,6 +653,8 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   </div>
 </div>
 
+<div class="cloud-banner" id="cloud-banner"><span id="cloud-banner-msg" style="flex:1">☁️ 其他裝置有新資料</span><button onclick="applyCloudUpdate()">立即同步</button><button onclick="dismissCloudBanner()" style="opacity:0.6">略過</button></div>
+<div class="validate-banner" id="validate-banner">⚠️ <b>單價不得低於成本：</b><span id="validate-msg"></span></div>
 <!-- ★★★ 報價總覽 (最重要) ★★★ -->
 <div class="cost-box">
   <div class="cost-box-header">
@@ -725,6 +760,67 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
     <div id="a03-modal-body" style="min-height:80px"></div>
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="closeModal()">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: 模板管理 -->
+<div class="modal-bg" id="template-modal">
+  <div class="modal" style="max-width:580px">
+    <div class="modal-title">📁 模板管理</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+      <input type="text" id="tpl-name-input" placeholder="輸入模板名稱（例：住宅標準版）" style="flex:1;min-width:160px">
+      <button class="btn btn-green" onclick="saveTemplate()">💾 儲存目前為模板</button>
+    </div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:10px;padding:8px 12px;background:var(--surface2);border-radius:6px">
+      💡 套用模板會載入工程項目，<b>不影響客戶資訊、匯款資訊、簽名</b>。最多儲存 20 個模板。
+    </div>
+    <div id="tpl-list"><div class="empty">尚未儲存任何模板</div></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal()">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: 跨裝置同步 -->
+<div class="modal-bg" id="sync-modal">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-title">☁️ 跨裝置編輯</div>
+    <div class="sync-tabs">
+      <button class="sync-tab active" id="stab-out" onclick="syncTab('out')">📤 匯出（當前裝置）</button>
+      <button class="sync-tab" id="stab-in"  onclick="syncTab('in')">📥 匯入（其他裝置）</button>
+    </div>
+
+    <!-- 匯出 -->
+    <div id="sync-out">
+      <div class="sync-step"><div class="sync-step-num">1</div>點下方按鈕產生同步代碼</div>
+      <div class="sync-step"><div class="sync-step-num">2</div>複製代碼，用 LINE / Email / AirDrop 傳給自己</div>
+      <div class="sync-step"><div class="sync-step-num">3</div>在其他裝置開啟系統，點「☁️ 跨裝置」→「匯入」貼上即可</div>
+      <div style="display:flex;gap:8px;margin:14px 0 10px">
+        <button class="btn btn-green" style="flex:1" onclick="genSyncCode()">🔄 產生同步代碼</button>
+        <button class="btn btn-ghost" id="btn-copy-code" style="flex:1;display:none" onclick="copySyncCode()">📋 複製代碼</button>
+        <button class="btn btn-ghost" id="btn-share-code" style="flex:1;display:none" onclick="shareSyncCode()">📨 分享</button>
+      </div>
+      <textarea class="sync-code" id="sync-out-code" readonly placeholder="按上方按鈕產生..."></textarea>
+      <div style="text-align:center;margin-top:10px">
+        <div class="sync-qr-wrap" id="sync-qr-wrap" style="display:none"></div>
+        <div id="sync-qr-note" style="font-size:11px;color:var(--text2);margin-top:4px"></div>
+      </div>
+    </div>
+
+    <!-- 匯入 -->
+    <div id="sync-in" style="display:none">
+      <div class="sync-step"><div class="sync-step-num">1</div>從 LINE / Email 複製收到的同步代碼</div>
+      <div class="sync-step"><div class="sync-step-num">2</div>貼入下方欄位，按「匯入還原」</div>
+      <textarea class="sync-code" id="sync-in-code" placeholder="請貼上同步代碼..." style="height:120px;margin:12px 0"></textarea>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btn-ghost" onclick="closeModal()">取消</button>
+        <button class="btn btn-green" onclick="doImport()">✅ 匯入還原</button>
+      </div>
+    </div>
+
+    <div class="modal-foot" id="sync-foot">
+      <button class="btn btn-ghost" onclick="closeModal()">關閉</button>
     </div>
   </div>
 </div>
@@ -1321,6 +1417,36 @@ function recalc(){
     if(el) el.textContent=fmt(gt);
   });
   drawPie(results.map(r=>r.quoteT));
+  validatePrices();
+}
+
+function validatePrices(){
+  const errs=[];
+  document.querySelectorAll('tbody tr').forEach(tr=>{
+    if(tr.classList.contains('a03-cat-hdr')||tr.classList.contains('a03-sub-add-row')) return;
+    const priceEl=tr.querySelector('.price-inp');
+    const costEl=tr.querySelector('.cost-inp');
+    if(!priceEl||!costEl) return;
+    const price=parseFloat(priceEl.value)||0;
+    const cost=parseFloat(costEl.value)||0;
+    if(cost>price && price>0){
+      costEl.classList.add('price-error');
+      priceEl.classList.add('price-error');
+      const item=tr.querySelector('.a03-sub-sel,.item-sel');
+      errs.push(item?.value||'項目');
+    } else {
+      costEl.classList.remove('price-error');
+      priceEl.classList.remove('price-error');
+    }
+  });
+  const banner=document.getElementById('validate-banner');
+  const msgEl=document.getElementById('validate-msg');
+  if(errs.length>0){
+    banner.classList.add('show');
+    msgEl.textContent=errs.slice(0,4).join('、')+(errs.length>4?` 等 ${errs.length} 項`:'');
+  } else {
+    banner.classList.remove('show');
+  }
 }
 
 function drawPie(vals){
@@ -1503,13 +1629,275 @@ function getQuoteData(){
   };
 }
 
+// ══ TEMPLATE MANAGEMENT ══
+function showTemplates(){
+  renderTplList();
+  document.getElementById('template-modal').classList.add('open');
+}
+function renderTplList(){
+  const list=JSON.parse(localStorage.getItem('templates_v1')||'[]');
+  const cont=document.getElementById('tpl-list');
+  if(!list.length){ cont.innerHTML='<div class="empty">尚未儲存任何模板</div>'; return; }
+  cont.innerHTML=list.map((t,i)=>{
+    const cnt=SECTIONS.reduce((a,s)=>a+(t.data.rows?.[s.id]||[]).length,0);
+    return `<div class="tpl-item">
+      <div>
+        <div class="tpl-name">${t.name}</div>
+        <div class="tpl-date">${t.date} &nbsp;·&nbsp; ${cnt} 個項目</div>
+      </div>
+      <div class="tpl-btns">
+        <button class="tpl-btn load" onclick="applyTemplate(${i})">套用</button>
+        <button class="tpl-btn del" onclick="deleteTemplate(${i})">刪除</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function saveTemplate(){
+  const name=document.getElementById('tpl-name-input').value.trim();
+  if(!name){ alert('請輸入模板名稱'); return; }
+  const data=getQuoteData();
+  const list=JSON.parse(localStorage.getItem('templates_v1')||'[]');
+  const idx=list.findIndex(t=>t.name===name);
+  const entry={name, data, date:new Date().toLocaleDateString('zh-TW')};
+  if(idx>=0){
+    if(!confirm(`模板「${name}」已存在，要覆蓋嗎？`)) return;
+    list[idx]=entry;
+  } else {
+    list.unshift(entry);
+  }
+  localStorage.setItem('templates_v1',JSON.stringify(list.slice(0,20)));
+  document.getElementById('tpl-name-input').value='';
+  renderTplList();
+  alert(`✅ 模板「${name}」已儲存！`);
+}
+function applyTemplate(idx){
+  if(!confirm('套用模板會覆蓋目前所有工程項目，客戶資訊不受影響。確定嗎？')) return;
+  const list=JSON.parse(localStorage.getItem('templates_v1')||'[]');
+  const t=list[idx];
+  if(!t) return;
+  // Clear all section rows
+  SECTIONS.forEach(s=>{
+    const tb=document.getElementById('tbody-'+s.id);
+    if(tb) tb.innerHTML='';
+  });
+  // Load template rows
+  SECTIONS.forEach(sec=>{
+    (t.data.rows?.[sec.id]||[]).forEach(r=>{
+      if(typeof a03AddItemInGroup==='function' && sec.id==='A03')
+        a03AddItemInGroup(sec.id, r.cat||Object.keys(A03_CATS)[0], r);
+      else addRow(sec.id, r);
+    });
+    // Open sections with content
+    if((t.data.rows?.[sec.id]||[]).length>0){
+      const body=document.getElementById('body-'+sec.id);
+      const caret=document.getElementById('caret-'+sec.id);
+      if(body&&body.style.display==='none'){ body.style.display=''; caret?.classList.add('open'); }
+    }
+  });
+  recalc();
+  closeModal();
+  alert(`✅ 已套用模板「${t.name}」`);
+}
+function deleteTemplate(idx){
+  if(!confirm('確定刪除這個模板？')) return;
+  const list=JSON.parse(localStorage.getItem('templates_v1')||'[]');
+  list.splice(idx,1);
+  localStorage.setItem('templates_v1',JSON.stringify(list));
+  renderTplList();
+}
+
+// ══ CROSS-DEVICE SYNC ══
+function showSync(){
+  syncTab('out');
+  document.getElementById('sync-out-code').value='';
+  document.getElementById('sync-in-code').value='';
+  document.getElementById('btn-copy-code').style.display='none';
+  document.getElementById('btn-share-code').style.display='none';
+  document.getElementById('sync-qr-wrap').style.display='none';
+  document.getElementById('sync-modal').classList.add('open');
+}
+function syncTab(t){
+  document.getElementById('stab-out').classList.toggle('active',t==='out');
+  document.getElementById('stab-in').classList.toggle('active',t==='in');
+  document.getElementById('sync-out').style.display=t==='out'?'':'none';
+  document.getElementById('sync-in').style.display=t==='in'?'':'none';
+  document.getElementById('sync-foot').style.display=t==='out'?'':'none';
+}
+function genSyncCode(){
+  const data=getQuoteData();
+  const json=JSON.stringify(data);
+  const code=btoa(encodeURIComponent(json));
+  const ta=document.getElementById('sync-out-code');
+  ta.value=code;
+  document.getElementById('btn-copy-code').style.display='';
+  // Share button only if Web Share API available
+  if(navigator.share) document.getElementById('btn-share-code').style.display='';
+  // QR Code
+  const wrap=document.getElementById('sync-qr-wrap');
+  const note=document.getElementById('sync-qr-note');
+  wrap.innerHTML='';
+  if(code.length<=2953){
+    try{
+      new QRCode(wrap,{text:code,width:160,height:160,colorDark:'#111',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.L});
+      wrap.style.display='block';
+      note.textContent='📱 用手機相機掃描 QR Code，再複製頁面上的代碼，到系統匯入';
+    }catch(e){ wrap.style.display='none'; }
+  } else {
+    wrap.style.display='none';
+    note.textContent='資料量較大，請用「複製代碼」後透過 LINE 傳送給自己';
+  }
+}
+function copySyncCode(){
+  const code=document.getElementById('sync-out-code').value;
+  if(!code){ alert('請先按「產生同步代碼」'); return; }
+  navigator.clipboard.writeText(code)
+    .then(()=>alert('✅ 代碼已複製！\n\n請用 LINE / Email 傳給自己，\n在其他裝置開啟此系統後點「☁️ 跨裝置」→「匯入」貼上'))
+    .catch(()=>{ document.getElementById('sync-out-code').select(); document.execCommand('copy'); alert('✅ 已複製！'); });
+}
+function shareSyncCode(){
+  const code=document.getElementById('sync-out-code').value;
+  if(!code){ alert('請先按「產生同步代碼」'); return; }
+  navigator.share({ title:'報價系統同步代碼', text:code })
+    .catch(()=>copySyncCode());
+}
+function doImport(){
+  const code=document.getElementById('sync-in-code').value.trim();
+  if(!code){ alert('請貼上同步代碼'); return; }
+  try{
+    const json=decodeURIComponent(atob(code));
+    const data=JSON.parse(json);
+    if(!confirm('確定匯入？目前所有資料將被覆蓋（此動作無法復原）')) return;
+    loadQuote(data);
+    closeModal();
+    alert('✅ 匯入成功！所有資料已還原');
+  } catch(e){
+    alert('❌ 代碼格式錯誤\n請確認是否完整複製，勿包含多餘空格');
+  }
+}
+
+// ══ FIREBASE CLOUD SYNC ══
+const firebaseConfig = {
+  apiKey: "AIzaSyCoFGcVhg3Kj8TVwGxabNyl3hW1Yd5_DPU",
+  authDomain: "interior-quote.firebaseapp.com",
+  databaseURL: "https://interior-quote-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "interior-quote",
+  storageBucket: "interior-quote.firebasestorage.app",
+  messagingSenderId: "894057531427",
+  appId: "1:894057531427:web:3d6905aaeabf566246c996"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let _cloudUpdatePending = null;
+let _ignoreNextCloudUpdate = false;
+
+function setCloudStatus(state){
+  const dot = document.getElementById('cloud-dot');
+  const label = document.getElementById('cloud-status');
+  if(!dot||!label) return;
+  const map = {
+    connecting: { color:'#888', text:'連線中…' },
+    ok:         { color:'#50e88a', text:'☁️ 已同步' },
+    saving:     { color:'#fbbf24', text:'☁️ 儲存中…' },
+    error:      { color:'#f87171', text:'☁️ 離線' },
+  };
+  const s = map[state]||map.ok;
+  dot.style.background = s.color;
+  label.textContent = s.text;
+}
+
+// Save current data to Firebase cloud
+function saveToCloud(data){
+  setCloudStatus('saving');
+  _ignoreNextCloudUpdate = true;
+  return db.ref('current').set({
+    ...data,
+    _savedAt: Date.now()
+  }).then(()=>{
+    setCloudStatus('ok');
+  }).catch(e=>{
+    setCloudStatus('error');
+    console.warn('Cloud save failed:', e);
+  });
+}
+
+// Load cloud data on startup
+function loadFromCloud(){
+  setCloudStatus('connecting');
+  return db.ref('current').once('value').then(snap=>{
+    if(snap.exists()){
+      const data = snap.val();
+      loadQuote(data);
+      const t = data._savedAt ? new Date(data._savedAt).toLocaleString('zh-TW') : '';
+      setCloudStatus('ok');
+      document.getElementById('cloud-status').textContent = `☁️ 已載入 ${t}`;
+      return true;
+    } else {
+      setCloudStatus('ok');
+      document.getElementById('cloud-status').textContent = '☁️ 無雲端資料';
+      initDefaults();
+      recalc();
+      return false;
+    }
+  }).catch(e=>{
+    setCloudStatus('error');
+    initDefaults();
+    recalc();
+    return false;
+  });
+}
+
+// Real-time listener: notify when another device saves
+function startCloudListener(){
+  db.ref('current').on('value', snap=>{
+    if(_ignoreNextCloudUpdate){ _ignoreNextCloudUpdate=false; return; }
+    if(!snap.exists()) return;
+    const data = snap.val();
+    if(!data._savedAt) return;
+    _cloudUpdatePending = data;
+    const t = new Date(data._savedAt).toLocaleString('zh-TW');
+    const banner = document.getElementById('cloud-banner');
+    const msg = document.getElementById('cloud-banner-msg');
+    if(banner && msg){
+      msg.textContent = `☁️ 其他裝置在 ${t} 儲存了新資料`;
+      banner.classList.add('show');
+    }
+    setCloudStatus('ok');
+    document.getElementById('cloud-status').textContent = `☁️ 有新資料 ${t}`;
+  }, e=>{ setCloudStatus('error'); });
+}
+
+function applyCloudUpdate(){
+  if(!_cloudUpdatePending) return;
+  loadQuote(_cloudUpdatePending);
+  _cloudUpdatePending = null;
+  dismissCloudBanner();
+  setCloudStatus('ok');
+}
+function dismissCloudBanner(){
+  _cloudUpdatePending = null;
+  document.getElementById('cloud-banner')?.classList.remove('show');
+}
+
+// Save history to Firebase too
+function saveHistoryToCloud(data){
+  db.ref('history').push({ ...data, _savedAt: Date.now() }).catch(()=>{});
+}
+
 function saveQuote(){
   const data=getQuoteData();
   if(!data.client){ alert('請先填入客戶姓名再存檔'); return; }
+  // Local save
   const list=JSON.parse(localStorage.getItem('id_quotes_v3')||'[]');
   list.unshift({id:Date.now(),...data});
   localStorage.setItem('id_quotes_v3',JSON.stringify(list.slice(0,30)));
-  alert(`✅ 已存檔：${data.client}（${data.date}）`);
+  // Cloud save
+  saveToCloud(data).then(()=>{
+    saveHistoryToCloud(data);
+    alert(`✅ 已存檔並同步至雲端\n客戶：${data.client}（${data.date}）\n其他裝置開啟後將自動顯示最新資料`);
+  }).catch(()=>{
+    alert(`✅ 已存檔（本機）\n⚠️ 雲端同步失敗，請確認網路連線`);
+  });
 }
 
 function loadQuote(data){
@@ -1712,8 +2100,10 @@ function initDefaults(){
 document.getElementById('quote-date').textContent='報價日期：'+new Date().toLocaleDateString('zh-TW');
 
 buildSections();
-initDefaults();
-recalc();
+// Load from Firebase cloud first; fall back to local defaults
+loadFromCloud().then(()=>{
+  startCloudListener(); // Listen for updates from other devices
+});
 </script>
 </body>
 </html>
