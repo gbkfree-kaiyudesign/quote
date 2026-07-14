@@ -723,13 +723,6 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 .cloud-banner button:hover { background:rgba(91,164,245,0.1); }
 
 /* ── Consistency check ── */
-.consist-banner { display:none; background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.35); border-radius:8px; padding:11px 14px; margin-bottom:10px; font-size:12px; color:var(--amber); }
-.consist-banner.show { display:block; }
-.consist-banner ul { margin:6px 0 8px 16px; line-height:1.8; }
-.consist-banner .consist-actions { display:flex; gap:8px; margin-top:8px; }
-.consist-btn { font-size:11px; padding:4px 12px; border-radius:5px; border:1px solid rgba(251,191,36,0.4); background:none; color:var(--amber); cursor:pointer; font-family:inherit; }
-.consist-btn:hover { background:rgba(251,191,36,0.12); }
-.consist-btn.ok { background:rgba(251,191,36,0.15); font-weight:600; }
 /* ── Price validation ── */
 .price-error { border-color:#f87171 !important; box-shadow:0 0 0 2px rgba(240,112,112,0.22) !important; }
 .validate-banner {
@@ -752,6 +745,18 @@ dialog:not([open]){display:none !important;}
 dialog[open]{display:block;}
 .cp-inp-fix{color:#e84e88 !important;font-weight:700 !important;}
 .cp-save-btn{padding:4px 10px;border-radius:6px;border:1px solid rgba(232,78,136,.3);background:rgba(232,78,136,.1);color:#e84e88;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;}
+
+/* ── 分類標頭 ── */
+.cat-header {
+  font-size:10px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--text2); padding:14px 0 6px; border-bottom:1px solid var(--border);
+  margin-bottom:6px; display:flex; align-items:center; gap:8px;
+}
+.cat-header:first-child { padding-top:4px; }
+.cat-badge {
+  font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px;
+  background:var(--surface3); color:var(--text2); flex-shrink:0;
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -834,13 +839,6 @@ dialog[open]{display:block;}
 </div>
 
 <div class="cloud-banner" id="cloud-banner"><span id="cloud-banner-msg" style="flex:1">☁️ 其他裝置有新資料</span><button onclick="applyCloudUpdate()">立即同步</button><button onclick="dismissCloudBanner()" style="opacity:0.6">略過</button></div>
-<div class="consist-banner" id="consist-banner">
-  <strong>⚠️ 數量不一致</strong>
-  <ul id="consist-list"></ul>
-  <div class="consist-actions">
-    <button class="consist-btn ok" onclick="confirmConsistency()">✅ 確認，我知道了</button>
-    <button class="consist-btn" onclick="dismissConsistency()">略過</button>
-  </div>
 </div>
 <div class="validate-banner" id="validate-banner">⚠️ <b>單價不得低於成本：</b><span id="validate-msg"></span></div>
 <!-- ★★★ 報價總覽 (最重要) ★★★ -->
@@ -894,7 +892,7 @@ dialog[open]{display:block;}
     <div class="field"><label>戶名</label><input type="text" id="bank-holder" placeholder="例：林OO設計有限公司"></div>
     <div class="field"><label>帳號</label><input type="text" id="bank-account" placeholder="例：0123-456-789012"></div>
   </div>
-  <div class="grid3">
+  <div style="display:grid;grid-template-columns:3fr 100px 1.5fr;gap:14px">
     <div class="field">
       <label>付款條件</label>
       <select id="pay-terms" onchange="onPayTermsChange(this)">
@@ -910,7 +908,7 @@ dialog[open]{display:block;}
         style="display:none;margin-top:6px;width:100%"
         onchange="syncCustomPayTerms(this)">
     </div>
-    <div class="field"><label>報價有效期（天）</label><input type="number" id="valid-days" value="30" min="1"></div>
+    <div class="field"><label>有效期（天）</label><input type="number" id="valid-days" value="30" min="1" style="width:100%"></div>
     <div class="field"><label>預計開工日</label><input type="text" id="start-date" placeholder="2025/09/01"></div>
   </div>
 </div>
@@ -1351,7 +1349,7 @@ function addRow(secId, data){
   tr.innerHTML = `
     ${lockTd}
     ${itemTd}
-    <td><input class="qty-inp" type="number" value="${d.qty||1}" min="1" step="1" onchange="this.value=Math.max(1,Math.round(this.value)||1);recalc()" style="width:56px"></td>
+    <td><input class="qty-inp" type="number" value="${d.qty||1}" min="0" step="1" onchange="this.value=Math.max(0,Math.round(this.value)||0);recalc()" style="width:56px"></td>
     <td>${unitSel}</td>
     <td><input class="price-inp" type="number" value="${d.price||3000}" min="0" step="100" onchange="recalc()" style="width:84px"></td>
     <td class="cost-col"><input class="cost-inp" type="number" value="${defCost}" min="0" step="100" onchange="recalc()" style="width:84px;color:#e84e88;font-weight:700"></td>
@@ -1476,7 +1474,7 @@ function a03AddItemInGroup(secId, cat, d){
   tr.innerHTML=`
     <td class="lock-td"><button class="lock-btn" onclick="toggleLock(this,'${secId}')" title="🔒 鎖定保留此列">🔓</button></td>
     <td style="min-width:150px"><select class="a03-sub-sel item-sel" onchange="recalc()" style="width:100%">${subOpts}</select></td>
-    <td><input class="qty-inp" type="number" value="${d.qty||1}" min="1" step="1" onchange="this.value=Math.max(1,Math.round(this.value)||1);recalc()" style="width:56px"></td>
+    <td><input class="qty-inp" type="number" value="${d.qty||1}" min="0" step="1" onchange="this.value=Math.max(0,Math.round(this.value)||0);recalc()" style="width:56px"></td>
     <td>${unitSel}</td>
     <td><input class="price-inp" type="number" value="${d.price||0}" min="0" step="100" onchange="recalc()" style="width:84px"></td>
     <td class="cost-col"><input class="cost-inp" type="number" value="${defCost}" min="0" step="100" onchange="recalc()" style="width:84px;color:#e84e88;font-weight:700"></td>
@@ -1752,83 +1750,8 @@ function getSectionTotal(secId){
 
 
 // ══ CONSISTENCY CHECKS (A03 水電) ══
-const A03_OUTLET_MAP = {
-  '開關出線':   '新增開關',
-  '插座出線':   '新增插座',
-  '網路出線':   '新增網路插座',
-  '電話出線':   '新增電話插座',
-  '電視出線':   '新增電視插座',
-  '門鈴出線':   '新增門鈴開關',
-  'HDMI出線':   '新增HDMI插座',
-  '緊急壓扣出線':'新增緊急壓扣',
-};
 
-function getA03CatItemQty(cat, itemName){
-  let total=0;
-  document.querySelectorAll('#tbody-A03 tr.a03-item-row').forEach(tr=>{
-    if(tr.dataset.cat!==cat) return;
-    const sel=tr.querySelector('.a03-sub-sel,.item-sel');
-    if(sel && sel.value===itemName){
-      total += parseFloat(tr.querySelector('.qty-inp')?.value)||0;
-    }
-  });
-  return total;
-}
-function getSecItemQty(secId, keyword){
-  let total=0;
-  document.querySelectorAll(`#tbody-${secId} tr`).forEach(tr=>{
-    if(tr.classList.contains('a03-cat-hdr')||tr.classList.contains('a03-sub-add-row')) return;
-    const sel=tr.querySelector('.a03-sub-sel,.item-sel');
-    if(sel && sel.value.includes(keyword)){
-      total += parseFloat(tr.querySelector('.qty-inp')?.value)||0;
-    }
-  });
-  return total;
-}
 
-let _consistTimer=null;
-let _consistDismissed=false;
-function scheduleConsistencyCheck(){
-  _consistDismissed=false;
-  clearTimeout(_consistTimer);
-  _consistTimer=setTimeout(runConsistencyCheck, 800);
-}
-function runConsistencyCheck(){
-  if(_consistDismissed) return;
-  const issues=[];
-
-  // ── 1. 冷氣迴路5.5mm ↔ A13 室外機配置
-  const acCircuit = getA03CatItemQty('迴路','新增迴路5.5mm');
-  const acUnit    = getSecItemQty('A13','室外機');
-  if(acCircuit>0 && acUnit>0 && acCircuit!==acUnit){
-    issues.push(`B03 冷氣迴路5.5mm 數量 <b>${acCircuit}</b>，B13 空調室外機 數量 <b>${acUnit}</b>`);
-  }
-
-  // ── 2. 出線 ↔ 開關插座
-  Object.entries(A03_OUTLET_MAP).forEach(([outlet, device])=>{
-    const oQty = getA03CatItemQty('出線', outlet);
-    const dQty = getA03CatItemQty('開關插座', device);
-    if(oQty>0 && dQty>0 && oQty!==dQty){
-      issues.push(`出線「${outlet}」數量 <b>${oQty}</b>，開關插座「${device}」數量 <b>${dQty}</b>`);
-    }
-  });
-
-  const banner=document.getElementById('consist-banner');
-  const list=document.getElementById('consist-list');
-  if(issues.length>0 && banner && list){
-    list.innerHTML=issues.map(i=>`<li>${i}</li>`).join('');
-    banner.classList.add('show');
-  } else if(banner){
-    banner.classList.remove('show');
-  }
-}
-function confirmConsistency(){
-  _consistDismissed=true;
-  document.getElementById('consist-banner')?.classList.remove('show');
-}
-function dismissConsistency(){
-  document.getElementById('consist-banner')?.classList.remove('show');
-}
 
 function recalc(){
   // Pass 1: calc non-E sections to get ABC total
@@ -1867,7 +1790,6 @@ function recalc(){
   });
   drawPie(results.map(r=>r.quoteT));
   validatePrices();
-  scheduleConsistencyCheck();
 }
 
 function validateMgmtQty(input){
@@ -2092,27 +2014,55 @@ function getQuoteData(){
 }
 
 // ══ TEMPLATE MANAGEMENT ══
+// ── 模板 Firebase 雲端同步 ──
+function tplToCloud(list){
+  if(typeof db==='undefined') return;
+  try{ db.ref('templates').set(list||[]); }catch(e){}
+}
+function tplFromCloud(cb){
+  if(typeof db==='undefined'){ cb(null); return; }
+  db.ref('templates').once('value').then(function(snap){
+    cb(snap.exists()?snap.val():null);
+  }).catch(function(){ cb(null); });
+}
+
 function showTemplates(){
-  renderTplList();
-  document.getElementById('template-modal').classList.add('open');
+  tplFromCloud(function(cloudList){
+    if(cloudList && cloudList.length>0)
+      localStorage.setItem('templates_v1',JSON.stringify(cloudList));
+    renderTplList();
+    document.getElementById('template-modal').classList.add('open');
+  });
 }
 function renderTplList(){
   const list=JSON.parse(localStorage.getItem('templates_v1')||'[]');
   const cont=document.getElementById('tpl-list');
   if(!list.length){ cont.innerHTML='<div class="empty">尚未儲存任何模板</div>'; return; }
-  cont.innerHTML=list.map((t,i)=>{
-    const cnt=SECTIONS.reduce((a,s)=>a+(t.data.rows?.[s.id]||[]).length,0);
-    return `<div class="tpl-item">
-      <div>
-        <div class="tpl-name">${t.name}</div>
-        <div class="tpl-date">${t.date} &nbsp;·&nbsp; ${cnt} 個項目</div>
-      </div>
-      <div class="tpl-btns">
-        <button class="tpl-btn load" onclick="applyTemplate(${i})">套用</button>
-        <button class="tpl-btn del" onclick="deleteTemplate(${i})">刪除</button>
-      </div>
-    </div>`;
-  }).join('');
+  // Group by spaceType
+  const groups={};
+  list.forEach((t,i)=>{
+    const cat=t.spaceType||'未分類';
+    if(!groups[cat]) groups[cat]=[];
+    groups[cat].push({t,i});
+  });
+  let html='';
+  Object.entries(groups).forEach(([cat,items])=>{
+    html+=`<div class="cat-header"><span>${cat}</span><span class="cat-badge">${items.length}</span></div>`;
+    items.forEach(({t,i})=>{
+      const cnt=SECTIONS.reduce((a,s)=>a+(t.data.rows?.[s.id]||[]).length,0);
+      html+=`<div class="tpl-item">
+        <div>
+          <div class="tpl-name">${t.name}</div>
+          <div class="tpl-date">${t.date} &nbsp;·&nbsp; ${cnt} 個項目</div>
+        </div>
+        <div class="tpl-btns">
+          <button class="tpl-btn load" onclick="applyTemplate(${i})">套用</button>
+          <button class="tpl-btn del" onclick="deleteTemplate(${i})">刪除</button>
+        </div>
+      </div>`;
+    });
+  });
+  cont.innerHTML=html;
 }
 function saveTemplate(){
   const name=document.getElementById('tpl-name-input').value.trim();
@@ -2120,17 +2070,20 @@ function saveTemplate(){
   const data=getQuoteData();
   const list=JSON.parse(localStorage.getItem('templates_v1')||'[]');
   const idx=list.findIndex(t=>t.name===name);
-  const entry={name, data, date:new Date().toLocaleDateString('zh-TW')};
+  const spaceType=document.getElementById('space-type')?.value||'未分類';
+  const entry={name, data, date:new Date().toLocaleDateString('zh-TW'), spaceType};
   if(idx>=0){
     if(!confirm(`模板「${name}」已存在，要覆蓋嗎？`)) return;
     list[idx]=entry;
   } else {
     list.unshift(entry);
   }
-  localStorage.setItem('templates_v1',JSON.stringify(list.slice(0,20)));
+  const newList=list.slice(0,20);
+  localStorage.setItem('templates_v1',JSON.stringify(newList));
+  tplToCloud(newList);
   document.getElementById('tpl-name-input').value='';
   renderTplList();
-  alert(`✅ 模板「${name}」已儲存！`);
+  alert(`✅ 模板「${name}」已儲存並同步至雲端！`);
 }
 function applyTemplate(idx){
   if(!confirm('套用模板會覆蓋目前所有工程項目，客戶資訊不受影響。確定嗎？')) return;
@@ -2165,6 +2118,7 @@ function deleteTemplate(idx){
   const list=JSON.parse(localStorage.getItem('templates_v1')||'[]');
   list.splice(idx,1);
   localStorage.setItem('templates_v1',JSON.stringify(list));
+  tplToCloud(list);
   renderTplList();
 }
 
@@ -2662,20 +2616,31 @@ function showHistory(){
   const cont=document.getElementById('history-content');
   if(!list.length){ cont.innerHTML='<div class="empty">尚無歷史記錄</div>'; }
   else {
-    cont.innerHTML='<div>'+list.map(q=>{
-      const quote=SECTIONS.reduce((a,s)=>a+(q.rows?.[s.id]||[]).reduce((b,r)=>b+r.price*r.qty,0),0);
-      const cost=quote;
-      return `<div class="hist-item">
-        <div>
-          <div style="font-size:13px;font-weight:600">${q.client} — ${q.addr||'未填地址'}</div>
-          <div class="hist-meta">${q.date} · ${q.area}坪 · ${q.style||''} · 報價 ${fmt(quote)}</div>
-        </div>
-        <div class="hist-btns">
-          <button class="hist-btn" onclick="loadQuote(${JSON.stringify(q).replace(/"/g,'&quot;')})">載入</button>
-          <button class="hist-btn del" onclick="deleteQuote(${q.id})">刪除</button>
-        </div>
-      </div>`;
-    }).join('')+'</div>';
+    // Group by spaceType
+    const groups={};
+    list.forEach(q=>{
+      const cat=q.spaceType||'未分類';
+      if(!groups[cat]) groups[cat]=[];
+      groups[cat].push(q);
+    });
+    let html='';
+    Object.entries(groups).forEach(([cat,items])=>{
+      html+=`<div class="cat-header"><span>${cat}</span><span class="cat-badge">${items.length}</span></div>`;
+      items.forEach(q=>{
+        const quote=SECTIONS.reduce((a,s)=>a+(q.rows?.[s.id]||[]).reduce((b,r)=>b+r.price*r.qty,0),0);
+        html+=`<div class="hist-item">
+          <div>
+            <div style="font-size:13px;font-weight:600">${q.client} — ${q.addr||'未填地址'}</div>
+            <div class="hist-meta">${q.date} · ${q.area}坪 · ${q.style||''} · 報價 ${fmt(quote)}</div>
+          </div>
+          <div class="hist-btns">
+            <button class="hist-btn" onclick="loadQuote(${JSON.stringify(q).replace(/"/g,'&quot;')})">載入</button>
+            <button class="hist-btn del" onclick="deleteQuote(${q.id})">刪除</button>
+          </div>
+        </div>`;
+      });
+    });
+    cont.innerHTML=html;
   }
   document.getElementById('history-modal').classList.add('open');
 }
@@ -2812,6 +2777,11 @@ buildSections();
 // Load from Firebase cloud first; fall back to local defaults
 loadFromCloud().then(()=>{
   startCloudListener();
+  // 載入模板
+  tplFromCloud(function(cloudList){
+    if(cloudList && cloudList.length>0)
+      localStorage.setItem('templates_v1',JSON.stringify(cloudList));
+  });
   loadCostPresetsFromCloud();
 });
 
