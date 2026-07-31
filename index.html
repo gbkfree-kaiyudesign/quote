@@ -773,6 +773,11 @@ dialog[open]{display:block;}
   .note-inp:placeholder-shown { display: none; }
   .note-inp { border: none; background: transparent; color: #333; font-size: 10px; padding: 0; margin-top: 2px; }
 }
+
+/* ── 精簡版 PDF（只顯示分類標題與小計）── */
+body.print-summary .section-table tbody tr { display: none !important; }
+body.print-summary .add-btn { display: none !important; }
+body.print-summary .section-table { margin-bottom: 0 !important; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -809,7 +814,8 @@ dialog[open]{display:block;}
     <button class="btn btn-ghost" onclick="showTemplates()">📁 模板</button>
     <button class="btn btn-ghost" onclick="showHistory()">📋 歷史報價</button>
     <button class="btn btn-amber" onclick="saveQuote()">💾 存檔</button>
-    <button class="btn btn-green" onclick="window.print()">🖨️ 列印 / PDF</button>
+    <button class="btn btn-green" onclick="window.print()">🖨️ 完整版 PDF</button>
+    <button class="btn" onclick="printSummary()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text)">📄 精簡版 PDF</button>
     <button class="btn install-btn" onclick="showInstallGuide()" style="background:rgba(91,164,245,0.12);color:var(--blue);border-color:rgba(91,164,245,0.3)">📲 安裝 App</button>
   </div>
   <!-- Mobile hamburger -->
@@ -3078,6 +3084,14 @@ function rmRow(btn, secId){
   recalc();
 }
 
+
+function printSummary(){
+  document.body.classList.add('print-summary');
+  window.print();
+  // 列印對話框關閉後移除 class
+  setTimeout(function(){ document.body.classList.remove('print-summary'); }, 1000);
+}
+
 </script>
 <!-- Mobile bottom drawer -->
 <div class="mobile-drawer-bg" id="drawer-bg" onclick="closeDrawer()"></div>
@@ -3092,7 +3106,8 @@ function rmRow(btn, secId){
     <button class="drawer-btn"       onclick="showHistory();closeDrawer()">📋 歷史報價</button>
     <button class="drawer-btn"       onclick="copyText();closeDrawer()">📋 複製報價</button>
     <button class="drawer-btn"       onclick="showInstallGuide();closeDrawer()">📲 安裝 App</button>
-    <button class="drawer-btn green" onclick="window.print();closeDrawer()" style="grid-column:span 2">🖨️ 列印 / 輸出 PDF</button>
+    <button class="drawer-btn green" onclick="window.print();closeDrawer()">🖨️ 完整版 PDF</button>
+    <button class="drawer-btn" onclick="printSummary();closeDrawer()">📄 精簡版 PDF</button>
   </div>
 </div>
 
