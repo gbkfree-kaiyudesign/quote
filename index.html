@@ -229,10 +229,12 @@ select option { background: #1a1a20; color: var(--text); }
   white-space: nowrap;
 }
 .group-badge.b { background: var(--blue-dim); color: var(--blue); border-color: rgba(91,164,245,0.25); }
+.group-badge.red { background: rgba(240,112,112,0.12); color: var(--red); border-color: rgba(240,112,112,0.3); }
 .group-line { flex: 1; height: 1px; background: var(--border2); }
 .group-total-label { font-size: 11px; color: var(--text2); white-space: nowrap; }
 .group-total-val { font-size: 12px; font-weight: 700; color: var(--green); font-variant-numeric: tabular-nums; }
 .group-total-val.b { color: var(--blue); }
+.group-total-val.red { color: var(--red); }
 
 /* ── SECTION CARDS ── */
 .section-card {
@@ -261,13 +263,16 @@ select option { background: #1a1a20; color: var(--text); }
 }
 .sec-id.b { background: var(--blue-dim); color: var(--blue); border-color: rgba(91,164,245,0.25); }
 .sec-id.gold { background: var(--gold-dim); color: var(--gold); border-color: rgba(228,184,74,0.3); }
+.sec-id.red { background: rgba(240,112,112,0.12); color: var(--red); border-color: rgba(240,112,112,0.3); }
 .sec-name { font-size: 13px; font-weight: 600; }
 .sec-icon { font-size: 14px; }
 .sec-right { display: flex; align-items: center; gap: 10px; }
 .sec-total { font-size: 12px; font-weight: 700; color: var(--green); font-variant-numeric: tabular-nums; }
 .sec-total.b { color: var(--blue); }
 .sec-total.gold { color: var(--gold); }
+.sec-total.red { color: var(--red); }
 .sub-cell.gold { color: var(--gold); }
+.sub-cell.red { color: var(--red); }
 .group-badge.gold { background: var(--gold-dim); color: var(--gold); border-color: rgba(228,184,74,0.3); }
 .group-total-val.gold { color: var(--gold); }
 .print-hide { /* 螢幕可見，列印隱藏 */ }
@@ -986,6 +991,7 @@ const GROUPS = [
   { id:'D', label:'A類 設計及申請費', icon:'📋' },
   { id:'A', label:'B類 基礎工程類', icon:'🏗️' },
   { id:'B', label:'C類 材料道具類', icon:'📦' },
+  { id:'E', label:'D類 施工管理費', icon:'🏢' },
 ];
 
 const SECTIONS = [
@@ -1052,10 +1058,13 @@ const SECTIONS = [
   { id:'B05', dispId:'C05', group:'B', label:'軟裝家具', icon:'🛋️',
     items:['沙發','餐桌椅','主臥床架','床頭燈','地毯','裝飾掛畫','植栽佈置','抱枕組','邊几'],
     specs:['國產','進口','訂製'], units:['式','件','套'] },
+  { id:'E01', dispId:'D01', group:'E', label:'施工管理費', icon:'🏢',
+    items:['施工管理費'],
+    specs:['一般'], units:['%'], _isManage:true },
 ];
 
-const PIE_COLORS = ['#e4b84a','#50e88a','#5ba4f5'];
-const SEC_COLORS = { D:'gold', A:'green', B:'b' };
+const PIE_COLORS = ['#e4b84a','#50e88a','#5ba4f5','#f07070'];
+const SEC_COLORS = { D:'gold', A:'green', B:'b', E:'red' };
 
 function fmt(n){ return 'NT$\u00a0'+Math.round(n).toLocaleString('zh-TW'); }
 
@@ -1191,7 +1200,7 @@ function addRow(secId, data){
     <td><input class="price-inp" type="number" value="${d.price||3000}" min="0" step="100" onchange="recalc()" style="width:84px"></td>
     <td class="cost-col"><input class="cost-inp" type="number" value="${defCost}" min="0" step="100" onchange="recalc()" style="width:84px;color:#e84e88;font-weight:700"></td>
     <td class="sub-cell${cls}">NT$\u00a00</td>
-    <td style="min-width:90px">${specSel}</td>
+    <td style="min-width:90px">${specSel}<input type="text" class="note-inp" placeholder="說明..." value="${d.note||''}" style="margin-top:3px;width:100%;font-size:11px;color:var(--text2);background:transparent;border:none;border-bottom:1px solid var(--border2);outline:none;padding:2px 0" onchange="recalc()"></td>
     <td><button class="rm-btn" onclick="this.closest('tr').remove();saveLockedRows(secId);recalc()" title="刪除">×</button></td>`;
   tbody.appendChild(tr);
   // Apply locked state
@@ -1380,7 +1389,8 @@ function getRowDataForLock(tr, secId){
     spec:specVal, price:parseFloat(priceEl?.value)||0,
     qty:parseFloat(qtyEl?.value)||1,
     cost:parseFloat(costEl?.value)||0,
-    unit:unitVal, locked:true
+    unit:unitVal, locked:true,
+    note:tr.querySelector('.note-inp')?.value||''
   };
 }
 function saveLockedRows(secId){
@@ -1517,7 +1527,7 @@ function getSectionTotal(secId){
     const costEl=tr.querySelector('.cost-inp');
     const sc=tr.querySelector('.sub-cell');
     if(priceEl&&qtyEl){
-      const qty=parseFloat(qtyEl.value)||1;
+      const qty = qtyEl.value===''?1:parseFloat(qtyEl.value);
       const sub=(parseFloat(priceEl.value)||0)*qty;
       if(sc) sc.textContent=fmt(sub);
       quoteT+=sub;
@@ -1609,7 +1619,36 @@ function dismissConsistency(){
 }
 
 function recalc(){
-  const results=SECTIONS.map(s=>getSectionTotal(s.id));
+  // 先算非 E 類
+  const nonE = SECTIONS.filter(s=>s.group!=='E');
+  const eSecList = SECTIONS.filter(s=>s.group==='E');
+  const nonEResults = nonE.map(s=>getSectionTotal(s.id));
+  const nonESum = nonEResults.reduce((a,r)=>a+r.quoteT,0);
+  // E01 施工管理費：自動設定單價 = 工程總價 × qty%
+  eSecList.forEach(sec=>{
+    const tbody=document.getElementById('tbody-'+sec.id);
+    if(!tbody) return;
+    tbody.querySelectorAll('tr').forEach(tr=>{
+      if(tr.classList.contains('a03-cat-hdr')||tr.classList.contains('a03-sub-add-row')) return;
+      const qtyEl=tr.querySelector('.qty-inp');
+      const priceEl=tr.querySelector('.price-inp');
+      if(qtyEl&&priceEl){
+        const pct=parseFloat(qtyEl.value)||5;
+        const autoPrice=Math.round(nonESum*pct/100);
+        priceEl.value=autoPrice;
+        priceEl.readOnly=true;
+        priceEl.style.color='var(--red)';
+      }
+    });
+  });
+  const eResults = eSecList.map(s=>getSectionTotal(s.id));
+  // 重組為與 SECTIONS 同順序（非E在前，E在後）
+  const results=SECTIONS.map(s=>{
+    const idx=nonE.findIndex(x=>x.id===s.id);
+    if(idx>=0) return nonEResults[idx];
+    const ei=eSecList.findIndex(x=>x.id===s.id);
+    return eResults[ei]||{quoteT:0,costT:0};
+  });
   const quoteSum=results.reduce((a,r)=>a+r.quoteT,0);
   const costSum=results.reduce((a,r)=>a+r.costT,0);
   const area=parseFloat(document.getElementById('area').value)||1;
@@ -1807,7 +1846,8 @@ function getQuoteData(){
         price:parseFloat(priceEl2.value)||0,
         qty:parseFloat(qtyEl2.value)||1,
         cost:parseFloat(costEl2?.value)||0,
-        unit:unitSel?.value
+        unit:unitSel?.value,
+        note:tr.querySelector('.note-inp')?.value||''
       });
     });
   });
