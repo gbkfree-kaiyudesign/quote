@@ -90,136 +90,7 @@ body {
 .logo-name { font-size: 14px; font-weight: 700; letter-spacing: 0.06em; color: #fff; }
 .logo-sub  { font-size: 9.5px; letter-spacing: 0.14em; color: var(--text2); text-transform: uppercase; }
 
-
-
-
-/* ── Cost Admin Panel ── */
-.cp-sec { margin-bottom:20px; }
-.cp-sec-title { font-size:12px; font-weight:700; color:var(--text2); letter-spacing:0.06em; text-transform:uppercase; padding:8px 0 10px; border-bottom:1px solid var(--border2); margin-bottom:10px; }
-.cp-cat-tag { display:inline-block; font-size:10px; font-weight:800; color:var(--amber); background:rgba(245,166,35,0.1); border-radius:4px; padding:2px 8px; margin:8px 0 6px; letter-spacing:0.06em; }
-.cp-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:8px; }
-.cp-card { background:var(--surface); border:1px solid var(--border2); border-radius:8px; padding:10px 12px; }
-.cp-name { font-size:11px; color:var(--text2); margin-bottom:6px; min-height:30px; display:flex; align-items:flex-start; line-height:1.4; }
-.cp-input-row { display:flex; align-items:center; gap:4px; }
-.cp-input {
-  flex:1; min-width:0;
-  font-size:14px; font-weight:600; text-align:right;
-  padding:7px 8px;
-  border:2px solid var(--border2);
-  border-radius:6px;
-  background:var(--surface2);
-  color:var(--text);
-  -webkit-appearance:none;
-  appearance:none;
-  touch-action:manipulation;
-  cursor:text;
-}
-.cp-input:focus { border-color:var(--green); outline:none; background:var(--surface3); }
-.cp-unit { font-size:12px; color:var(--text2); flex-shrink:0; }
-.cp-tab {
-  flex-shrink:0; padding:10px 16px;
-  font-size:12px; font-weight:600; font-family:inherit;
-  background:none; border:none; border-bottom:2px solid transparent;
-  color:var(--text2); cursor:pointer; white-space:nowrap;
-}
-.cp-tab.active { color:var(--green); border-bottom-color:var(--green); }
-
-.cost-cat-label { font-size:10px; font-weight:800; letter-spacing:0.08em; color:var(--amber); background:rgba(245,166,35,0.08); border-radius:4px; padding:2px 8px; margin:8px 0 5px; display:inline-block; }
-/* ── D類 施工管理費 (purple) ── */
-:root { --purple:#c084fc; --purple-dim:rgba(192,132,252,0.1); --purple-border:rgba(192,132,252,0.28); }
-.sec-id.purple { background:var(--purple-dim); color:var(--purple); border-color:var(--purple-border); }
-.group-badge.purple { background:var(--purple-dim); color:var(--purple); border-color:var(--purple-border); }
-.group-total-val.purple { color:var(--purple); }
-.sec-total.purple { color:var(--purple); }
-.sub-cell.purple { color:var(--purple); }
-.mgmt-price-wrap { display:flex; align-items:center; gap:6px; }
-.mgmt-price-label { font-size:10px; color:var(--text2); white-space:nowrap; }
-input.auto-price { opacity:0.65; cursor:not-allowed; background:var(--surface3) !important; }
-.qty-pct-warn { font-size:10px; color:var(--red); display:none; margin-top:2px; }
-.qty-pct-warn.show { display:block; }
-/* Print purple colours */
 .topbar-actions { display: flex; gap: 7px; align-items: center; }
-
-/* ══ MOBILE TOPBAR ══ */
-.topbar {
-  transition: transform 0.28s ease;
-}
-.topbar.hide-up {
-  transform: translateY(-100%);
-}
-/* Hamburger button — visible only on mobile */
-.ham-btn {
-  display: none;
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-radius: var(--radius-sm);
-  padding: 7px 10px;
-  cursor: pointer;
-  color: var(--text);
-  font-size: 18px;
-  line-height: 1;
-  flex-shrink: 0;
-}
-/* Mobile drawer overlay */
-.mobile-drawer-bg {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  z-index: 300;
-  backdrop-filter: blur(4px);
-}
-.mobile-drawer-bg.open { display: block; }
-.mobile-drawer {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  background: var(--surface);
-  border-top: 1px solid var(--border2);
-  border-radius: 16px 16px 0 0;
-  padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
-  z-index: 301;
-  transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-}
-.mobile-drawer.open { transform: translateY(0); }
-.drawer-handle {
-  width: 36px; height: 4px;
-  background: var(--border2);
-  border-radius: 2px;
-  margin: 0 auto 14px;
-}
-.drawer-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-.drawer-btn {
-  display: flex; align-items: center; gap: 8px;
-  padding: 12px 14px; border-radius: var(--radius);
-  border: 1px solid var(--border2);
-  background: var(--surface2);
-  color: var(--text); cursor: pointer;
-  font-size: 13px; font-weight: 500;
-  font-family: inherit; text-align: left;
-  transition: all 0.15s;
-}
-.drawer-btn:active { background: var(--surface3); transform: scale(0.97); }
-.drawer-btn.green { background: var(--green); color: #0a1f12; border-color: var(--green); font-weight: 700; }
-.drawer-btn.amber { background: var(--amber-dim); color: var(--amber); border-color: rgba(245,166,35,0.3); }
-.drawer-btn.blue  { background: var(--blue-dim);  color: var(--blue);  border-color: rgba(91,164,245,0.3); }
-
-/* Cloud status compact on mobile */
-@media (max-width: 640px) {
-  .topbar { padding: 0 14px; height: 52px; }
-  .topbar-actions { display: none !important; }
-  .ham-btn { display: flex; align-items: center; justify-content: center; }
-  .logo-sub { display: none; }
-  #cloud-status { display: none; }
-  .container { padding: 14px 12px 100px; }
-  .metrics { grid-template-columns: 1fr 1fr !important; }
-  .cost-box-body { padding: 12px 14px; }
-}
-
 
 /* ── BUTTONS ── */
 .btn {
@@ -453,8 +324,7 @@ tr[data-locked="true"] { background: rgba(80,232,138,0.04) !important; }
 .a03-sub-btn { font-size: 12px; padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); cursor: pointer; font-family: inherit; transition: all 0.15s; }
 .a03-sub-btn:hover { border-color: var(--amber); color: var(--amber); }
 /* Lock-disabled row */
-tr[data-locked="true"] input, tr[data-locked="true"] select { pointer-events: none; opacity: 0.55; }
-tr[data-locked="true"] button.rm-btn { opacity: 0.55; }
+tr[data-locked="true"] input, tr[data-locked="true"] select, tr[data-locked="true"] button.rm-btn { pointer-events: none; opacity: 0.55; }
 tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offset: -1px; }
 .cost-col { color: #e84e88; font-weight: 700; }
 .cost-col input { color: #e84e88 !important; font-weight: 700; }
@@ -504,7 +374,7 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
 .sig-wrap {
   border: 1px solid var(--border2); border-radius: 8px;
   background: var(--surface2); overflow: hidden;
-  cursor: crosshair; touch-action: none; -webkit-user-select:none;
+  cursor: crosshair; touch-action: none;
 }
 .sig-wrap canvas { display: block; width: 100%; }
 
@@ -646,8 +516,6 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   }
   .cost-col { display:none !important; }
   .lock-th, .lock-td { display:none !important; }
-  .mobile-drawer, .mobile-drawer-bg, .ham-btn { display:none !important; }
-  .section-card.print-zero { display:none !important; }
   .topbar,.action-bar,.add-btn,.rm-btn,.profit-row,.btn,.modal-bg,
   .a03-sub-add-row,.a03-add-sub-btn,
   .print-hide-profit,
@@ -683,7 +551,6 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   .group-badge { background:#e8f5ee !important; color:#1a6b3a !important; border-color:#a8d8bc !important; }
   .group-badge.b    { background:#e6f0fa !important; color:#1a4a8a !important; }
   .group-badge.gold { background:#fdf3e0 !important; color:#8a6200 !important; border-color:#e4c57a !important; }
-  .group-badge.purple { background:#f3e8ff !important; color:#7c3aed !important; border-color:#c4b5fd !important; }
   .group-total-val { color:#1a6b3a !important; }
   .group-total-val.b    { color:#1a4a8a !important; }
   .group-total-val.gold { color:#8a6200 !important; }
@@ -724,6 +591,13 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 .cloud-banner button:hover { background:rgba(91,164,245,0.1); }
 
 /* ── Consistency check ── */
+.consist-banner { display:none; background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.35); border-radius:8px; padding:11px 14px; margin-bottom:10px; font-size:12px; color:var(--amber); }
+.consist-banner.show { display:block; }
+.consist-banner ul { margin:6px 0 8px 16px; line-height:1.8; }
+.consist-banner .consist-actions { display:flex; gap:8px; margin-top:8px; }
+.consist-btn { font-size:11px; padding:4px 12px; border-radius:5px; border:1px solid rgba(251,191,36,0.4); background:none; color:var(--amber); cursor:pointer; font-family:inherit; }
+.consist-btn:hover { background:rgba(251,191,36,0.12); }
+.consist-btn.ok { background:rgba(251,191,36,0.15); font-weight:600; }
 /* ── Price validation ── */
 .price-error { border-color:#f87171 !important; box-shadow:0 0 0 2px rgba(240,112,112,0.22) !important; }
 .validate-banner {
@@ -741,46 +615,6 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 .tpl-btn.load { color:var(--green); border-color:rgba(80,232,138,0.3); background:rgba(80,232,138,0.06); }
 .tpl-btn.load:hover { background:rgba(80,232,138,0.14); }
 .tpl-btn.del:hover { color:var(--red); border-color:rgba(240,112,112,0.3); background:var(--red-dim); }
-
-dialog:not([open]){display:none !important;}
-dialog[open]{display:block;}
-.cp-inp-fix{color:#e84e88 !important;font-weight:700 !important;}
-.cp-save-btn{padding:4px 10px;border-radius:6px;border:1px solid rgba(232,78,136,.3);background:rgba(232,78,136,.1);color:#e84e88;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;}
-
-/* ── 分類標頭 ── */
-.cat-header {
-  font-size:10px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase;
-  color:var(--text2); padding:14px 0 6px; border-bottom:1px solid var(--border);
-  margin-bottom:6px; display:flex; align-items:center; gap:8px;
-}
-.cat-header:first-child { padding-top:4px; }
-.cat-badge {
-  font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px;
-  background:var(--surface3); color:var(--text2); flex-shrink:0;
-}
-
-/* ── 說明欄位 ── */
-.note-inp {
-  width: 100%; box-sizing: border-box;
-  font-size: 11px; padding: 3px 7px; margin-top: 5px;
-  border: 1px solid var(--border); border-radius: 4px;
-  background: var(--surface2); color: var(--text2);
-  font-family: inherit; resize: none;
-}
-.note-inp:focus { border-color: var(--green); color: var(--text); outline: none; }
-.note-inp::placeholder { color: var(--text3); font-style: italic; }
-@media print {
-  .note-inp:placeholder-shown { display: none; }
-  .note-inp { border: none; background: transparent; color: #333; font-size: 10px; padding: 0; margin-top: 2px; }
-}
-
-/* ── 精簡版 PDF（只顯示分類 ID + 名稱 + 總價）── */
-body.print-summary .section-body { display: block !important; }
-body.print-summary .section-body .section-table-wrap,
-body.print-summary .section-body table,
-body.print-summary .section-body thead,
-body.print-summary .section-body tbody,
-body.print-summary .add-btn { display: none !important; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -813,20 +647,15 @@ body.print-summary .add-btn { display: none !important; }
   </div>
   <div class="topbar-actions">
     <button class="btn btn-blue" onclick="showSync()">☁️ 跨裝置</button>
-    <button class="btn btn-ghost" onclick="showCostAdmin()">🔧 成本管理</button>
     <button class="btn btn-ghost" onclick="showTemplates()">📁 模板</button>
     <button class="btn btn-ghost" onclick="showHistory()">📋 歷史報價</button>
     <button class="btn btn-amber" onclick="saveQuote()">💾 存檔</button>
-    <button class="btn btn-green" onclick="window.print()">🖨️ 完整版 PDF</button>
-    <button class="btn" onclick="printSummary()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text)">📄 精簡版 PDF</button>
+    <button class="btn btn-green" onclick="window.print()">🖨️ 列印 / PDF</button>
     <button class="btn install-btn" onclick="showInstallGuide()" style="background:rgba(91,164,245,0.12);color:var(--blue);border-color:rgba(91,164,245,0.3)">📲 安裝 App</button>
   </div>
-  <!-- Mobile hamburger -->
-  <button class="ham-btn" onclick="openDrawer()" aria-label="選單">☰</button>
 </div>
 
 <div class="container">
-
 
 <!-- 客戶資訊 -->
 <div class="card">
@@ -864,6 +693,13 @@ body.print-summary .add-btn { display: none !important; }
 </div>
 
 <div class="cloud-banner" id="cloud-banner"><span id="cloud-banner-msg" style="flex:1">☁️ 其他裝置有新資料</span><button onclick="applyCloudUpdate()">立即同步</button><button onclick="dismissCloudBanner()" style="opacity:0.6">略過</button></div>
+<div class="consist-banner" id="consist-banner">
+  <strong>⚠️ 數量不一致</strong>
+  <ul id="consist-list"></ul>
+  <div class="consist-actions">
+    <button class="consist-btn ok" onclick="confirmConsistency()">✅ 確認，我知道了</button>
+    <button class="consist-btn" onclick="dismissConsistency()">略過</button>
+  </div>
 </div>
 <div class="validate-banner" id="validate-banner">⚠️ <b>單價不得低於成本：</b><span id="validate-msg"></span></div>
 <!-- ★★★ 報價總覽 (最重要) ★★★ -->
@@ -917,7 +753,7 @@ body.print-summary .add-btn { display: none !important; }
     <div class="field"><label>戶名</label><input type="text" id="bank-holder" placeholder="例：林OO設計有限公司"></div>
     <div class="field"><label>帳號</label><input type="text" id="bank-account" placeholder="例：0123-456-789012"></div>
   </div>
-  <div style="display:grid;grid-template-columns:3fr 100px 1.5fr;gap:14px">
+  <div class="grid3">
     <div class="field">
       <label>付款條件</label>
       <select id="pay-terms" onchange="onPayTermsChange(this)">
@@ -933,7 +769,7 @@ body.print-summary .add-btn { display: none !important; }
         style="display:none;margin-top:6px;width:100%"
         onchange="syncCustomPayTerms(this)">
     </div>
-    <div class="field"><label>有效期（天）</label><input type="number" id="valid-days" value="30" min="1" style="width:100%"></div>
+    <div class="field"><label>報價有效期（天）</label><input type="number" id="valid-days" value="30" min="1"></div>
     <div class="field"><label>預計開工日</label><input type="text" id="start-date" placeholder="2025/09/01"></div>
   </div>
 </div>
@@ -1122,7 +958,6 @@ const GROUPS = [
   { id:'D', label:'A類 設計及申請費', icon:'📋' },
   { id:'A', label:'B類 基礎工程類', icon:'🏗️' },
   { id:'B', label:'C類 材料道具類', icon:'📦' },
-  { id:'E', label:'D類 施工管理費',  icon:'⚙️' },
 ];
 
 const SECTIONS = [
@@ -1186,16 +1021,13 @@ const SECTIONS = [
   { id:'B04', dispId:'C04', group:'B', label:'窗簾', icon:'🪟',
     items:['捲簾','百葉簾','布簾','木百葉','紗簾','蜂巢簾','羅馬簾','防曬簾'],
     specs:['國產','進口','訂製'], units:['式','組','窗','才','cm'] },
-  { id:'E01', dispId:'D01', group:'E', label:'施工管理費', icon:'⚙️',
-    mgmtFee:true,
-    items:['施工管理費'], specs:['標準'], units:['%'] },
   { id:'B05', dispId:'C05', group:'B', label:'軟裝家具', icon:'🛋️',
     items:['沙發','餐桌椅','主臥床架','床頭燈','地毯','裝飾掛畫','植栽佈置','抱枕組','邊几'],
     specs:['國產','進口','訂製'], units:['式','件','套'] },
 ];
 
-const PIE_COLORS = ['#e4b84a','#50e88a','#5ba4f5','#c084fc'];
-const SEC_COLORS = { D:'gold', A:'green', B:'b', E:'purple' };
+const PIE_COLORS = ['#e4b84a','#50e88a','#5ba4f5'];
+const SEC_COLORS = { D:'gold', A:'green', B:'b' };
 
 function fmt(n){ return 'NT$\u00a0'+Math.round(n).toLocaleString('zh-TW'); }
 
@@ -1206,7 +1038,7 @@ function buildSections(){
   GROUPS.forEach(grp => {
     const divider = document.createElement('div');
     divider.className = 'group-divider';
-    const cls = grp.id==='B' ? ' b' : grp.id==='D' ? ' gold' : grp.id==='E' ? ' purple' : '';
+    const cls = grp.id==='B' ? ' b' : grp.id==='D' ? ' gold' : '';
     divider.innerHTML = `
       <span class="group-badge${cls}">${grp.icon} ${grp.label}</span>
       <div class="group-line"></div>
@@ -1219,7 +1051,7 @@ function buildSections(){
       const el = document.createElement('div');
       el.className = 'section-card';
       el.id = 'sec-'+sec.id;
-      const idCls = color==='b' ? ' b' : color==='gold' ? ' gold' : color==='purple' ? ' purple' : '';
+      const idCls = color==='b' ? ' b' : color==='gold' ? ' gold' : '';
       el.innerHTML = `
         <div class="section-head" onclick="toggleSec('${sec.id}')">
           <div class="section-head-left">
@@ -1312,55 +1144,7 @@ function addRow(secId, data){
     onkeydown="if(event.key==='Enter'){confirmCustomUnit(this,'${secId}');event.preventDefault();}"
     onblur="confirmCustomUnit(this,'${secId}')">`;
 
-  // ── D類 施工管理費 special row ──
-  if(secId==='E01'){
-    const sec=SECTIONS.find(s=>s.id==='E01');
-    const color='purple'; const cls=' purple';
-    const uSaved=JSON.parse(localStorage.getItem('cu_E01')||'[]');
-    uSaved.forEach(u=>{if(!sec.units.includes(u)) sec.units.push(u);});
-    const tr=document.createElement('tr');
-    tr.innerHTML=`
-      <td class="lock-td"><button class="lock-btn" onclick="toggleLock(this,'E01')" title="鎖定">🔓</button></td>
-      <td style="min-width:120px"><span style="font-size:13px;font-weight:600">施工管理費</span></td>
-      <td>
-        <input class="qty-inp" type="number" value="${d.qty||5}" min="5" max="10" step="0.5"
-          onchange="validateMgmtQty(this);recalc()" style="width:56px">
-        <div class="qty-pct-warn" id="qty-warn-${Date.now()}">需介於5~10%</div>
-      </td>
-      <td><span style="font-size:12px;font-weight:700;padding:4px 8px;background:var(--purple-dim);border-radius:4px;color:var(--purple)">%</span></td>
-      <td>
-        <div class="mgmt-price-wrap">
-          <input class="price-inp auto-price" type="number" value="${d.price||0}" min="0" readonly
-            title="自動抓取工程總價（A+B+C類合計）" style="width:84px">
-        </div>
-        <div style="font-size:9px;color:var(--text2);margin-top:2px">自動 = 工程總價</div>
-      </td>
-      <td class="cost-col"><input class="cost-inp" type="number" value="${d.cost||0}" min="0" step="100" onchange="recalc()" style="width:84px;color:#e84e88;font-weight:700"></td>
-      <td class="sub-cell purple" id="mgmt-total-cell">NT$\u00a00</td>
-      <td></td>
-      <td><button class="rm-btn" onclick="rmRow(this)" title="刪除">×</button></td>`;
-    document.getElementById('tbody-E01').appendChild(tr);
-    if(d.locked){
-      tr.dataset.locked='true';
-      const lb=tr.querySelector('.lock-btn');
-      if(lb){lb.textContent='🔒';lb.classList.add('locked');}
-      tr.style.background='rgba(80,232,138,0.04)';
-      tr.querySelectorAll('input,select').forEach(el=>{ el.disabled=true; });
-      // rm-btn stays clickable (rmRow handles locked check)
-    }
-    recalc();
-    return;
-  }
-  // Look up cost preset for this item
-  let _presetCost=null;
-  if(d.cost===undefined){
-    const _presets=getCostPresets();
-    if(_presets[secId]){
-      const _iSel=d.item;
-      if(_iSel && _presets[secId][_iSel]!==undefined) _presetCost=_presets[secId][_iSel];
-    }
-  }
-  const defCost=d.cost!==undefined?d.cost:(_presetCost!==null?_presetCost:(d.price||3000));
+  const defCost=d.cost!==undefined?d.cost:(d.price||3000);
 
   // Lock cell
   const lockTd=`<td class="lock-td"><button class="lock-btn" onclick="toggleLock(this,'${secId}')" title="🔒 鎖定保留此列">🔓</button></td>`;
@@ -1374,12 +1158,12 @@ function addRow(secId, data){
   tr.innerHTML = `
     ${lockTd}
     ${itemTd}
-    <td><input class="qty-inp" type="number" value="${d.qty||1}" min="0" step="1" onchange="this.value=Math.max(0,Math.round(this.value)||0);recalc()" style="width:56px"></td>
+    <td><input class="qty-inp" type="number" value="${d.qty||1}" min="0.1" step="0.5" onchange="recalc()" style="width:56px"></td>
     <td>${unitSel}</td>
     <td><input class="price-inp" type="number" value="${d.price||3000}" min="0" step="100" onchange="recalc()" style="width:84px"></td>
     <td class="cost-col"><input class="cost-inp" type="number" value="${defCost}" min="0" step="100" onchange="recalc()" style="width:84px;color:#e84e88;font-weight:700"></td>
     <td class="sub-cell${cls}">NT$\u00a00</td>
-    <td style="min-width:90px">${specSel}<input class="note-inp" type="text" value="${d.note||''}" placeholder="說明..."></td>
+    <td style="min-width:90px">${specSel}</td>
     <td><button class="rm-btn" onclick="this.closest('tr').remove();saveLockedRows(secId);recalc()" title="刪除">×</button></td>`;
   tbody.appendChild(tr);
   // Apply locked state
@@ -1433,56 +1217,7 @@ function a03AddItemInGroup(secId, cat, d){
   const sec=SECTIONS.find(s=>s.id===secId);
   const color=SEC_COLORS[sec.group]||'green';
   const cls=color==='b'?' b':color==='gold'?' gold':'';
-  // ── D類 施工管理費 special row ──
-  if(secId==='E01'){
-    const sec=SECTIONS.find(s=>s.id==='E01');
-    const color='purple'; const cls=' purple';
-    const uSaved=JSON.parse(localStorage.getItem('cu_E01')||'[]');
-    uSaved.forEach(u=>{if(!sec.units.includes(u)) sec.units.push(u);});
-    const tr=document.createElement('tr');
-    tr.innerHTML=`
-      <td class="lock-td"><button class="lock-btn" onclick="toggleLock(this,'E01')" title="鎖定">🔓</button></td>
-      <td style="min-width:120px"><span style="font-size:13px;font-weight:600">施工管理費</span></td>
-      <td>
-        <input class="qty-inp" type="number" value="${d.qty||5}" min="5" max="10" step="0.5"
-          onchange="validateMgmtQty(this);recalc()" style="width:56px">
-        <div class="qty-pct-warn" id="qty-warn-${Date.now()}">需介於5~10%</div>
-      </td>
-      <td><span style="font-size:12px;font-weight:700;padding:4px 8px;background:var(--purple-dim);border-radius:4px;color:var(--purple)">%</span></td>
-      <td>
-        <div class="mgmt-price-wrap">
-          <input class="price-inp auto-price" type="number" value="${d.price||0}" min="0" readonly
-            title="自動抓取工程總價（A+B+C類合計）" style="width:84px">
-        </div>
-        <div style="font-size:9px;color:var(--text2);margin-top:2px">自動 = 工程總價</div>
-      </td>
-      <td class="cost-col"><input class="cost-inp" type="number" value="${d.cost||0}" min="0" step="100" onchange="recalc()" style="width:84px;color:#e84e88;font-weight:700"></td>
-      <td class="sub-cell purple" id="mgmt-total-cell">NT$\u00a00</td>
-      <td></td>
-      <td><button class="rm-btn" onclick="rmRow(this)" title="刪除">×</button></td>`;
-    document.getElementById('tbody-E01').appendChild(tr);
-    if(d.locked){
-      tr.dataset.locked='true';
-      const lb=tr.querySelector('.lock-btn');
-      if(lb){lb.textContent='🔒';lb.classList.add('locked');}
-      tr.style.background='rgba(80,232,138,0.04)';
-      tr.querySelectorAll('input,select').forEach(el=>{ el.disabled=true; });
-      // rm-btn stays clickable (rmRow handles locked check)
-    }
-    recalc();
-    return;
-  }
-  // Look up cost preset for this item
-  let _presetCost=null;
-  if(d.cost===undefined){
-    const _presets=getCostPresets();
-    if(_presets[secId]){
-      const _key2=cat?(cat+'__'+(d.item||'')):(d.item||'');
-      if(_key2 && _presets[secId][_key2]!==undefined) _presetCost=_presets[secId][_key2];
-      else if(d.item && _presets[secId][d.item]!==undefined) _presetCost=_presets[secId][d.item];
-    }
-  }
-  const defCost=d.cost!==undefined?d.cost:(_presetCost!==null?_presetCost:(d.price||0));
+  const defCost=d.cost!==undefined?d.cost:(d.price||3000);
   // sub-item select for this category
   const subItems=getA03SubItems(cat);
   const subOpts=subItems.map(i=>`<option${d.item===i?' selected':''}>${i}</option>`).join('');
@@ -1499,12 +1234,12 @@ function a03AddItemInGroup(secId, cat, d){
   tr.innerHTML=`
     <td class="lock-td"><button class="lock-btn" onclick="toggleLock(this,'${secId}')" title="🔒 鎖定保留此列">🔓</button></td>
     <td style="min-width:150px"><select class="a03-sub-sel item-sel" onchange="recalc()" style="width:100%">${subOpts}</select></td>
-    <td><input class="qty-inp" type="number" value="${d.qty||1}" min="0" step="1" onchange="this.value=Math.max(0,Math.round(this.value)||0);recalc()" style="width:56px"></td>
+    <td><input class="qty-inp" type="number" value="${d.qty||1}" min="0.1" step="0.5" onchange="recalc()" style="width:56px"></td>
     <td>${unitSel}</td>
     <td><input class="price-inp" type="number" value="${d.price||0}" min="0" step="100" onchange="recalc()" style="width:84px"></td>
     <td class="cost-col"><input class="cost-inp" type="number" value="${defCost}" min="0" step="100" onchange="recalc()" style="width:84px;color:#e84e88;font-weight:700"></td>
     <td class="sub-cell${cls}">NT$ 0</td>
-    <td>${specSel}<input class="note-inp" type="text" value="${d.note||''}" placeholder="說明..."></td>
+    <td>${specSel}</td>
     <td><button class="rm-btn" onclick="a03RemoveRow(this,'${secId}','${cat}')" title="刪除">×</button></td>`;
   tbody.insertBefore(tr, subAddRow);
   if(d.locked){
@@ -1513,7 +1248,7 @@ function a03AddItemInGroup(secId, cat, d){
     if(lb){lb.textContent='🔒';lb.classList.add('locked');}
     tr.style.background='rgba(80,232,138,0.04)';
     tr.querySelectorAll('input,select').forEach(el=>{ el.disabled=true; });
-    // rm-btn stays clickable (rmRow handles locked check)
+    tr.querySelector('.rm-btn').disabled=true;
   }
   recalc();
 }
@@ -1614,7 +1349,7 @@ function getRowDataForLock(tr, secId){
   const unitVal=unitSel?.value==='__cu__'?(tr.querySelector('.custom-unit')?.value||''):(unitSel?.value||'式');
   return {
     item:itemVal, cat:tr.dataset?.cat||'',
-    spec:specVal, note:tr.querySelector('.note-inp')?.value||'', price:parseFloat(priceEl?.value)||0,
+    spec:specVal, price:parseFloat(priceEl?.value)||0,
     qty:parseFloat(qtyEl?.value)||1,
     cost:parseFloat(costEl?.value)||0,
     unit:unitVal, locked:true
@@ -1713,15 +1448,15 @@ function confirmCustomItem(input){
   const sec = SECTIONS.find(s=>s.id===secId);
   // 加入 section items（讓之後新增的列也能選到）
   if(!sec.items.includes(val)) sec.items.push(val);
-  // 在所有同 section 的 item-sel 加入這個選項（如果還沒有）
+  // 在所有同 section 的 item-sel 加入這個選項（如果還沒有），但只切換當前列
   document.querySelectorAll(`#tbody-${secId} .item-sel`).forEach(s=>{
     if(![...s.options].some(o=>o.value===val)){
       const opt = document.createElement('option');
       opt.value = val; opt.text = val;
       s.insertBefore(opt, s.lastElementChild); // 插在「手動輸入」前
     }
-    s.value = val; // 切換到新選項
   });
+  sel.value = val; // 只切換當前列
   input.style.display = 'none';
   recalc();
 }
@@ -1739,15 +1474,14 @@ function confirmCustomSpec(input){
       opt.value = val; opt.text = val;
       s.insertBefore(opt, s.lastElementChild);
     }
-    s.value = val;
   });
+  sel.value = val; // 只切換當前列
   input.style.display = 'none';
   recalc();
 }
 
 function getSectionTotal(secId){
   let quoteT=0, costT=0;
-  const isMgmt = secId==='E01';
   document.querySelectorAll(`#tbody-${secId} tr`).forEach(tr=>{
     if(tr.classList.contains('a03-cat-hdr')||tr.classList.contains('a03-sub-add-row')) return;
     const priceEl=tr.querySelector('.price-inp');
@@ -1755,49 +1489,99 @@ function getSectionTotal(secId){
     const costEl=tr.querySelector('.cost-inp');
     const sc=tr.querySelector('.sub-cell');
     if(priceEl&&qtyEl){
-      const qty=parseFloat(qtyEl.value)||0;
-      const price=parseFloat(priceEl.value)||0;
-      const sub=isMgmt ? price*(qty/100) : price*qty;
+      const qty=parseFloat(qtyEl.value)||1;
+      const sub=(parseFloat(priceEl.value)||0)*qty;
       if(sc) sc.textContent=fmt(sub);
       quoteT+=sub;
-      if(costEl){
-        const costQty=parseFloat(costEl.value)||0;
-        costT+=isMgmt ? costQty*(qty/100) : costQty*qty;
-      }
+      if(costEl) costT+=(parseFloat(costEl.value)||0)*qty;
     }
   });
   document.getElementById('total-'+secId).textContent=fmt(quoteT);
-  // Print-hide section if total is 0
-  const card=document.getElementById('sec-'+secId);
-  if(card) card.classList.toggle('print-zero', quoteT===0 && costT===0);
   return {quoteT,costT};
 }
 
 
 // ══ CONSISTENCY CHECKS (A03 水電) ══
+const A03_OUTLET_MAP = {
+  '開關出線':   '新增開關',
+  '插座出線':   '新增插座',
+  '網路出線':   '新增網路插座',
+  '電話出線':   '新增電話插座',
+  '電視出線':   '新增電視插座',
+  '門鈴出線':   '新增門鈴開關',
+  'HDMI出線':   '新增HDMI插座',
+  '緊急壓扣出線':'新增緊急壓扣',
+};
 
+function getA03CatItemQty(cat, itemName){
+  let total=0;
+  document.querySelectorAll('#tbody-A03 tr.a03-item-row').forEach(tr=>{
+    if(tr.dataset.cat!==cat) return;
+    const sel=tr.querySelector('.a03-sub-sel,.item-sel');
+    if(sel && sel.value===itemName){
+      total += parseFloat(tr.querySelector('.qty-inp')?.value)||0;
+    }
+  });
+  return total;
+}
+function getSecItemQty(secId, keyword){
+  let total=0;
+  document.querySelectorAll(`#tbody-${secId} tr`).forEach(tr=>{
+    if(tr.classList.contains('a03-cat-hdr')||tr.classList.contains('a03-sub-add-row')) return;
+    const sel=tr.querySelector('.a03-sub-sel,.item-sel');
+    if(sel && sel.value.includes(keyword)){
+      total += parseFloat(tr.querySelector('.qty-inp')?.value)||0;
+    }
+  });
+  return total;
+}
 
+let _consistTimer=null;
+let _consistDismissed=false;
+function scheduleConsistencyCheck(){
+  _consistDismissed=false;
+  clearTimeout(_consistTimer);
+  _consistTimer=setTimeout(runConsistencyCheck, 800);
+}
+function runConsistencyCheck(){
+  if(_consistDismissed) return;
+  const issues=[];
+
+  // ── 1. 冷氣迴路5.5mm ↔ A13 室外機配置
+  const acCircuit = getA03CatItemQty('迴路','新增迴路5.5mm');
+  const acUnit    = getSecItemQty('A13','室外機');
+  if(acCircuit>0 && acUnit>0 && acCircuit!==acUnit){
+    issues.push(`B03 冷氣迴路5.5mm 數量 <b>${acCircuit}</b>，B13 空調室外機 數量 <b>${acUnit}</b>`);
+  }
+
+  // ── 2. 出線 ↔ 開關插座
+  Object.entries(A03_OUTLET_MAP).forEach(([outlet, device])=>{
+    const oQty = getA03CatItemQty('出線', outlet);
+    const dQty = getA03CatItemQty('開關插座', device);
+    if(oQty>0 && dQty>0 && oQty!==dQty){
+      issues.push(`出線「${outlet}」數量 <b>${oQty}</b>，開關插座「${device}」數量 <b>${dQty}</b>`);
+    }
+  });
+
+  const banner=document.getElementById('consist-banner');
+  const list=document.getElementById('consist-list');
+  if(issues.length>0 && banner && list){
+    list.innerHTML=issues.map(i=>`<li>${i}</li>`).join('');
+    banner.classList.add('show');
+  } else if(banner){
+    banner.classList.remove('show');
+  }
+}
+function confirmConsistency(){
+  _consistDismissed=true;
+  document.getElementById('consist-banner')?.classList.remove('show');
+}
+function dismissConsistency(){
+  document.getElementById('consist-banner')?.classList.remove('show');
+}
 
 function recalc(){
-  // Pass 1: calc non-E sections to get ABC total
-  const nonE=SECTIONS.filter(s=>s.group!=='E');
-  const eS=SECTIONS.filter(s=>s.group==='E');
-  const nonERes=nonE.map(s=>getSectionTotal(s.id));
-  const abcTotal=nonERes.reduce((a,r)=>a+r.quoteT,0);
-  // Update E01 auto-price inputs
-  eS.forEach(sec=>{
-    document.querySelectorAll(`#tbody-${sec.id} tr`).forEach(tr=>{
-      const p=tr.querySelector('.auto-price');
-      if(p&&!tr.dataset.locked) p.value=Math.round(abcTotal);
-    });
-  });
-  // Pass 2: calc E sections with updated price
-  const eRes=eS.map(s=>getSectionTotal(s.id));
-  // Merge results in SECTIONS order
-  const rMap={};
-  nonE.forEach((s,i)=>rMap[s.id]=nonERes[i]);
-  eS.forEach((s,i)=>rMap[s.id]=eRes[i]);
-  const results=SECTIONS.map(s=>rMap[s.id]||{quoteT:0,costT:0});
+  const results=SECTIONS.map(s=>getSectionTotal(s.id));
   const quoteSum=results.reduce((a,r)=>a+r.quoteT,0);
   const costSum=results.reduce((a,r)=>a+r.costT,0);
   const area=parseFloat(document.getElementById('area').value)||1;
@@ -1815,20 +1599,9 @@ function recalc(){
   });
   drawPie(results.map(r=>r.quoteT));
   validatePrices();
+  scheduleConsistencyCheck();
 }
 
-function validateMgmtQty(input){
-  const v=parseFloat(input.value);
-  const warn=input.parentElement?.querySelector('.qty-pct-warn')
-             || input.closest('td')?.querySelector('.qty-pct-warn');
-  if(v<5||v>10){
-    input.style.borderColor='var(--red)';
-    if(warn) warn.classList.add('show');
-  } else {
-    input.style.borderColor='';
-    if(warn) warn.classList.remove('show');
-  }
-}
 function validatePrices(){
   const errs=[];
   document.querySelectorAll('tbody tr').forEach(tr=>{
@@ -1907,7 +1680,7 @@ function drawPie(vals){
   ctx.fillStyle='#1a1a20'; ctx.fill();
 
   // Group labels A/B/C on outer rim
-  const groupLabels=['A','B','C','D'];
+  const groupLabels=['A','B','C'];
   GROUPS.forEach((grp,gi)=>{
     const secs=SECTIONS.filter(s=>s.group===grp.id);
     const grpTotal=secs.reduce((a,s)=>a+(vals[SECTIONS.indexOf(s)]||0),0);
@@ -2006,8 +1779,7 @@ function getQuoteData(){
         price:parseFloat(priceEl2.value)||0,
         qty:parseFloat(qtyEl2.value)||1,
         cost:parseFloat(costEl2?.value)||0,
-        unit:unitSel?.value,
-        note:tr.querySelector('.note-inp')?.value||''
+        unit:unitSel?.value
       });
     });
   });
@@ -2040,55 +1812,27 @@ function getQuoteData(){
 }
 
 // ══ TEMPLATE MANAGEMENT ══
-// ── 模板 Firebase 雲端同步 ──
-function tplToCloud(list){
-  if(typeof db==='undefined') return;
-  try{ db.ref('templates').set(list||[]); }catch(e){}
-}
-function tplFromCloud(cb){
-  if(typeof db==='undefined'){ cb(null); return; }
-  db.ref('templates').once('value').then(function(snap){
-    cb(snap.exists()?snap.val():null);
-  }).catch(function(){ cb(null); });
-}
-
 function showTemplates(){
-  tplFromCloud(function(cloudList){
-    if(cloudList && cloudList.length>0)
-      localStorage.setItem('templates_v1',JSON.stringify(cloudList));
-    renderTplList();
-    document.getElementById('template-modal').classList.add('open');
-  });
+  renderTplList();
+  document.getElementById('template-modal').classList.add('open');
 }
 function renderTplList(){
   const list=JSON.parse(localStorage.getItem('templates_v1')||'[]');
   const cont=document.getElementById('tpl-list');
   if(!list.length){ cont.innerHTML='<div class="empty">尚未儲存任何模板</div>'; return; }
-  // Group by spaceType
-  const groups={};
-  list.forEach((t,i)=>{
-    const cat=t.spaceType||'未分類';
-    if(!groups[cat]) groups[cat]=[];
-    groups[cat].push({t,i});
-  });
-  let html='';
-  Object.entries(groups).forEach(([cat,items])=>{
-    html+=`<div class="cat-header"><span>${cat}</span><span class="cat-badge">${items.length}</span></div>`;
-    items.forEach(({t,i})=>{
-      const cnt=SECTIONS.reduce((a,s)=>a+(t.data.rows?.[s.id]||[]).length,0);
-      html+=`<div class="tpl-item">
-        <div>
-          <div class="tpl-name">${t.name}</div>
-          <div class="tpl-date">${t.date} &nbsp;·&nbsp; ${cnt} 個項目</div>
-        </div>
-        <div class="tpl-btns">
-          <button class="tpl-btn load" onclick="applyTemplate(${i})">套用</button>
-          <button class="tpl-btn del" onclick="deleteTemplate(${i})">刪除</button>
-        </div>
-      </div>`;
-    });
-  });
-  cont.innerHTML=html;
+  cont.innerHTML=list.map((t,i)=>{
+    const cnt=SECTIONS.reduce((a,s)=>a+(t.data.rows?.[s.id]||[]).length,0);
+    return `<div class="tpl-item">
+      <div>
+        <div class="tpl-name">${t.name}</div>
+        <div class="tpl-date">${t.date} &nbsp;·&nbsp; ${cnt} 個項目</div>
+      </div>
+      <div class="tpl-btns">
+        <button class="tpl-btn load" onclick="applyTemplate(${i})">套用</button>
+        <button class="tpl-btn del" onclick="deleteTemplate(${i})">刪除</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 function saveTemplate(){
   const name=document.getElementById('tpl-name-input').value.trim();
@@ -2096,20 +1840,17 @@ function saveTemplate(){
   const data=getQuoteData();
   const list=JSON.parse(localStorage.getItem('templates_v1')||'[]');
   const idx=list.findIndex(t=>t.name===name);
-  const spaceType=document.getElementById('space-type')?.value||'未分類';
-  const entry={name, data, date:new Date().toLocaleDateString('zh-TW'), spaceType};
+  const entry={name, data, date:new Date().toLocaleDateString('zh-TW')};
   if(idx>=0){
     if(!confirm(`模板「${name}」已存在，要覆蓋嗎？`)) return;
     list[idx]=entry;
   } else {
     list.unshift(entry);
   }
-  const newList=list.slice(0,20);
-  localStorage.setItem('templates_v1',JSON.stringify(newList));
-  tplToCloud(newList);
+  localStorage.setItem('templates_v1',JSON.stringify(list.slice(0,20)));
   document.getElementById('tpl-name-input').value='';
   renderTplList();
-  alert(`✅ 模板「${name}」已儲存並同步至雲端！`);
+  alert(`✅ 模板「${name}」已儲存！`);
 }
 function applyTemplate(idx){
   if(!confirm('套用模板會覆蓋目前所有工程項目，客戶資訊不受影響。確定嗎？')) return;
@@ -2144,7 +1885,6 @@ function deleteTemplate(idx){
   const list=JSON.parse(localStorage.getItem('templates_v1')||'[]');
   list.splice(idx,1);
   localStorage.setItem('templates_v1',JSON.stringify(list));
-  tplToCloud(list);
   renderTplList();
 }
 
@@ -2326,255 +2066,9 @@ function saveHistoryToCloud(data){
   db.ref('history').push({ ...data, _savedAt: Date.now() }).catch(()=>{});
 }
 
-
-// ══ COST PRESETS ══
-const COST_KEY = 'cost_presets_v1';
-function getCostPresets(){ return JSON.parse(localStorage.getItem(COST_KEY)||'{}'); }
-function saveCostPresetsData(p){
-  localStorage.setItem(COST_KEY,JSON.stringify(p));
-  if(typeof db!=='undefined') db.ref('cost_presets').set(p).catch(()=>{});
-}
-function getItemCost(secId,itemName,cat){
-  const p=getCostPresets();
-  const key=cat?(cat+'__'+itemName):itemName;
-  return p[secId]?.[key]??null;
-}
-function importCurrentCosts(){
-  const p=getCostPresets();
-  SECTIONS.filter(s=>s.id!=='E01').forEach(sec=>{
-    if(sec.id==='A03'){
-      document.querySelectorAll('#tbody-A03 tr.a03-item-row').forEach(tr=>{
-        const cat=tr.dataset.cat;
-        const iSel=tr.querySelector('.a03-sub-sel');
-        const cEl=tr.querySelector('.cost-inp');
-        if(cat&&iSel&&cEl){
-          const cost=parseFloat(cEl.value);
-          const item=iSel.value;
-          if(item&&!isNaN(cost)&&cost>0){
-            if(!p[sec.id]) p[sec.id]={};
-            p[sec.id][cat+'__'+item]=cost;
-          }
-        }
-      });
-    } else {
-      document.querySelectorAll('#tbody-'+sec.id+' tr').forEach(tr=>{
-        if(tr.classList.contains('a03-cat-hdr')||tr.classList.contains('a03-sub-add-row')) return;
-        const iSel=tr.querySelector('.item-sel');
-        const cEl=tr.querySelector('.cost-inp');
-        if(iSel&&cEl){
-          const cost=parseFloat(cEl.value);
-          const item=iSel.value;
-          if(item&&!isNaN(cost)&&cost>0){
-            if(!p[sec.id]) p[sec.id]={};
-            p[sec.id][item]=cost;
-          }
-        }
-      });
-    }
-  });
-  return p;
-}
-
-let _cpGrp='D';
-
-function showCostAdmin(){
-  // 匯入現有成本
-  var p={};
-  try{ p=JSON.parse(localStorage.getItem('cost_presets_v1')||'{}'); }catch(e){}
-  try{
-    (typeof SECTIONS!=='undefined'?SECTIONS:[]).forEach(function(sec){
-      if(sec.id==='E01') return;
-      var rows=document.querySelectorAll('#tbody-'+sec.id+' tr');
-      rows.forEach(function(tr){
-        if(tr.classList.contains('a03-cat-hdr')||tr.classList.contains('a03-sub-add-row')) return;
-        var iSel=tr.querySelector(sec.id==='A03'?'.a03-sub-sel':'.item-sel');
-        var cEl=tr.querySelector('.cost-inp');
-        if(iSel&&cEl&&iSel.value){
-          var cost=parseFloat(cEl.value);
-          if(!isNaN(cost)&&cost>0){
-            if(!p[sec.id]) p[sec.id]={};
-            var cat=tr.dataset.cat||'';
-            p[sec.id][cat?(cat+'__'+iSel.value):iSel.value]=cost;
-          }
-        }
-      });
-    });
-    localStorage.setItem('cost_presets_v1',JSON.stringify(p));
-  }catch(e){}
-  // 開啟 dialog
-  var dlg=document.getElementById('cost-dialog');
-  if(!dlg){alert('找不到對話框'); return;}
-  _cpBuild(p);
-  dlg.showModal();
-}
-
-function _cpBuild(p){
-  if(!p){ try{p=JSON.parse(localStorage.getItem('cost_presets_v1')||'{}');}catch(e){p={};} }
-  var grps=(typeof GROUPS!=='undefined')?GROUPS.filter(function(g){return g.id!=='E';}):[{id:'D',label:'A類 設計及申請費',icon:'📋'}];
-  var tc=document.getElementById('cost-tabs');
-  if(tc){
-    tc.innerHTML=grps.map(function(g){
-      var a=g.id===_cpGrp;
-      return '<button onclick="_cpSwitch(\''+g.id+'\')" style="padding:10px 16px;border:none;border-bottom:2px solid '+(a?'var(--green)':'transparent')+';background:none;color:'+(a?'var(--green)':'var(--text2)')+';font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap">'+g.icon+' '+g.label.replace(/[A-D]類 /,'')+'</button>';
-    }).join('');
-  }
-  _cpBody(p,_cpGrp);
-}
-
-function _cpSwitch(grpId){
-  _cpGrp=grpId;
-  var p={};try{p=JSON.parse(localStorage.getItem('cost_presets_v1')||'{}');}catch(e){}
-  _cpBuild(p);
-}
-
-function _cpBody(p,grpId){
-  var body=document.getElementById('cost-body');
-  if(!body) return;
-  var secs=(typeof SECTIONS!=='undefined')?SECTIONS.filter(function(s){return s.group===grpId&&s.id!=='E01';}):[]; 
-  var h='';
-  var dates={}; try{dates=JSON.parse(localStorage.getItem('cost_dates_v1')||'{}');}catch(e){}
-  secs.forEach(function(sec){
-    var ds=dates[sec.id]?'更新：'+dates[sec.id]:'—';
-    h+='<div style="margin-bottom:20px">'
-     +'<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border2);margin-bottom:10px">'
-     +'<span style="flex:1;font-size:12px;font-weight:700">'+(sec.icon||'')+' '+(sec.dispId||sec.id)+' '+sec.label+'</span>'
-     +'<span id="cpd-'+sec.id+'" style="font-size:10px;color:var(--text2)">'+ds+'</span>'
-     +'<button class="cp-save-btn" data-save-sec="'+sec.id+'" onclick="cpSaveSec(this.dataset.saveSec,this)">&#x1F4BE; 儲存</button>'
-     +'</div>';
-    if(sec.id==='A03'&&typeof A03_CATS!=='undefined'){
-      Object.keys(A03_CATS).forEach(function(cat){
-        var items=A03_CATS[cat]||[];
-        if(!items.length) return;
-        h+='<div style="font-size:10px;font-weight:800;color:var(--amber);margin:8px 0 6px">'+cat+'</div>'
-         +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:4px">';
-        items.forEach(function(item){
-          var key=cat+'__'+item;
-          var val=(p[sec.id]&&p[sec.id][key]!==undefined)?p[sec.id][key]:'';
-          h+=_cpCard(sec.id,key,item,val);
-        });
-        h+='</div>';
-      });
-    } else {
-      h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px">';
-      (sec.items||[]).forEach(function(item){
-        var val=(p[sec.id]&&p[sec.id][item]!==undefined)?p[sec.id][item]:'';
-        h+=_cpCard(sec.id,item,item,val);
-      });
-      h+='</div>';
-    }
-    h+='</div>';
-  });
-  body.innerHTML=h||'<div style="color:var(--text2);padding:16px">此類別無項目</div>';
-}
-
-function _cpCard(secId,key,label,val){
-  return '<label style="display:block;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;cursor:text">'
-    +'<div style="font-size:11px;color:var(--text2);margin-bottom:6px;line-height:1.4">'+label+'</div>'
-    +'<div style="display:flex;align-items:center;gap:4px">'
-    +'<input type="number" inputmode="decimal" min="0" step="50" value="'+val+'" placeholder="—"'
-    +' data-sec="'+secId+'" data-key="'+key+'"'
-    +' onchange="cpAutoSave(this)"'
-    +' style="flex:1;min-width:0;width:0;padding:6px 8px;border:1.5px solid var(--border2);border-radius:6px;'
-    +'background:var(--surface3);color:#e84e88;font-size:14px;font-weight:700;text-align:right;'
-    +'font-family:inherit;-webkit-appearance:none;appearance:none;box-sizing:border-box">'
-    +'<span style="font-size:12px;color:var(--text2);flex-shrink:0">元</span>'
-    +'</div></label>';
-}
-
-function cpAutoSave(inp){
-  var p={};try{p=JSON.parse(localStorage.getItem('cost_presets_v1')||'{}');}catch(e){}
-  var sec=inp.getAttribute('data-sec'),key=inp.getAttribute('data-key'),val=parseFloat(inp.value);
-  if(!p[sec]) p[sec]={};
-  if(!isNaN(val)&&val>=0) p[sec][key]=val; else delete p[sec][key];
-  try{localStorage.setItem('cost_presets_v1',JSON.stringify(p));}catch(e){}
-  if(typeof db!=='undefined')try{db.ref('cost_presets').set(p);}catch(e){}
-}
-
-function saveCostPresets(){
-  var p={};try{p=JSON.parse(localStorage.getItem('cost_presets_v1')||'{}');}catch(e){}
-  var inputs=document.querySelectorAll('#cost-body input');
-  inputs.forEach(function(inp){
-    var sec=inp.getAttribute('data-sec'),key=inp.getAttribute('data-key'),val=parseFloat(inp.value);
-    if(!p[sec]) p[sec]={};
-    if(!isNaN(val)&&val>=0) p[sec][key]=val; else{if(p[sec]) delete p[sec][key];}
-  });
-  try{localStorage.setItem('cost_presets_v1',JSON.stringify(p));}catch(e){}
-  if(typeof db!=='undefined')try{db.ref('cost_presets').set(p);}catch(e){}
-  alert('✅ 成本已儲存！');
-}
-
-function resetCostPresets(){
-  if(!confirm('確定清除所有成本預設值？')) return;
-  try{localStorage.removeItem('cost_presets_v1');}catch(e){}
-  if(typeof db!=='undefined')try{db.ref('cost_presets').remove();}catch(e){}
-  _cpBuild({});
-}
-
-function loadCostPresetsFromCloud(){
-  if(typeof db==='undefined') return;
-  db.ref('cost_presets').once('value').then(snap=>{
-    if(snap.exists()) localStorage.setItem(COST_KEY,JSON.stringify(snap.val()));
-  }).catch(()=>{});
-}
-
-
-function syncCostsOnSave(){
-  // 從主頁所有列讀取成本，同步到後台 cost_presets_v1
-  var p={};
-  try{p=JSON.parse(localStorage.getItem('cost_presets_v1')||'{}');}catch(e){}
-  if(typeof SECTIONS==='undefined') return;
-  SECTIONS.forEach(function(sec){
-    if(sec.id==='E01') return;
-    if(sec.id==='A03'){
-      document.querySelectorAll('#tbody-A03 tr.a03-item-row').forEach(function(tr){
-        var cat=tr.dataset.cat||'';
-        var sel=tr.querySelector('.a03-sub-sel');
-        var cEl=tr.querySelector('.cost-inp');
-        if(!sel||!cEl||!sel.value) return;
-        var cost=parseFloat(cEl.value);
-        if(isNaN(cost)||cost<=0) return;
-        if(!p['A03']) p['A03']={};
-        var key=cat?(cat+'__'+sel.value):sel.value;
-        p['A03'][key]=cost;
-        // 若為自訂新增項目，確保也存入 A03_CATS 和 localStorage
-        if(cat&&typeof A03_CATS!=='undefined'){
-          if(!A03_CATS[cat]) A03_CATS[cat]=[];
-          if(!A03_CATS[cat].includes(sel.value)){
-            A03_CATS[cat].push(sel.value);
-            var saved=[];
-            try{saved=JSON.parse(localStorage.getItem('a03s_'+cat)||'[]');}catch(e){}
-            if(!saved.includes(sel.value)){
-              saved.push(sel.value);
-              localStorage.setItem('a03s_'+cat,JSON.stringify(saved));
-            }
-          }
-        }
-      });
-    } else {
-      document.querySelectorAll('#tbody-'+sec.id+' tr').forEach(function(tr){
-        if(tr.classList.contains('a03-cat-hdr')||tr.classList.contains('a03-sub-add-row')) return;
-        var sel=tr.querySelector('.item-sel');
-        var cEl=tr.querySelector('.cost-inp');
-        if(!sel||!cEl||!sel.value) return;
-        var cost=parseFloat(cEl.value);
-        if(isNaN(cost)||cost<=0) return;
-        if(!p[sec.id]) p[sec.id]={};
-        p[sec.id][sel.value]=cost;
-        // 若為自訂項目，確保也在 sec.items 中
-        if(sec.items&&!sec.items.includes(sel.value)){
-          sec.items.push(sel.value);
-        }
-      });
-    }
-  });
-  localStorage.setItem('cost_presets_v1',JSON.stringify(p));
-  if(typeof db!=='undefined'){try{db.ref('cost_presets').set(p);}catch(e){}}
-}
-
 function saveQuote(){
   const data=getQuoteData();
   if(!data.client){ alert('請先填入客戶姓名再存檔'); return; }
-  syncCostsOnSave(); // 同步主頁成本到後台
   // Local save
   const list=JSON.parse(localStorage.getItem('id_quotes_v3')||'[]');
   list.unshift({id:Date.now(),...data});
@@ -2642,31 +2136,20 @@ function showHistory(){
   const cont=document.getElementById('history-content');
   if(!list.length){ cont.innerHTML='<div class="empty">尚無歷史記錄</div>'; }
   else {
-    // Group by spaceType
-    const groups={};
-    list.forEach(q=>{
-      const cat=q.spaceType||'未分類';
-      if(!groups[cat]) groups[cat]=[];
-      groups[cat].push(q);
-    });
-    let html='';
-    Object.entries(groups).forEach(([cat,items])=>{
-      html+=`<div class="cat-header"><span>${cat}</span><span class="cat-badge">${items.length}</span></div>`;
-      items.forEach(q=>{
-        const quote=SECTIONS.reduce((a,s)=>a+(q.rows?.[s.id]||[]).reduce((b,r)=>b+r.price*r.qty,0),0);
-        html+=`<div class="hist-item">
-          <div>
-            <div style="font-size:13px;font-weight:600">${q.client} — ${q.addr||'未填地址'}</div>
-            <div class="hist-meta">${q.date} · ${q.area}坪 · ${q.style||''} · 報價 ${fmt(quote)}</div>
-          </div>
-          <div class="hist-btns">
-            <button class="hist-btn" onclick="loadQuote(${JSON.stringify(q).replace(/"/g,'&quot;')})">載入</button>
-            <button class="hist-btn del" onclick="deleteQuote(${q.id})">刪除</button>
-          </div>
-        </div>`;
-      });
-    });
-    cont.innerHTML=html;
+    cont.innerHTML='<div>'+list.map(q=>{
+      const quote=SECTIONS.reduce((a,s)=>a+(q.rows?.[s.id]||[]).reduce((b,r)=>b+r.price*r.qty,0),0);
+      const cost=quote;
+      return `<div class="hist-item">
+        <div>
+          <div style="font-size:13px;font-weight:600">${q.client} — ${q.addr||'未填地址'}</div>
+          <div class="hist-meta">${q.date} · ${q.area}坪 · ${q.style||''} · 報價 ${fmt(quote)}</div>
+        </div>
+        <div class="hist-btns">
+          <button class="hist-btn" onclick="loadQuote(${JSON.stringify(q).replace(/"/g,'&quot;')})">載入</button>
+          <button class="hist-btn del" onclick="deleteQuote(${q.id})">刪除</button>
+        </div>
+      </div>`;
+    }).join('')+'</div>';
   }
   document.getElementById('history-modal').classList.add('open');
 }
@@ -2782,7 +2265,6 @@ function initDefaults(){
     {secId:'A08',rows:[{item:'主臥衣櫃',spec:'國產系統',price:55000,qty:1,unit:'式'}]},
     {secId:'B03',rows:[{item:'崁燈',spec:'國產',price:800,qty:20,unit:'個'}]},
     {secId:'B05',rows:[{item:'沙發',spec:'國產',price:28000,qty:1,unit:'套'}]},
-    {secId:'E01',rows:[{item:'施工管理費',spec:'標準',price:0,qty:5,unit:'%',cost:0}]},
   ];
   defaults.forEach(d=>{
     if(document.querySelectorAll('#tbody-'+d.secId+' tr').length===0){
@@ -2802,13 +2284,7 @@ document.getElementById('quote-date').textContent='報價日期：'+new Date().t
 buildSections();
 // Load from Firebase cloud first; fall back to local defaults
 loadFromCloud().then(()=>{
-  startCloudListener();
-  // 載入模板
-  tplFromCloud(function(cloudList){
-    if(cloudList && cloudList.length>0)
-      localStorage.setItem('templates_v1',JSON.stringify(cloudList));
-  });
-  loadCostPresetsFromCloud();
+  startCloudListener(); // Listen for updates from other devices
 });
 
 // ══ PWA SETUP ══
@@ -2884,252 +2360,7 @@ function showInstallGuide(){
   document.getElementById('install-modal').classList.add('open');
 }
 
-// ══ MOBILE: auto-hide topbar + drawer ══
-(function(){
-  const topbar = document.querySelector('.topbar');
-  let lastY = 0, ticking = false;
-  window.addEventListener('scroll', ()=>{
-    if(!ticking){
-      requestAnimationFrame(()=>{
-        const y = window.scrollY;
-        if(y > lastY && y > 80){ topbar.classList.add('hide-up'); }
-        else { topbar.classList.remove('hide-up'); }
-        lastY = y; ticking = false;
-      });
-      ticking = true;
-    }
-  }, { passive: true });
-})();
-
-function openDrawer(){
-  document.getElementById('mobile-drawer').classList.add('open');
-  document.getElementById('drawer-bg').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-function closeDrawer(){
-  document.getElementById('mobile-drawer').classList.remove('open');
-  document.getElementById('drawer-bg').classList.remove('open');
-  document.body.style.overflow='';
-}
-(function(){
-  const d=document.getElementById('mobile-drawer');
-  if(!d) return;
-  let sy=0;
-  d.addEventListener('touchstart',e=>{sy=e.touches[0].clientY;},{passive:true});
-  d.addEventListener('touchend',e=>{ if(e.changedTouches[0].clientY-sy>60) closeDrawer(); },{passive:true});
-})();
-
-
-function cpSaveDate(secId){
-  var d={};
-  try{d=JSON.parse(localStorage.getItem('cost_dates_v1')||'{}');}catch(e){}
-  var n=new Date();
-  d[secId]=n.getFullYear()+'/'+(n.getMonth()+1).toString().padStart(2,'0')+'/'+n.getDate().toString().padStart(2,'0');
-  localStorage.setItem('cost_dates_v1',JSON.stringify(d));
-  if(typeof db!=='undefined'){try{db.ref('cost_dates').set(d);}catch(e){}}
-  return d[secId];
-}
-function cpSaveSec(secId,btn){
-  var p={};
-  try{p=JSON.parse(localStorage.getItem('cost_presets_v1')||'{}');}catch(e){}
-  document.querySelectorAll('#cost-body input[data-sec="'+secId+'"]').forEach(function(inp){
-    var key=inp.getAttribute('data-key'), val=parseFloat(inp.value);
-    if(!p[secId]) p[secId]={};
-    if(!isNaN(val)&&val>=0) p[secId][key]=val; else delete p[secId][key];
-  });
-  try{localStorage.setItem('cost_presets_v1',JSON.stringify(p));}catch(e){}
-  if(typeof db!=='undefined'){try{db.ref('cost_presets').set(p);}catch(e){}}
-  var ds=cpSaveDate(secId);
-  var de=document.getElementById('cpd-'+secId);
-  if(de) de.textContent='更新：'+ds;
-  var sp=p[secId]||{};
-  if(secId==='A03'){
-    document.querySelectorAll('#tbody-A03 tr.a03-item-row').forEach(function(tr){
-      var cat=tr.dataset.cat||'';
-      var sel=tr.querySelector('.a03-sub-sel');
-      var c=tr.querySelector('.cost-inp');
-      if(sel&&c){var k=cat?(cat+'__'+sel.value):sel.value;if(sp[k]!==undefined)c.value=sp[k];}
-    });
-  } else {
-    document.querySelectorAll('#tbody-'+secId+' tr').forEach(function(tr){
-      if(tr.classList.contains('a03-cat-hdr')||tr.classList.contains('a03-sub-add-row')) return;
-      var sel=tr.querySelector('.item-sel'), c=tr.querySelector('.cost-inp');
-      if(sel&&c&&sp[sel.value]!==undefined) c.value=sp[sel.value];
-    });
-  }
-  if(typeof recalc==='function') recalc();
-  if(btn){var o=btn.textContent;btn.textContent='✅';setTimeout(function(){btn.textContent=o;},1200);}
-}
-
-
-// ════ 主頁成本欄即時同步到後台 ════
-(function(){
-  var _fbTimer=null;
-  document.addEventListener('change', function(e){
-    if(!e.target.classList.contains('cost-inp')) return;
-    var tr=e.target.closest('tr');
-    if(!tr) return;
-    var tbody=tr.closest('tbody');
-    if(!tbody||!tbody.id) return;
-    var secId=tbody.id.replace('tbody-','');
-    var cost=parseFloat(e.target.value);
-    if(isNaN(cost)||cost<0) return;
-
-    var p={};
-    try{p=JSON.parse(localStorage.getItem('cost_presets_v1')||'{}');}catch(ex){}
-    if(!p[secId]) p[secId]={};
-
-    if(secId==='A03'){
-      var cat=tr.dataset.cat||'';
-      var sel=tr.querySelector('.a03-sub-sel');
-      if(!sel||!sel.value) return;
-      var key=cat?(cat+'__'+sel.value):sel.value;
-      p[secId][key]=cost;
-      // 自訂新項目 → 加入 A03_CATS
-      if(cat&&typeof A03_CATS!=='undefined'){
-        if(!A03_CATS[cat]) A03_CATS[cat]=[];
-        if(!A03_CATS[cat].includes(sel.value)){
-          A03_CATS[cat].push(sel.value);
-          var saved=[];
-          try{saved=JSON.parse(localStorage.getItem('a03s_'+cat)||'[]');}catch(ex){}
-          if(!saved.includes(sel.value)){
-            saved.push(sel.value);
-            localStorage.setItem('a03s_'+cat,JSON.stringify(saved));
-          }
-        }
-      }
-    } else {
-      var sel2=tr.querySelector('.item-sel');
-      if(!sel2||!sel2.value) return;
-      p[secId][sel2.value]=cost;
-      // 自訂新項目 → 加入 sec.items
-      if(typeof SECTIONS!=='undefined'){
-        var sec=SECTIONS.find(function(s){return s.id===secId;});
-        if(sec&&sec.items&&!sec.items.includes(sel2.value)){
-          sec.items.push(sel2.value);
-        }
-      }
-    }
-
-    // 立即存 localStorage
-    localStorage.setItem('cost_presets_v1',JSON.stringify(p));
-
-    // Firebase 延遲 3 秒批次同步（避免每個字都打 API）
-    clearTimeout(_fbTimer);
-    _fbTimer=setTimeout(function(){
-      if(typeof db!=='undefined'){
-        try{db.ref('cost_presets').set(JSON.parse(localStorage.getItem('cost_presets_v1')||'{}'));}catch(ex){}
-      }
-    },3000);
-  });
-})();
-
-
-function cpImportFromMain(){
-  // 從主頁所有列讀取成本 → 更新 localStorage + 重建後台 UI
-  var p={};
-  try{p=JSON.parse(localStorage.getItem('cost_presets_v1')||'{}');}catch(e){}
-  var count=0;
-  if(typeof SECTIONS!=='undefined'){
-    SECTIONS.forEach(function(sec){
-      if(sec.id==='E01') return;
-      if(sec.id==='A03'){
-        document.querySelectorAll('#tbody-A03 tr.a03-item-row').forEach(function(tr){
-          var cat=tr.dataset.cat||'';
-          var sel=tr.querySelector('.a03-sub-sel');
-          var cEl=tr.querySelector('.cost-inp');
-          if(!sel||!cEl||!sel.value) return;
-          var cost=parseFloat(cEl.value);
-          if(!p['A03']) p['A03']={};
-          var key=cat?(cat+'__'+sel.value):sel.value;
-          p['A03'][key]=cost;
-          // 加入自訂項目
-          if(cat&&typeof A03_CATS!=='undefined'){
-            if(!A03_CATS[cat]) A03_CATS[cat]=[];
-            if(!A03_CATS[cat].includes(sel.value)){
-              A03_CATS[cat].push(sel.value);
-              var s=[];try{s=JSON.parse(localStorage.getItem('a03s_'+cat)||'[]');}catch(e){}
-              if(!s.includes(sel.value)){s.push(sel.value);localStorage.setItem('a03s_'+cat,JSON.stringify(s));}
-            }
-          }
-          count++;
-        });
-      } else {
-        document.querySelectorAll('#tbody-'+sec.id+' tr').forEach(function(tr){
-          if(tr.classList.contains('a03-cat-hdr')||tr.classList.contains('a03-sub-add-row')) return;
-          var sel=tr.querySelector('.item-sel');
-          var cEl=tr.querySelector('.cost-inp');
-          if(!sel||!cEl||!sel.value) return;
-          var cost=parseFloat(cEl.value);
-          if(!p[sec.id]) p[sec.id]={};
-          p[sec.id][sel.value]=cost;
-          if(sec.items&&!sec.items.includes(sel.value)) sec.items.push(sel.value);
-          count++;
-        });
-      }
-    });
-  }
-  localStorage.setItem('cost_presets_v1',JSON.stringify(p));
-  if(typeof db!=='undefined'){try{db.ref('cost_presets').set(p);}catch(e){}}
-  // 重建後台 UI
-  if(typeof _cpBuild==='function') _cpBuild(p);
-  else if(typeof cpRebuild==='function') cpRebuild(p);
-  alert('✅ 已從主頁匯入 '+count+' 筆成本資料！');
-}
-
-
-function rmRow(btn, secId){
-  const tr = btn.closest('tr');
-  const locked = tr.dataset.locked==='true';
-  if(locked && !confirm('此項目已鎖定，確定要刪除？')) return;
-  tr.remove();
-  if(secId) saveLockedRows(secId);
-  recalc();
-}
-
-
-function printSummary(){
-  document.body.classList.add('print-summary');
-  window.print();
-  // 列印對話框關閉後移除 class
-  setTimeout(function(){ document.body.classList.remove('print-summary'); }, 1000);
-}
 
 </script>
-<!-- Mobile bottom drawer -->
-<div class="mobile-drawer-bg" id="drawer-bg" onclick="closeDrawer()"></div>
-<div class="mobile-drawer" id="mobile-drawer">
-  <div class="drawer-handle"></div>
-  <div style="font-size:11px;color:var(--text2);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px">功能選單</div>
-  <div class="drawer-grid">
-    <button class="drawer-btn amber" onclick="saveQuote();closeDrawer()">💾 存檔</button>
-    <button class="drawer-btn blue"  onclick="showSync();closeDrawer()">☁️ 跨裝置</button>
-    <button class="drawer-btn"       onclick="showCostAdmin();closeDrawer()">🔧 成本管理</button>
-    <button class="drawer-btn"       onclick="showTemplates();closeDrawer()">📁 模板</button>
-    <button class="drawer-btn"       onclick="showHistory();closeDrawer()">📋 歷史報價</button>
-    <button class="drawer-btn"       onclick="copyText();closeDrawer()">📋 複製報價</button>
-    <button class="drawer-btn"       onclick="showInstallGuide();closeDrawer()">📲 安裝 App</button>
-    <button class="drawer-btn green" onclick="window.print();closeDrawer()">🖨️ 完整版 PDF</button>
-    <button class="drawer-btn" onclick="printSummary();closeDrawer()">📄 精簡版 PDF</button>
-  </div>
-</div>
-
-<!-- 成本管理：native dialog，iOS Safari 完整支援 -->
-<dialog id="cost-dialog" style="width:min(680px,100vw);max-height:90dvh;height:90dvh;border:1px solid var(--border2);border-radius:14px;background:var(--surface);color:var(--text);padding:0;overflow:hidden;">
-  <div style="display:flex;flex-direction:column;height:100%;width:100%;">
-    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border2);flex-shrink:0;">
-      <button onclick="document.getElementById('cost-dialog').close()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:2px 8px;border-radius:6px">‹</button>
-      <div style="flex:1">
-        <div style="font-size:15px;font-weight:700">🔧 成本管理後台</div>
-        <div style="font-size:11px;color:var(--text2)">開啟時自動匯入主頁成本</div>
-      </div>
-      <button onclick="cpImportFromMain()" style="background:var(--surface2);color:var(--text2);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0">⬇️ 從主頁匯入</button>
-      <button onclick="saveCostPresets()" style="background:var(--green);color:#0a1f12;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">💾 儲存</button>
-    </div>
-    <div id="cost-tabs" style="display:flex;overflow-x:auto;border-bottom:1px solid var(--border2);flex-shrink:0;-webkit-overflow-scrolling:touch;"></div>
-    <div id="cost-body" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;"></div>
-  </div>
-</dialog>
-
 </body>
 </html>
