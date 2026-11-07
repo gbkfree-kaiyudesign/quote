@@ -571,6 +571,32 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   .validate-banner, .cloud-banner { display:none !important; }
 }
 
+/* ── 客戶版列印：只顯示大項目標題+小計 ── */
+body.print-client .section-body { display:none !important; }
+body.print-client .cost-col { display:none !important; }
+body.print-client .metric.print-hide { display:none !important; }
+body.print-client .profit-row { display:none !important; }
+body.print-client .print-hide-profit { display:none !important; }
+body.print-client .pie-canvas-wrap { display:none !important; }
+body.print-client .gantt-wrap { display:none !important; }
+body.print-client .pie-wrap { display:none !important; }
+/* 費用結構分析整個區塊隱藏 */
+body.print-client .chart-section { display:none !important; }
+/* 利潤率、工料總成本 隱藏 */
+body.print-client [data-hide-client] { display:none !important; }
+@media print {
+  body.print-client .section-body { display:none !important; }
+  body.print-client .cost-col { display:none !important; }
+  body.print-client .profit-row { display:none !important; }
+  body.print-client .print-hide-profit { display:none !important; }
+  body.print-client .pie-canvas-wrap { display:none !important; }
+  body.print-client .gantt-wrap { display:none !important; }
+  body.print-client .pie-wrap { display:none !important; }
+  body.print-client .chart-section { display:none !important; }
+  body.print-client [data-hide-client] { display:none !important; }
+  body.print-client .metric:has(.metric-label) { }
+}
+
 
 
 /* ── PWA / iPhone ── */
@@ -651,6 +677,7 @@ body { padding-bottom: env(safe-area-inset-bottom); }
     <button class="btn btn-ghost" onclick="showHistory()">📋 歷史報價</button>
     <button class="btn btn-amber" onclick="saveQuote()">💾 存檔</button>
     <button class="btn btn-green" onclick="window.print()">🖨️ 列印 / PDF</button>
+    <button class="btn" style="background:rgba(168,139,250,0.15);color:#a78bfa;border-color:rgba(168,139,250,0.35)" onclick="printClient()">📄 客戶版列印</button>
     <button class="btn install-btn" onclick="showInstallGuide()" style="background:rgba(91,164,245,0.12);color:var(--blue);border-color:rgba(91,164,245,0.3)">📲 安裝 App</button>
   </div>
 </div>
@@ -710,11 +737,11 @@ body { padding-bottom: env(safe-area-inset-bottom); }
   </div>
   <div class="cost-box-body">
     <div class="metrics">
-      <div class="metric print-hide">
+      <div class="metric print-hide" data-hide-client>
         <div class="metric-label">工料總成本</div>
         <div class="metric-val" id="cost-total">NT$ 0</div>
       </div>
-      <div class="metric print-hide">
+      <div class="metric print-hide" data-hide-client>
         <div class="metric-label">利潤率</div>
         <div class="metric-val v-green" id="actual-profit-label">0.0%</div>
       </div>
@@ -734,7 +761,7 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 <div id="sections-container"></div>
 
 <!-- 費用分析圓餅圖 -->
-<div class="card">
+<div class="card chart-section">
   <div class="card-title"><div class="card-title-dot"></div>費用結構分析</div>
   <div class="pie-wrap">
     <div class="pie-canvas-wrap">
@@ -796,6 +823,7 @@ body { padding-bottom: env(safe-area-inset-bottom); }
   <button class="btn btn-ghost" onclick="copyText()">📋 複製文字報價</button>
   <button class="btn btn-amber" onclick="saveQuote()">💾 存入歷史</button>
   <button class="btn btn-green" onclick="window.print()">🖨️ 列印 / 輸出 PDF</button>
+  <button class="btn" style="background:rgba(168,139,250,0.15);color:#a78bfa;border-color:rgba(168,139,250,0.35)" onclick="printClient()">📄 客戶版列印</button>
 </div>
 
 </div><!-- /container -->
@@ -1158,7 +1186,7 @@ function addRow(secId, data){
   tr.innerHTML = `
     ${lockTd}
     ${itemTd}
-    <td><input class="qty-inp" type="number" value="${d.qty||1}" min="0.1" step="0.5" onchange="recalc()" style="width:56px"></td>
+    <td><input class="qty-inp" type="number" value="${d.qty||1}" min="0.1" step="${secId==='A08'?'0.1':'0.5'}" onchange="recalc()" style="width:56px"></td>
     <td>${unitSel}</td>
     <td><input class="price-inp" type="number" value="${d.price||3000}" min="0" step="100" onchange="recalc()" style="width:84px"></td>
     <td class="cost-col"><input class="cost-inp" type="number" value="${defCost}" min="0" step="100" onchange="recalc()" style="width:84px;color:#e84e88;font-weight:700"></td>
@@ -2064,6 +2092,13 @@ function dismissCloudBanner(){
 // Save history to Firebase too
 function saveHistoryToCloud(data){
   db.ref('history').push({ ...data, _savedAt: Date.now() }).catch(()=>{});
+}
+
+function printClient(){
+  document.body.classList.add('print-client');
+  window.print();
+  // 列印對話框關閉後移除 class
+  setTimeout(()=>document.body.classList.remove('print-client'), 1000);
 }
 
 function saveQuote(){
