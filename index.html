@@ -23,17 +23,17 @@
   --text: #2a2826;
   --text2: #7a7470;
   --text3: #aaa49e;
-  --green: #2a7a4e;
-  --green-dim: rgba(42,122,78,0.1);
-  --green-border: rgba(42,122,78,0.22);
-  --gold: #8a6200;
-  --gold-dim: rgba(138,98,0,0.1);
-  --blue: #2a5a9a;
-  --blue-dim: rgba(42,90,154,0.1);
-  --red: #a03030;
-  --red-dim: rgba(160,48,48,0.1);
-  --amber: #a06000;
-  --amber-dim: rgba(160,96,0,0.1);
+  --green: #5e8c6a;        /* 莫蘭迪鼠尾草綠 B類 */
+  --green-dim: rgba(94,140,106,0.12);
+  --green-border: rgba(94,140,106,0.28);
+  --gold: #a08840;         /* 莫蘭迪砂金 A類 */
+  --gold-dim: rgba(160,136,64,0.12);
+  --blue: #6882a0;         /* 莫蘭迪粉藍 C類 */
+  --blue-dim: rgba(104,130,160,0.12);
+  --red: #a06858;          /* 莫蘭迪赭紅/磚色 D類 */
+  --red-dim: rgba(160,104,88,0.12);
+  --amber: #a07840;        /* 莫蘭迪暖棕amber */
+  --amber-dim: rgba(160,120,64,0.12);
   --radius: 10px;
   --radius-sm: 6px;
 }
@@ -355,16 +355,16 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
 .gantt-group-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
 .gantt-group-label { font-size: 11px; font-weight: 800; min-width: 18px; }
 .gantt-group-name { font-size: 12px; font-weight: 600; flex: 1; color: var(--text); }
-.gantt-pct { font-size: 12px; font-weight: 800; color: #fff; min-width: 34px; text-align: right; }
-.gantt-amt { font-size: 12px; color: #fff; min-width: 88px; text-align: right; }
+.gantt-pct { font-size: 12px; font-weight: 800; color: var(--text); min-width: 34px; text-align: right; }
+.gantt-amt { font-size: 12px; font-weight: 700; color: var(--text); min-width: 88px; text-align: right; }
 .gantt-bar-track { height: 8px; background: var(--border2); border-radius: 4px; overflow: hidden; margin-left: 26px; }
 .gantt-bar-fill { height: 100%; border-radius: 4px; transition: width 0.45s cubic-bezier(.4,0,.2,1); }
 .gantt-sub { margin-left: 26px; margin-top: 5px; }
 .gantt-sub-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
 .gantt-sub-id { font-size: 9.5px; color: var(--text2); min-width: 28px; font-weight: 600; }
 .gantt-sub-name { font-size: 11px; color: var(--text2); flex: 1; }
-.gantt-sub-pct { font-size: 10.5px; font-weight: 700; color: #fff; min-width: 30px; text-align: right; }
-.gantt-sub-amt { font-size: 10.5px; color: #fff; min-width: 88px; text-align: right; }
+.gantt-sub-pct { font-size: 10.5px; font-weight: 700; color: var(--text2); min-width: 30px; text-align: right; }
+.gantt-sub-amt { font-size: 10.5px; font-weight: 600; color: var(--text2); min-width: 88px; text-align: right; }
 .gantt-sub-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
 .gantt-sub-fill { height: 100%; border-radius: 2px; opacity: 0.55; transition: width 0.45s cubic-bezier(.4,0,.2,1); }
 
@@ -516,9 +516,9 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
     --bg:#ffffff; --bg2:#f8f8f8; --surface:#ffffff; --surface2:#f4f4f4; --surface3:#eeeeee;
     --border:rgba(0,0,0,0.12); --border2:rgba(0,0,0,0.22);
     --text:#111111; --text2:#444444; --text3:#666666;
-    --green:#1a6b3a; --green-dim:#e8f5ee; --green-border:#a8d8bc;
-    --gold:#8a6200; --blue:#1a4a8a; --blue-dim:#e6f0fa;
-    --red:#8a1a1a; --amber:#8a5500; --amber-dim:#fdf3e0;
+    --green:#3d6e4a; --green-dim:#e6efe8; --green-border:#9abfa2;
+    --gold:#7a6228; --blue:#445e7a; --blue-dim:#e6ecf3;
+    --red:#7a4a3c; --amber:#7a5828; --amber-dim:#f5ede0;
   }
   .cost-col { display:none !important; }
   .lock-th, .lock-td { display:none !important; }
@@ -540,31 +540,31 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   .metric-val.v-gold  { color:#8a6200 !important; }
   .card { background:#fff !important; border:1px solid #ddd !important; box-shadow:none !important; page-break-inside:avoid; }
   .card-title { color:#444 !important; }
-  .card-title-dot { background:#1a6b3a !important; box-shadow:none !important; }
+  .card-title-dot { background:#3d6e4a !important; box-shadow:none !important; }
   .section-card { border:1px solid #ccc !important; box-shadow:none !important; page-break-inside:avoid; margin-bottom:4px !important; }
-  .section-head { background:#f4f4f4 !important; }
+  .section-head { background:#f4f4f2 !important; }
   .section-body { display:block !important; padding:8px 10px !important; }
-  .sec-id { background:#e8f5ee !important; color:#1a6b3a !important; border-color:#a8d8bc !important; box-shadow:none !important; }
-  .sec-id.b    { background:#e6f0fa !important; color:#1a4a8a !important; }
-  .sec-id.gold { background:#fdf3e0 !important; color:#8a6200 !important; border-color:#e4c57a !important; }
+  .sec-id { background:#eaf0eb !important; color:#3d6e4a !important; border-color:#9abfa2 !important; box-shadow:none !important; }
+  .sec-id.b    { background:#e8edf3 !important; color:#445e7a !important; border-color:#9aadc2 !important; }
+  .sec-id.gold { background:#f3eedd !important; color:#7a6228 !important; border-color:#c4aa6a !important; }
+  .sec-id.red  { background:#f2eae8 !important; color:#7a4a3c !important; border-color:#c49a8a !important; }
   .sec-name { color:#111 !important; }
-  .sec-total { color:#1a6b3a !important; }
-  .sec-total.b    { color:#1a4a8a !important; }
-  .sec-total.gold { color:#8a6200 !important; }
-  .sub-cell { color:#1a6b3a !important; }
-  .sub-cell.b    { color:#1a4a8a !important; }
-  .sub-cell.gold { color:#8a6200 !important; }
-  .group-badge { background:#e8f5ee !important; color:#1a6b3a !important; border-color:#a8d8bc !important; }
-  .group-badge.b    { background:#e6f0fa !important; color:#1a4a8a !important; }
-  .group-badge.gold { background:#fdf3e0 !important; color:#8a6200 !important; border-color:#e4c57a !important; }
-  .group-total-val { color:#1a6b3a !important; }
-  .group-total-val.b    { color:#1a4a8a !important; }
-  .group-total-val.gold { color:#8a6200 !important; }
-  .group-total-val.red  { color:#8a1a1a !important; }
-  .group-badge.red { background:#faeaea !important; color:#8a1a1a !important; border-color:#e4aaaa !important; }
-  .sec-id.red { background:#faeaea !important; color:#8a1a1a !important; border-color:#e4aaaa !important; }
-  .sec-total.red { color:#8a1a1a !important; }
-  .sub-cell.red { color:#8a1a1a !important; }
+  .sec-total { color:#3d6e4a !important; }
+  .sec-total.b    { color:#445e7a !important; }
+  .sec-total.gold { color:#7a6228 !important; }
+  .sec-total.red  { color:#7a4a3c !important; }
+  .sub-cell { color:#3d6e4a !important; }
+  .sub-cell.b    { color:#445e7a !important; }
+  .sub-cell.gold { color:#7a6228 !important; }
+  .sub-cell.red  { color:#7a4a3c !important; }
+  .group-badge { background:#eaf0eb !important; color:#3d6e4a !important; border-color:#9abfa2 !important; }
+  .group-badge.b    { background:#e8edf3 !important; color:#445e7a !important; border-color:#9aadc2 !important; }
+  .group-badge.gold { background:#f3eedd !important; color:#7a6228 !important; border-color:#c4aa6a !important; }
+  .group-badge.red  { background:#f2eae8 !important; color:#7a4a3c !important; border-color:#c49a8a !important; }
+  .group-total-val { color:#3d6e4a !important; }
+  .group-total-val.b    { color:#445e7a !important; }
+  .group-total-val.gold { color:#7a6228 !important; }
+  .group-total-val.red  { color:#7a4a3c !important; }
   .group-line { background:#ccc !important; }
   thead th { color:#444 !important; border-bottom-color:#ccc !important; }
   tbody td { border-bottom-color:#eee !important; color:#111 !important; }
@@ -576,7 +576,7 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   .gantt-amt, .gantt-pct, .gantt-sub-amt, .gantt-sub-pct { color:#111 !important; }
   .gantt-bar-fill { print-color-adjust:exact !important; }
   .gantt-group-name, .gantt-sub-name { color:#333 !important; }
-  .gantt-group-label { color:#1a6b3a !important; }
+  .gantt-group-label { color:#3d6e4a !important; }
   .gantt-bar-track { background:#eee !important; }
   .gantt-sub-track { background:#ddd !important; }
   .validate-banner, .cloud-banner { display:none !important; }
@@ -1061,7 +1061,7 @@ const SECTIONS = [
     specs:['一般'], units:['%'], _isManage:true },
 ];
 
-const PIE_COLORS = ['#c49a28','#2a7a4e','#2a5a9a','#a03030'];
+const PIE_COLORS = ['#a08840','#5e8c6a','#6882a0','#a06858']; // 莫蘭迪：砂金、鼠尾草、粉藍、磚赭
 const SEC_COLORS = { D:'gold', A:'green', B:'b', E:'red' };
 
 function fmt(n){ return 'NT$\u00a0'+Math.round(n).toLocaleString('zh-TW'); }
