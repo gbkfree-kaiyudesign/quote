@@ -1110,7 +1110,7 @@ function buildSections(){
                 <th style="min-width:88px">單價（元）</th>
                 <th class="cost-col" style="min-width:88px;color:#e84e88">成本（元）</th>
                 <th style="min-width:96px">總價</th>
-                <th style="min-width:76px">規格</th>
+                <th style="min-width:76px">${sec.id==='A01'?'說明':'規格'}</th>
                 <th></th>
               </tr></thead>
               <tbody id="tbody-${sec.id}"></tbody>
@@ -1198,7 +1198,10 @@ function addRow(secId, data){
     <td><input class="price-inp" type="number" value="${d.price||3000}" min="0" step="100" onchange="recalc()" style="width:84px"></td>
     <td class="cost-col"><input class="cost-inp" type="number" value="${defCost}" min="0" step="100" onchange="recalc()" style="width:84px;color:#e84e88;font-weight:700"></td>
     <td class="sub-cell${cls}">NT$\u00a00</td>
-    <td style="min-width:90px">${specSel}<input type="text" class="note-inp" placeholder="說明..." value="${d.note||''}" style="margin-top:3px;width:100%;font-size:11px;color:var(--text2);background:transparent;border:none;border-bottom:1px solid var(--border2);outline:none;padding:2px 0" onchange="recalc()"></td>
+    <td style="min-width:120px">${secId==='A01'
+      ? `<input type="text" class="note-inp spec-sel" placeholder="說明（選填）..." value="${d.note||d.spec||''}" style="width:100%;font-size:12px;color:var(--text2);background:transparent;border:none;border-bottom:1px solid var(--border2);outline:none;padding:3px 0" onchange="recalc()">`
+      : `${specSel}<input type="text" class="note-inp" placeholder="說明..." value="${d.note||''}" style="margin-top:3px;width:100%;font-size:11px;color:var(--text2);background:transparent;border:none;border-bottom:1px solid var(--border2);outline:none;padding:2px 0" onchange="recalc()">`
+    }</td>
     <td><button class="rm-btn" onclick="this.closest('tr').remove();saveLockedRows(secId);recalc()" title="刪除">×</button></td>`;
   tbody.appendChild(tr);
   // Apply locked state
@@ -1215,6 +1218,13 @@ function addRow(secId, data){
 }
 
 // ══ A03 HIERARCHICAL DROPDOWN ══
+// 各 A03 category 的規格選項（B03 水電專用）
+const A03_CAT_SPECS = {
+  '出線':     ['1.6MM 單線','2.0MM 單線','3.5平方 絞線','5.5平方 絞線','8平方 絞線'],
+  '迴路':     ['1.6MM 單線','2.0MM 單線','3.5平方 絞線','5.5平方 絞線','8平方 絞線'],
+  '開關插座': ['SO-STYLE','GLATIMA','RISNA','星光','省空間系列','不銹鋼'],
+  '給排水':   ['給水/2分','給水/3分','給水/4分','給水/6分','給水/1吋','排水/1.5吋','排水/2吋','排水/3~4吋'],
+};
 const A03_CATS = {
   '迴路':    ['新增迴路8mm','新增迴路5.5mm','新增迴路2.0','新增總切迴路','新增雙切迴路'],
   '出線':    ['電燈出線','開關出線','插座出線','網路出線','電話出線','電視出線','門鈴出線','HDMI出線','緊急壓扣出線'],
@@ -1256,9 +1266,13 @@ function a03AddItemInGroup(secId, cat, d){
   // sub-item select for this category
   const subItems=getA03SubItems(cat);
   const subOpts=subItems.map(i=>`<option${d.item===i?' selected':''}>${i}</option>`).join('');
-  // spec select
-  const specOpts=sec.specs.map(sp=>`<option${d.spec===sp?' selected':''}>${sp}</option>`).join('');
-  const specSel=`<select class="spec-sel" onchange="recalc()" style="width:100%">${specOpts}<option value="__custom__">自訂</option></select>`;
+  // spec select — use category-specific options if available
+  const catSpecList = A03_CAT_SPECS[cat] || sec.specs;
+  const specOpts = catSpecList.map(sp=>`<option${d.spec===sp?' selected':''}>${sp}</option>`).join('');
+  const specSel=`<select class="spec-sel" onchange="onSpecChange(this);recalc()" style="width:100%">${specOpts}<option value="__custom__">✏️ 自訂</option></select>
+  <input type="text" class="custom-spec" placeholder="輸入後按 Enter 加入" style="display:none;margin-top:3px;width:100%" onkeydown="if(event.key==='Enter'){confirmCustomSpec(this);event.preventDefault();}" onblur="confirmCustomSpec(this)" onchange="recalc()">
+  <input type="text" class="note-inp" placeholder="說明..." value="${d.note||''}" style="margin-top:3px;width:100%;font-size:11px;color:var(--text2);background:transparent;border:none;border-bottom:1px solid var(--border2);outline:none;padding:2px 0" onchange="recalc()">`;
+
   // unit select
   const uSaved=JSON.parse(localStorage.getItem('cu_'+secId)||'[]');
   uSaved.forEach(u=>{if(!sec.units.includes(u)) sec.units.push(u);});
