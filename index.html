@@ -509,8 +509,12 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
 }
 
 /* ── PRINT / PDF ── */
+@page { size: A4; margin: 12mm 10mm; }
 @media print {
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  html, body { width:100% !important; overflow:hidden !important; }
+  /* 0元 section 列印只顯示標題 */
+  .sec-zero .section-body { display:none !important; }
   :root {
     --bg:#ffffff; --bg2:#f8f8f8; --surface:#ffffff; --surface2:#f4f4f4; --surface3:#eeeeee;
     --border:rgba(0,0,0,0.12); --border2:rgba(0,0,0,0.22);
@@ -559,6 +563,11 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   .group-total-val { color:#1a6b3a !important; }
   .group-total-val.b    { color:#1a4a8a !important; }
   .group-total-val.gold { color:#8a6200 !important; }
+  .group-total-val.red  { color:#8a1a1a !important; }
+  .group-badge.red { background:#faeaea !important; color:#8a1a1a !important; border-color:#e4aaaa !important; }
+  .sec-id.red { background:#faeaea !important; color:#8a1a1a !important; border-color:#e4aaaa !important; }
+  .sec-total.red { color:#8a1a1a !important; }
+  .sub-cell.red { color:#8a1a1a !important; }
   .group-line { background:#ccc !important; }
   thead th { color:#444 !important; border-bottom-color:#ccc !important; }
   tbody td { border-bottom-color:#eee !important; color:#111 !important; }
@@ -659,17 +668,9 @@ body { padding-bottom: env(safe-area-inset-bottom); }
     <!-- ★ 請把 logo 圖片放在這裡，例如:
          <img src="logo.png" style="width:36px;height:36px;border-radius:9px;object-fit:contain">
          目前使用的是文字佔位 logo -->
-    <svg width="36" height="36" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="border-radius:6px;flex-shrink:0">
-  <rect width="100" height="100" fill="#111"/>
-  <polygon points="28,18 72,18 28,62" fill="white"/>
-  <rect x="28" y="62" width="44" height="22" fill="white"/>
-  <polygon points="52,84 72,84 72,62" fill="#111"/>
-  <polygon points="72,18 72,36 54,18" fill="#111"/>
-  <line x1="30" y1="60" x2="70" y2="20" stroke="#111" stroke-width="8" stroke-linecap="round"/>
-</svg>
-    <div class="logo-text">
-      <div class="logo-name">INTERIOR DESIGN</div>
-      <div class="logo-sub">室內設計報價系統</div>
+    <div style="display:flex;flex-direction:column;line-height:1.1">
+      <div style="font-size:16px;font-weight:300;letter-spacing:0.35em;color:var(--text);font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;white-space:nowrap">KAIYU&nbsp;&nbsp;DESIGN</div>
+      <div style="font-size:9px;letter-spacing:0.2em;color:var(--text3);margin-top:1px;font-family:-apple-system,'Helvetica Neue',Arial,sans-serif">室內設計報價系統</div>
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
@@ -1538,6 +1539,9 @@ function getSectionTotal(secId){
     }
   });
   document.getElementById('total-'+secId).textContent=fmt(quoteT);
+  // 標記 0 元 section，列印時隱藏 body
+  const card=document.getElementById('sec-'+secId);
+  if(card){ quoteT===0?card.classList.add('sec-zero'):card.classList.remove('sec-zero'); }
   return {quoteT,costT};
 }
 
@@ -1750,7 +1754,7 @@ function drawPie(vals){
   ctx.fillStyle='#1a1a20'; ctx.fill();
 
   // Group labels A/B/C on outer rim
-  const groupLabels=['A','B','C'];
+  const groupLabels=['A','B','C','D'];
   GROUPS.forEach((grp,gi)=>{
     const secs=SECTIONS.filter(s=>s.group===grp.id);
     const grpTotal=secs.reduce((a,s)=>a+(vals[SECTIONS.indexOf(s)]||0),0);
