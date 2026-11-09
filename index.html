@@ -1520,6 +1520,8 @@ function confirmCustomSpec(input){
 
 function getSectionTotal(secId){
   let quoteT=0, costT=0;
+  const sec=SECTIONS.find(s=>s.id===secId);
+  const isManage=sec&&sec._isManage;
   document.querySelectorAll(`#tbody-${secId} tr`).forEach(tr=>{
     if(tr.classList.contains('a03-cat-hdr')||tr.classList.contains('a03-sub-add-row')) return;
     const priceEl=tr.querySelector('.price-inp');
@@ -1527,7 +1529,8 @@ function getSectionTotal(secId){
     const costEl=tr.querySelector('.cost-inp');
     const sc=tr.querySelector('.sub-cell');
     if(priceEl&&qtyEl){
-      const qty = qtyEl.value===''?1:parseFloat(qtyEl.value);
+      // _isManage: price已是 nonESum×pct/100 的總額，qty是%數字不再乘
+      const qty = isManage ? 1 : (qtyEl.value===''?1:parseFloat(qtyEl.value));
       const sub=(parseFloat(priceEl.value)||0)*qty;
       if(sc) sc.textContent=fmt(sub);
       quoteT+=sub;
