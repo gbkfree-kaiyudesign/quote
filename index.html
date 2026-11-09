@@ -6,34 +6,34 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="設計報價">
-<meta name="theme-color" content="#0e0e11">
+<meta name="theme-color" content="#edeae4">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" id="pwa-icon" sizes="512x512">
 <link rel="manifest" id="pwa-manifest">
 <title>室內設計報價系統</title>
 <style>
 :root {
-  --bg: #0e0e11;
-  --bg2: #131318;
-  --surface: #1a1a20;
-  --surface2: #21212a;
-  --surface3: #28282f;
-  --border: rgba(255,255,255,0.06);
-  --border2: rgba(255,255,255,0.12);
-  --text: #ddddd8;
-  --text2: #888888;
-  --text3: #484848;
-  --green: #50e88a;
-  --green-dim: rgba(80,232,138,0.1);
-  --green-border: rgba(80,232,138,0.22);
-  --gold: #e4b84a;
-  --gold-dim: rgba(228,184,74,0.1);
-  --blue: #5ba4f5;
-  --blue-dim: rgba(91,164,245,0.1);
-  --red: #f07070;
-  --red-dim: rgba(240,112,112,0.1);
-  --amber: #f5a623;
-  --amber-dim: rgba(245,166,35,0.1);
+  --bg: #edeae4;
+  --bg2: #e5e0d8;
+  --surface: #f0ede7;
+  --surface2: #e8e3db;
+  --surface3: #ddd8cf;
+  --border: rgba(60,50,40,0.08);
+  --border2: rgba(60,50,40,0.16);
+  --text: #2a2826;
+  --text2: #7a7470;
+  --text3: #aaa49e;
+  --green: #2a7a4e;
+  --green-dim: rgba(42,122,78,0.1);
+  --green-border: rgba(42,122,78,0.22);
+  --gold: #8a6200;
+  --gold-dim: rgba(138,98,0,0.1);
+  --blue: #2a5a9a;
+  --blue-dim: rgba(42,90,154,0.1);
+  --red: #a03030;
+  --red-dim: rgba(160,48,48,0.1);
+  --amber: #a06000;
+  --amber-dim: rgba(160,96,0,0.1);
   --radius: 10px;
   --radius-sm: 6px;
 }
@@ -52,7 +52,7 @@ body {
 
 /* ── TOPBAR ── */
 .topbar {
-  background: rgba(26,26,32,0.92);
+  background: rgba(237,234,228,0.92);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border2);
   padding: 0 24px;
@@ -75,19 +75,16 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 9px;
-  background: linear-gradient(135deg, #1e4d35 0%, #2d7a52 50%, #50e88a 100%);
+  background: #2a2826;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 18px;
   flex-shrink: 0;
-  box-shadow: 0 0 12px rgba(80,232,138,0.25);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
 }
-/* To use your own logo image, add this inside .logo-icon or replace it:
-   <img src="YOUR_LOGO.png" style="width:36px;height:36px;border-radius:9px;object-fit:contain">
-*/
 .logo-text { line-height: 1.15; }
-.logo-name { font-size: 14px; font-weight: 700; letter-spacing: 0.06em; color: #fff; }
+.logo-name { font-size: 14px; font-weight: 700; letter-spacing: 0.06em; color: var(--text); }
 .logo-sub  { font-size: 9.5px; letter-spacing: 0.14em; color: var(--text2); text-transform: uppercase; }
 
 .topbar-actions { display: flex; gap: 7px; align-items: center; }
@@ -101,8 +98,8 @@ body {
 }
 .btn-ghost  { background: var(--surface2); color: var(--text); }
 .btn-ghost:hover { background: var(--surface3); }
-.btn-green  { background: var(--green); color: #0a1f12; border-color: var(--green); font-weight: 700; }
-.btn-green:hover { background: #6df0a0; }
+.btn-green  { background: var(--green); color: #fff; border-color: var(--green); font-weight: 700; }
+.btn-green:hover { filter: brightness(1.1); }
 .btn-amber  { background: var(--amber-dim); color: var(--amber); border-color: rgba(245,166,35,0.3); }
 .btn-amber:hover { background: rgba(245,166,35,0.18); }
 .btn-blue   { background: var(--blue-dim); color: var(--blue); border-color: rgba(91,164,245,0.3); }
@@ -150,7 +147,7 @@ input:focus, select:focus, textarea:focus {
   border-color: var(--green); box-shadow: 0 0 0 2.5px rgba(80,232,138,0.12);
 }
 textarea { resize: vertical; min-height: 64px; }
-select option { background: #1a1a20; color: var(--text); }
+select option { background: var(--surface); color: var(--text); }
 
 /* ═══════════════════════════════════════════════
    ★★★ COST SUMMARY BOX — MOST IMPORTANT ★★★
@@ -1064,7 +1061,7 @@ const SECTIONS = [
     specs:['一般'], units:['%'], _isManage:true },
 ];
 
-const PIE_COLORS = ['#e4b84a','#50e88a','#5ba4f5','#f07070'];
+const PIE_COLORS = ['#c49a28','#2a7a4e','#2a5a9a','#a03030'];
 const SEC_COLORS = { D:'gold', A:'green', B:'b', E:'red' };
 
 function fmt(n){ return 'NT$\u00a0'+Math.round(n).toLocaleString('zh-TW'); }
@@ -1751,7 +1748,7 @@ function drawPie(vals){
 
   // Inner hole
   ctx.beginPath(); ctx.arc(cx,cy,ri,0,Math.PI*2);
-  ctx.fillStyle='#1a1a20'; ctx.fill();
+  ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#edeae4'; ctx.fill();
 
   // Group labels A/B/C on outer rim
   const groupLabels=['A','B','C','D'];
@@ -2377,7 +2374,7 @@ loadFromCloud().then(()=>{
     c.width=c.height=512;
     const ctx=c.getContext('2d');
     // Dark background
-    ctx.fillStyle='#0e0e11';
+    ctx.fillStyle='#edeae4';
     ctx.fillRect(0,0,512,512);
     // Rounded corners simulation via clip
     ctx.beginPath();
@@ -2389,7 +2386,7 @@ loadFromCloud().then(()=>{
     ctx.quadraticCurveTo(0,512,0,432);
     ctx.lineTo(0,80);
     ctx.quadraticCurveTo(0,0,80,0);
-    ctx.fillStyle='#0e0e11'; ctx.fill();
+    ctx.fillStyle='#edeae4'; ctx.fill();
     // Green accent
     ctx.fillStyle='rgba(80,232,138,0.15)';
     ctx.fillRect(0,0,512,512);
@@ -2398,11 +2395,11 @@ loadFromCloud().then(()=>{
     ctx.beginPath(); ctx.moveTo(176,128); ctx.lineTo(336,128); ctx.lineTo(176,288); ctx.closePath(); ctx.fill();
     ctx.fillStyle='#50e88a';
     ctx.fillRect(176,288,160,88);
-    ctx.fillStyle='#0e0e11';
+    ctx.fillStyle='#edeae4';
     ctx.beginPath(); ctx.moveTo(256,376); ctx.lineTo(336,376); ctx.lineTo(336,288); ctx.closePath(); ctx.fill();
-    ctx.fillStyle='#0e0e11';
+    ctx.fillStyle='#edeae4';
     ctx.beginPath(); ctx.moveTo(336,128); ctx.lineTo(336,200); ctx.lineTo(264,128); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle='#0e0e11'; ctx.lineWidth=14; ctx.lineCap='round';
+    ctx.strokeStyle='#edeae4'; ctx.lineWidth=14; ctx.lineCap='round';
     ctx.beginPath(); ctx.moveTo(178,286); ctx.lineTo(334,130); ctx.stroke();
     const iconUrl=c.toDataURL('image/png');
     const iconEl=document.getElementById('pwa-icon');
@@ -2413,8 +2410,8 @@ loadFromCloud().then(()=>{
       short_name:'設計報價',
       start_url:'./',
       display:'standalone',
-      background_color:'#0e0e11',
-      theme_color:'#0e0e11',
+      background_color:'#edeae4',
+      theme_color:'#edeae4',
       orientation:'portrait-primary',
       icons:[{src:iconUrl,sizes:'512x512',type:'image/png',purpose:'any maskable'}]
     };
