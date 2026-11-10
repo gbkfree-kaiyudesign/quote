@@ -170,7 +170,7 @@ select option { background: var(--surface); color: var(--text); }
 .cost-box-header {
   background: linear-gradient(90deg, rgba(80,232,138,0.07) 0%, transparent 100%);
   border-bottom: 1px solid rgba(80,232,138,0.18);
-  padding: 10px 18px;
+  padding: 7px 18px;
   display: flex; align-items: center; justify-content: space-between;
 }
 .cost-box-title {
@@ -185,7 +185,7 @@ select option { background: var(--surface); color: var(--text); }
   border-radius: 2px;
   box-shadow: 0 0 8px rgba(80,232,138,0.6);
 }
-.cost-box-body { padding: 16px 18px; }
+.cost-box-body { padding: 10px 18px 12px; }
 
 .metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 16px; }
 @media (max-width: 640px) { .metrics { grid-template-columns: 1fr 1fr; } }
@@ -193,7 +193,7 @@ select option { background: var(--surface); color: var(--text); }
   background: var(--surface2);
   border: 1px solid var(--border2);
   border-radius: 9px;
-  padding: 13px 15px;
+  padding: 9px 15px;
   position: relative;
   overflow: hidden;
 }
@@ -566,18 +566,10 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
 @media print {
   .cover-title-row { margin: 24px 0 28px; }
 }
-/* 螢幕上隱藏封面資訊細節（列印時才顯示） */
-.cover-quote-box, .cover-note-line {
+/* 螢幕上封面只顯示 header+title，細節僅列印時才顯示 */
+#cover-info-table, .cover-breakdown-title,
+#cover-breakdown-table, .cover-quote-box, .cover-note-line {
   display: none;
-}
-#cover-info-table {
-  display: table;
-}
-.cover-breakdown-title {
-  display: block;
-}
-#cover-breakdown-table {
-  display: table;
 }
 .cover-info-table {
   width: 100%;
@@ -644,7 +636,7 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
 }
 .cover-quote-box {
   margin-top: 16px;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: space-between;
 }
@@ -959,6 +951,17 @@ body { padding-bottom: env(safe-area-inset-bottom); }
   </div>
 </div>
 <div class="validate-banner" id="validate-banner">⚠️ <b>單價不得低於成本：</b><span id="validate-msg"></span></div>
+<!-- 費用分析圓餅圖 -->
+<div class="card chart-section">
+  <div class="card-title"><div class="card-title-dot"></div>費用結構分析</div>
+  <div class="pie-wrap">
+    <div class="pie-canvas-wrap">
+      <canvas id="pie-chart" width="200" height="200"></canvas>
+    </div>
+    <div class="pie-legend" id="pie-legend"></div>
+  </div>
+</div>
+
 <!-- ★★★ 報價總覽 (最重要) ★★★ -->
 <div class="cost-box">
   <div class="cost-box-header">
@@ -993,17 +996,6 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 
 <!-- 工程分類 -->
 <div id="sections-container"></div>
-
-<!-- 費用分析圓餅圖 -->
-<div class="card chart-section">
-  <div class="card-title"><div class="card-title-dot"></div>費用結構分析</div>
-  <div class="pie-wrap">
-    <div class="pie-canvas-wrap">
-      <canvas id="pie-chart" width="200" height="200"></canvas>
-    </div>
-    <div class="pie-legend" id="pie-legend"></div>
-  </div>
-</div>
 
 <!-- 匯款資訊 -->
 <div class="card">
