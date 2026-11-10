@@ -518,7 +518,7 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   background: var(--surface);
   border: 1px solid var(--border2);
   border-radius: var(--radius);
-  padding: 28px 32px 24px;
+  padding: 24px 32px 20px;
   margin-bottom: 14px;
   font-family: 'Helvetica Neue', -apple-system, Arial, sans-serif;
 }
@@ -555,7 +555,7 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
 }
 .cover-title-row {
   text-align: center;
-  margin: 20px 0 24px;
+  margin: 20px 0 0;
 }
 .cover-title {
   font-size: 20px;
@@ -563,33 +563,20 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   letter-spacing: 0.22em;
   color: var(--text);
 }
+@media print {
+  .cover-title-row { margin: 24px 0 28px; }
+}
+/* 螢幕上隱藏封面資訊細節（列印時才顯示） */
+#cover-info-table, .cover-breakdown-title,
+#cover-breakdown-table, .cover-quote-box, .cover-note-line {
+  display: none;
+}
+/* 以下樣式僅在列印時生效 */
 .cover-info-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
   margin-bottom: 20px;
-}
-.cover-info-table td {
-  padding: 7px 12px;
-  border: 1px solid var(--border2);
-  color: var(--text);
-}
-.cover-info-table td:first-child {
-  background: var(--surface2);
-  font-weight: 600;
-  color: var(--text2);
-  width: 90px;
-  white-space: nowrap;
-}
-.cover-breakdown-title {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--text2);
-  margin: 18px 0 7px;
-  padding-left: 8px;
-  border-left: 3px solid var(--green);
-  text-transform: uppercase;
 }
 .cover-breakdown-table {
   width: 100%;
@@ -597,67 +584,11 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   font-size: 12px;
   margin-bottom: 16px;
 }
-.cover-breakdown-table th {
-  background: var(--surface2);
-  font-weight: 700;
-  color: var(--text2);
-  padding: 7px 12px;
-  border: 1px solid var(--border2);
-  text-align: left;
-  font-size: 11px;
-  letter-spacing: 0.04em;
-}
-.cover-breakdown-table td {
-  padding: 6px 12px;
-  border: 1px solid var(--border);
-  color: var(--text);
-}
-.cover-breakdown-table td:last-child {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-}
-.cover-total-row td {
-  background: var(--surface2) !important;
-  font-weight: 700;
-  border-top: 1.5px solid var(--border2) !important;
-  color: var(--text2) !important;
-}
-.cover-grandtotal-row td {
-  background: var(--green-dim) !important;
-  font-weight: 800;
-  color: var(--green) !important;
-  border-top: 2px solid var(--green-border) !important;
-  font-size: 13px;
-}
 .cover-quote-box {
   margin-top: 16px;
-  background: var(--green-dim);
-  border: 1.5px solid var(--green-border);
-  border-radius: 10px;
-  padding: 14px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-.cover-quote-label {
-  font-size: 11px;
-  color: var(--green);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-.cover-quote-val {
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--green);
-  font-variant-numeric: tabular-nums;
-}
-.cover-note-line {
-  font-size: 11px;
-  color: var(--text3);
-  margin-top: 14px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border2);
 }
 @media print {
   #cover-page {
@@ -672,16 +603,30 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   .cover-logo-en { color: #2a2826 !important; }
   .cover-company-name { color: #2a2826 !important; }
   .cover-title { color: #2a2826 !important; }
-  .cover-info-table td { border-color: #ddd !important; color: #222 !important; }
-  .cover-info-table td:first-child { background: #f5f5f2 !important; color: #444 !important; }
-  .cover-breakdown-table th { background: #f0f0ee !important; color: #333 !important; border-color: #ccc !important; }
-  .cover-breakdown-table td { border-color: #ddd !important; color: #222 !important; }
-  .cover-total-row td { background: #f5f5f2 !important; color: #333 !important; border-top-color: #aaa !important; }
-  .cover-grandtotal-row td { background: #eaf0eb !important; color: #1a6b3a !important; border-top-color: #3d6e4a !important; }
-  .cover-quote-box { background: #f0f7f3 !important; border-color: #3d6e4a !important; }
-  .cover-quote-label { color: #3d6e4a !important; }
-  .cover-quote-val { color: #1a6b3a !important; }
-  .cover-breakdown-title { border-left-color: #3d6e4a !important; color: #444 !important; }
+  /* 列印時顯示所有封面細節 */
+  #cover-info-table, .cover-breakdown-title,
+  #cover-breakdown-table, .cover-quote-box, .cover-note-line {
+    display: block !important;
+  }
+  #cover-breakdown-table { display: table !important; }
+  .cover-quote-box {
+    display: flex !important;
+    background: #f0f7f3;
+    border: 1.5px solid #3d6e4a;
+    border-radius: 8px;
+    padding: 14px 18px;
+  }
+  .cover-info-table td { padding:7px 12px; border:1px solid #ddd; color:#222; }
+  .cover-info-table td:first-child { background:#f5f5f2; font-weight:600; color:#444; width:90px; white-space:nowrap; }
+  .cover-breakdown-title { font-size:12px; font-weight:700; letter-spacing:0.08em; color:#444; margin:18px 0 7px; padding-left:8px; border-left:3px solid #3d6e4a; }
+  .cover-breakdown-table th { background:#f0f0ee; font-weight:700; color:#333; padding:7px 12px; border:1px solid #ccc; text-align:left; }
+  .cover-breakdown-table td { padding:6px 12px; border:1px solid #ddd; color:#222; }
+  .cover-breakdown-table td:last-child { text-align:right; font-variant-numeric:tabular-nums; font-weight:600; }
+  .cover-total-row td { background:#f5f5f2 !important; font-weight:700; border-top:1.5px solid #aaa !important; color:#333 !important; }
+  .cover-grandtotal-row td { background:#eaf0eb !important; font-weight:800; color:#1a6b3a !important; border-top:2px solid #3d6e4a !important; font-size:13px; }
+  .cover-quote-label { font-size:12px; color:#3d6e4a; font-weight:600; }
+  .cover-quote-val { font-size:20px; font-weight:800; color:#1a6b3a; font-variant-numeric:tabular-nums; }
+  .cover-note-line { font-size:11px; color:#666; margin-top:16px; padding-top:10px; border-top:1px solid #ddd; }
 }
 
 /* ── PRINT / PDF ── */
