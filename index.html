@@ -359,7 +359,7 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
 .pie-wrap { display: flex; align-items: flex-start; gap: 28px; flex-wrap: wrap; }
 .pie-canvas-wrap { flex-shrink: 0; position: relative; }
 .pie-legend { flex: 1; min-width: 260px; }
-.gantt-group { margin-bottom: 7px; }
+.gantt-group { margin-bottom: 10px; break-inside: avoid; }
 .gantt-group-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
 .gantt-group-label { font-size: 10px; font-weight: 800; min-width: 16px; }
 .gantt-group-name { font-size: 11.5px; font-weight: 600; flex: 1; color: var(--text); }
@@ -658,6 +658,8 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
 @media print {
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   html, body { width:100% !important; overflow:hidden !important; }
+  /* 工程分類從第2頁開始，報價總覽固定在第1頁底部 */
+  .sections-page-break { page-break-before: always !important; }
   /* 0元 section 列印只顯示標題 */
   .sec-zero .section-body { display:none !important; }
   :root {
@@ -886,10 +888,10 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 </div>
 
 <!-- 客戶資訊 -->
-<div class="card">
+<div class="card" style="padding-bottom:10px">
   <div class="card-title"><div class="card-title-dot"></div>客戶與專案資訊</div>
-  <!-- 第一排：姓名 電話 空間類型 -->
-  <div style="display:flex;gap:10px;margin-bottom:8px">
+  <!-- 第一排：姓名 電話 空間類型 設計風格 -->
+  <div style="display:flex;gap:10px;margin-bottom:7px">
     <div class="field" style="flex:1"><label>客戶姓名</label><input type="text" id="client-name" placeholder="例：林先生" oninput="fillCoverPage()"></div>
     <div class="field" style="flex:1"><label>聯絡電話</label><input type="tel" id="client-phone" placeholder="0912-345-678" oninput="fillCoverPage()"></div>
     <div class="field" style="flex:1">
@@ -903,15 +905,6 @@ body { padding-bottom: env(safe-area-inset-bottom); }
         <option value="old">老屋翻新</option>
       </select>
     </div>
-  </div>
-  <!-- 第二排：地址(長) 坪數(小) 備註 設計風格 -->
-  <div style="display:flex;gap:10px;margin-bottom:8px">
-    <div class="field" style="flex:3"><label>專案地址</label><input type="text" id="project-addr" placeholder="台北市大安區..." oninput="fillCoverPage()"></div>
-    <div class="field" style="flex:0.6"><label>坪數</label><input type="number" id="area" value="30" min="1" max="999" step="0.5" onchange="recalc()"></div>
-    <div class="field" style="flex:1.4"><label>備註（客戶可見）</label><input type="text" id="note" placeholder="本報價有效期限14天" oninput="fillCoverPage()"></div>
-  </div>
-  <!-- 設計風格（第三排） -->
-  <div style="display:flex;gap:10px;margin-bottom:4px">
     <div class="field" style="flex:1">
       <label>設計風格</label>
       <select id="style-type" onchange="onStyleTypeChange(this);fillCoverPage()">
@@ -921,9 +914,15 @@ body { padding-bottom: env(safe-area-inset-bottom); }
       </select>
       <input type="text" id="style-type-custom" placeholder="輸入自訂風格..." style="display:none;margin-top:4px">
     </div>
-    <div class="field" style="flex:1"><label>電子信箱</label><input type="email" id="client-email" placeholder="name@example.com"></div>
-    <div class="field" style="flex:1"></div>
   </div>
+  <!-- 第二排：地址(長) 坪數(小) 備註 -->
+  <div style="display:flex;gap:10px">
+    <div class="field" style="flex:3"><label>專案地址</label><input type="text" id="project-addr" placeholder="台北市大安區..." oninput="fillCoverPage()"></div>
+    <div class="field" style="flex:0.6"><label>坪數</label><input type="number" id="area" value="30" min="1" max="999" step="0.5" onchange="recalc()"></div>
+    <div class="field" style="flex:1.4"><label>備註（客戶可見）</label><input type="text" id="note" placeholder="本報價有效期限14天" oninput="fillCoverPage()"></div>
+  </div>
+  <!-- 電子信箱隱藏保留 -->
+  <input type="email" id="client-email" style="display:none">
 </div>
 
 <div class="cloud-banner" id="cloud-banner"><span id="cloud-banner-msg" style="flex:1">☁️ 其他裝置有新資料</span><button onclick="applyCloudUpdate()">立即同步</button><button onclick="dismissCloudBanner()" style="opacity:0.6">略過</button></div>
@@ -936,10 +935,10 @@ body { padding-bottom: env(safe-area-inset-bottom); }
   </div>
 </div>
 <div class="validate-banner" id="validate-banner">⚠️ <b>單價不得低於成本：</b><span id="validate-msg"></span></div>
-<!-- 費用結構分析（雙欄，無圓餅） -->
-<div class="card chart-section" style="padding:14px 18px 10px">
-  <div class="card-title" style="margin-bottom:10px"><div class="card-title-dot"></div>費用結構分析</div>
-  <div id="pie-legend" style="display:grid;grid-template-columns:1fr 1fr;gap:4px 24px"></div>
+<!-- 費用結構分析（雙欄，由左填右，無圓餅） -->
+<div class="card chart-section" style="padding:12px 18px 8px">
+  <div class="card-title" style="margin-bottom:8px"><div class="card-title-dot"></div>費用結構分析</div>
+  <div id="pie-legend" style="column-count:2;column-gap:28px;column-fill:balance"></div>
   <canvas id="pie-chart" style="display:none"></canvas>
 </div>
 
@@ -976,7 +975,7 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 </div>
 
 <!-- 工程分類 -->
-<div id="sections-container"></div>
+<div id="sections-container" class="sections-page-break"></div>
 
 <!-- 匯款資訊 -->
 <div class="card">
