@@ -664,8 +664,9 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   /* 0元 section 整個隱藏 */
   .sec-zero { display:none !important; }
   /* 避免 section 在頁尾只剩一小段 */
-  .section-card { break-inside: auto; orphans: 4; widows: 4; }
-  .section-body tr { break-inside: avoid; }
+  .section-card { break-inside: auto; }
+  .section-head { break-after: avoid; }
+  .section-body tr { break-inside: avoid; orphans: 2; widows: 2; }
   :root {
     --bg:#ffffff; --bg2:#f8f8f8; --surface:#ffffff; --surface2:#f4f4f4; --surface3:#eeeeee;
     --border:rgba(0,0,0,0.12); --border2:rgba(0,0,0,0.22);
@@ -700,10 +701,12 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   .metric-val { color:#111 !important; text-shadow:none !important; font-size:16px !important; }
   .metric-val.v-green { color:#1a6b3a !important; }
   .metric-val.v-gold  { color:#8a6200 !important; }
-  .card { background:#fff !important; border:1px solid #ddd !important; box-shadow:none !important; page-break-inside:avoid; }
+  .card { background:#fff !important; border:1px solid #ddd !important; box-shadow:none !important; }
   .card-title { color:#444 !important; }
   .card-title-dot { background:#3d6e4a !important; box-shadow:none !important; }
-  .section-card { border:1px solid #ccc !important; box-shadow:none !important; page-break-inside:avoid; margin-bottom:4px !important; }
+  /* section 允許跨頁，僅標題列不斷開 */
+  .section-card { border:1px solid #ccc !important; box-shadow:none !important; margin-bottom:4px !important; break-inside: auto; }
+  .section-head { break-after: avoid; }
   .section-head { background:#f4f4f2 !important; }
   .section-body { display:block !important; padding:8px 10px !important; }
   .sec-id { background:#eaf0eb !important; color:#3d6e4a !important; border-color:#9abfa2 !important; box-shadow:none !important; }
