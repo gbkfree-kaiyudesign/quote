@@ -385,6 +385,7 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   border: 1px solid var(--border2); border-radius: 8px;
   background: var(--surface2); overflow: hidden;
   cursor: crosshair; touch-action: none;
+  min-height: 160px;
 }
 .sig-wrap canvas { display: block; width: 100%; }
 
@@ -660,8 +661,11 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   html, body { width:100% !important; overflow:hidden !important; }
   /* 工程分類從第2頁開始，報價總覽固定在第1頁底部 */
   .sections-page-break { page-break-before: always !important; }
-  /* 0元 section 列印只顯示標題 */
-  .sec-zero .section-body { display:none !important; }
+  /* 0元 section 整個隱藏 */
+  .sec-zero { display:none !important; }
+  /* 避免 section 在頁尾只剩一小段 */
+  .section-card { break-inside: auto; orphans: 4; widows: 4; }
+  .section-body tr { break-inside: avoid; }
   :root {
     --bg:#ffffff; --bg2:#f8f8f8; --surface:#ffffff; --surface2:#f4f4f4; --surface3:#eeeeee;
     --border:rgba(0,0,0,0.12); --border2:rgba(0,0,0,0.22);
@@ -675,7 +679,15 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   .topbar,.action-bar,.add-btn,.rm-btn,.profit-row,.btn,.modal-bg,
   .a03-sub-add-row,.a03-add-sub-btn,
   .print-hide-profit,
-  .caret,.sig-wrap,.group-divider .btn { display: none !important; }
+  .caret,.group-divider .btn { display: none !important; }
+  /* 簽名欄列印時保留並加大 */
+  .sig-wrap {
+    display: block !important;
+    min-height: 220px !important;
+    background: #fff !important;
+    border: 1px solid #aaa !important;
+    margin-top: 8px !important;
+  }
   .print-hide { display: none !important; }
   body { background:#fff !important; color:#111 !important; font-size:12px !important; }
   .container { padding:0 !important; max-width:100% !important; }
@@ -978,7 +990,7 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 <div id="sections-container" class="sections-page-break"></div>
 
 <!-- 匯款資訊 -->
-<div class="card">
+<div class="card" style="margin-top:28px">
   <div class="card-title"><div class="card-title-dot"></div>匯款資訊</div>
   <div class="pay-grid" style="margin-bottom:10px">
     <div class="field"><label>銀行名稱</label><input type="text" id="bank-name" placeholder="例：台灣銀行"></div>
@@ -1008,15 +1020,15 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 </div>
 
 <!-- 客戶簽名 -->
-<div class="card">
+<div class="card" style="padding-bottom:24px">
   <div class="card-title"><div class="card-title-dot"></div>客戶確認簽名</div>
   <div class="grid2" style="margin-bottom:12px">
     <div class="field"><label>確認人姓名</label><input type="text" id="sig-name" placeholder="請填寫確認人姓名"></div>
     <div class="field"><label>確認日期</label><input type="text" id="sig-date" placeholder="2025/08/15"></div>
   </div>
-  <div class="field" style="margin-bottom:8px"><label>簽名欄（請在下方手寫簽名）</label></div>
+  <div class="field" style="margin-bottom:10px"><label>簽名欄（請在下方手寫簽名）</label></div>
   <div class="sig-wrap">
-    <canvas id="sig-canvas" height="130"></canvas>
+    <canvas id="sig-canvas" height="180"></canvas>
   </div>
   <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end">
     <button class="btn btn-ghost" onclick="clearSig()">清除簽名</button>
