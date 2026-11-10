@@ -359,21 +359,21 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
 .pie-wrap { display: flex; align-items: flex-start; gap: 28px; flex-wrap: wrap; }
 .pie-canvas-wrap { flex-shrink: 0; position: relative; }
 .pie-legend { flex: 1; min-width: 260px; }
-.gantt-group { margin-bottom: 12px; }
-.gantt-group-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
-.gantt-group-label { font-size: 11px; font-weight: 800; min-width: 18px; }
-.gantt-group-name { font-size: 12px; font-weight: 600; flex: 1; color: var(--text); }
-.gantt-pct { font-size: 12px; font-weight: 800; color: var(--text); min-width: 34px; text-align: right; }
-.gantt-amt { font-size: 12px; font-weight: 700; color: var(--text); min-width: 88px; text-align: right; }
-.gantt-bar-track { height: 8px; background: var(--border2); border-radius: 4px; overflow: hidden; margin-left: 26px; }
-.gantt-bar-fill { height: 100%; border-radius: 4px; transition: width 0.45s cubic-bezier(.4,0,.2,1); }
-.gantt-sub { margin-left: 26px; margin-top: 5px; }
-.gantt-sub-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
-.gantt-sub-id { font-size: 9.5px; color: var(--text2); min-width: 28px; font-weight: 600; }
-.gantt-sub-name { font-size: 11px; color: var(--text2); flex: 1; }
-.gantt-sub-pct { font-size: 10.5px; font-weight: 700; color: var(--text2); min-width: 30px; text-align: right; }
-.gantt-sub-amt { font-size: 10.5px; font-weight: 600; color: var(--text2); min-width: 88px; text-align: right; }
-.gantt-sub-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.gantt-group { margin-bottom: 7px; }
+.gantt-group-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+.gantt-group-label { font-size: 10px; font-weight: 800; min-width: 16px; }
+.gantt-group-name { font-size: 11.5px; font-weight: 600; flex: 1; color: var(--text); }
+.gantt-pct { font-size: 11px; font-weight: 800; color: var(--text); min-width: 30px; text-align: right; }
+.gantt-amt { font-size: 11px; font-weight: 700; color: var(--text); min-width: 80px; text-align: right; }
+.gantt-bar-track { height: 6px; background: var(--border2); border-radius: 3px; overflow: hidden; margin-left: 22px; }
+.gantt-bar-fill { height: 100%; border-radius: 3px; transition: width 0.45s cubic-bezier(.4,0,.2,1); }
+.gantt-sub { margin-left: 22px; margin-top: 3px; }
+.gantt-sub-row { display: flex; align-items: center; gap: 5px; margin-bottom: 2px; }
+.gantt-sub-id { font-size: 9px; color: var(--text2); min-width: 26px; font-weight: 600; }
+.gantt-sub-name { font-size: 10.5px; color: var(--text2); flex: 1; }
+.gantt-sub-pct { font-size: 10px; font-weight: 700; color: var(--text2); min-width: 28px; text-align: right; }
+.gantt-sub-amt { font-size: 10px; font-weight: 600; color: var(--text2); min-width: 76px; text-align: right; }
+.gantt-sub-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
 .gantt-sub-fill { height: 100%; border-radius: 2px; opacity: 0.55; transition: width 0.45s cubic-bezier(.4,0,.2,1); }
 
 /* ── PAYMENT ── */
@@ -888,14 +888,11 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 <!-- 客戶資訊 -->
 <div class="card">
   <div class="card-title"><div class="card-title-dot"></div>客戶與專案資訊</div>
-  <div class="grid3" style="margin-bottom:10px">
-    <div class="field"><label>客戶姓名</label><input type="text" id="client-name" placeholder="例：林先生" oninput="fillCoverPage()"></div>
-    <div class="field"><label>聯絡電話</label><input type="tel" id="client-phone" placeholder="0912-345-678" oninput="fillCoverPage()"></div>
-    <div class="field"><label>電子信箱</label><input type="email" id="client-email" placeholder="name@example.com"></div>
-  </div>
-  <div class="grid3" style="margin-bottom:10px">
-    <div class="field"><label>專案地址</label><input type="text" id="project-addr" placeholder="台北市大安區..." oninput="fillCoverPage()"></div>
-    <div class="field">
+  <!-- 第一排：姓名 電話 空間類型 -->
+  <div style="display:flex;gap:10px;margin-bottom:8px">
+    <div class="field" style="flex:1"><label>客戶姓名</label><input type="text" id="client-name" placeholder="例：林先生" oninput="fillCoverPage()"></div>
+    <div class="field" style="flex:1"><label>聯絡電話</label><input type="tel" id="client-phone" placeholder="0912-345-678" oninput="fillCoverPage()"></div>
+    <div class="field" style="flex:1">
       <label>空間類型</label>
       <select id="space-type" onchange="updateSpaceType();fillCoverPage()">
         <option value="apartment">一般住宅公寓</option>
@@ -906,7 +903,16 @@ body { padding-bottom: env(safe-area-inset-bottom); }
         <option value="old">老屋翻新</option>
       </select>
     </div>
-    <div class="field">
+  </div>
+  <!-- 第二排：地址(長) 坪數(小) 備註 設計風格 -->
+  <div style="display:flex;gap:10px;margin-bottom:8px">
+    <div class="field" style="flex:3"><label>專案地址</label><input type="text" id="project-addr" placeholder="台北市大安區..." oninput="fillCoverPage()"></div>
+    <div class="field" style="flex:0.6"><label>坪數</label><input type="number" id="area" value="30" min="1" max="999" step="0.5" onchange="recalc()"></div>
+    <div class="field" style="flex:1.4"><label>備註（客戶可見）</label><input type="text" id="note" placeholder="本報價有效期限14天" oninput="fillCoverPage()"></div>
+  </div>
+  <!-- 設計風格（第三排） -->
+  <div style="display:flex;gap:10px;margin-bottom:4px">
+    <div class="field" style="flex:1">
       <label>設計風格</label>
       <select id="style-type" onchange="onStyleTypeChange(this);fillCoverPage()">
         <option>現代簡約</option><option>北歐風</option><option>日式無印</option>
@@ -915,10 +921,8 @@ body { padding-bottom: env(safe-area-inset-bottom); }
       </select>
       <input type="text" id="style-type-custom" placeholder="輸入自訂風格..." style="display:none;margin-top:4px">
     </div>
-  </div>
-  <div class="grid2" style="margin-bottom:10px">
-    <div class="field"><label>坪數</label><input type="number" id="area" value="30" min="1" max="999" step="0.5" onchange="recalc()"></div>
-    <div class="field"><label>備註（客戶可見）</label><input type="text" id="note" placeholder="本報價有效期限14天" oninput="fillCoverPage()"></div>
+    <div class="field" style="flex:1"><label>電子信箱</label><input type="email" id="client-email" placeholder="name@example.com"></div>
+    <div class="field" style="flex:1"></div>
   </div>
 </div>
 
@@ -932,15 +936,11 @@ body { padding-bottom: env(safe-area-inset-bottom); }
   </div>
 </div>
 <div class="validate-banner" id="validate-banner">⚠️ <b>單價不得低於成本：</b><span id="validate-msg"></span></div>
-<!-- 費用分析圓餅圖 -->
-<div class="card chart-section">
-  <div class="card-title"><div class="card-title-dot"></div>費用結構分析</div>
-  <div class="pie-wrap">
-    <div class="pie-canvas-wrap">
-      <canvas id="pie-chart" width="200" height="200"></canvas>
-    </div>
-    <div class="pie-legend" id="pie-legend"></div>
-  </div>
+<!-- 費用結構分析（雙欄，無圓餅） -->
+<div class="card chart-section" style="padding:14px 18px 10px">
+  <div class="card-title" style="margin-bottom:10px"><div class="card-title-dot"></div>費用結構分析</div>
+  <div id="pie-legend" style="display:grid;grid-template-columns:1fr 1fr;gap:4px 24px"></div>
+  <canvas id="pie-chart" style="display:none"></canvas>
 </div>
 
 <!-- ★★★ 報價總覽 (最重要) ★★★ -->
