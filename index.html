@@ -34,6 +34,9 @@
   --red-dim: rgba(160,104,88,0.12);
   --amber: #a07840;        /* 莫蘭迪暖棕amber */
   --amber-dim: rgba(160,120,64,0.12);
+  --purple: #8878a8;       /* 莫蘭迪薰衣草紫 E類稅金 */
+  --purple-dim: rgba(136,120,168,0.12);
+  --purple-border: rgba(136,120,168,0.28);
   --radius: 10px;
   --radius-sm: 6px;
 }
@@ -227,11 +230,13 @@ select option { background: var(--surface); color: var(--text); }
 }
 .group-badge.b { background: var(--blue-dim); color: var(--blue); border-color: rgba(91,164,245,0.25); }
 .group-badge.red { background: rgba(240,112,112,0.12); color: var(--red); border-color: rgba(240,112,112,0.3); }
+.group-badge.purple { background: var(--purple-dim); color: var(--purple); border-color: var(--purple-border); }
 .group-line { flex: 1; height: 1px; background: var(--border2); }
 .group-total-label { font-size: 11px; color: var(--text2); white-space: nowrap; }
 .group-total-val { font-size: 12px; font-weight: 700; color: var(--green); font-variant-numeric: tabular-nums; }
 .group-total-val.b { color: var(--blue); }
 .group-total-val.red { color: var(--red); }
+.group-total-val.purple { color: var(--purple); }
 
 /* ── SECTION CARDS ── */
 .section-card {
@@ -261,6 +266,7 @@ select option { background: var(--surface); color: var(--text); }
 .sec-id.b { background: var(--blue-dim); color: var(--blue); border-color: rgba(91,164,245,0.25); }
 .sec-id.gold { background: var(--gold-dim); color: var(--gold); border-color: rgba(228,184,74,0.3); }
 .sec-id.red { background: rgba(240,112,112,0.12); color: var(--red); border-color: rgba(240,112,112,0.3); }
+.sec-id.purple { background: var(--purple-dim); color: var(--purple); border-color: var(--purple-border); }
 .sec-name { font-size: 13px; font-weight: 600; }
 .sec-icon { font-size: 14px; }
 .sec-right { display: flex; align-items: center; gap: 10px; }
@@ -268,8 +274,10 @@ select option { background: var(--surface); color: var(--text); }
 .sec-total.b { color: var(--blue); }
 .sec-total.gold { color: var(--gold); }
 .sec-total.red { color: var(--red); }
+.sec-total.purple { color: var(--purple); }
 .sub-cell.gold { color: var(--gold); }
 .sub-cell.red { color: var(--red); }
+.sub-cell.purple { color: var(--purple); }
 .group-badge.gold { background: var(--gold-dim); color: var(--gold); border-color: rgba(228,184,74,0.3); }
 .group-total-val.gold { color: var(--gold); }
 .print-hide { /* 螢幕可見，列印隱藏 */ }
@@ -505,6 +513,165 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; margin-top: 6px;
 }
 
+/* ── COVER PAGE (first print page) ── */
+#cover-page {
+  display: none; /* 只在列印時顯示 */
+}
+@media print {
+  #cover-page {
+    display: block !important;
+    page-break-after: always;
+    padding: 20mm 15mm 10mm;
+    background: #fff;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  .cover-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 2px solid #2a2826;
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+  }
+  .cover-logo-block {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .cover-logo-en {
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 0.35em;
+    color: #2a2826;
+  }
+  .cover-logo-sub {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: #888;
+  }
+  .cover-company-block {
+    text-align: right;
+  }
+  .cover-company-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2a2826;
+    letter-spacing: 0.08em;
+  }
+  .cover-doc-type {
+    font-size: 11px;
+    color: #666;
+    margin-top: 2px;
+    letter-spacing: 0.06em;
+  }
+  .cover-title-row {
+    text-align: center;
+    margin: 24px 0 28px;
+  }
+  .cover-title {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: #2a2826;
+    border-bottom: 1.5px solid #2a2826;
+    display: inline-block;
+    padding-bottom: 6px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .cover-info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-bottom: 24px;
+  }
+  .cover-info-table td {
+    padding: 7px 12px;
+    border: 1px solid #ddd;
+    color: #222;
+  }
+  .cover-info-table td:first-child {
+    background: #f5f5f2;
+    font-weight: 600;
+    color: #444;
+    width: 90px;
+    white-space: nowrap;
+  }
+  .cover-breakdown-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #444;
+    margin: 20px 0 8px;
+    padding-left: 4px;
+    border-left: 3px solid #3d6e4a;
+  }
+  .cover-breakdown-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-bottom: 20px;
+  }
+  .cover-breakdown-table th {
+    background: #f0f0ee;
+    font-weight: 700;
+    color: #333;
+    padding: 7px 12px;
+    border: 1px solid #ccc;
+    text-align: left;
+  }
+  .cover-breakdown-table td {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    color: #222;
+  }
+  .cover-breakdown-table td:last-child {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  .cover-total-row td {
+    background: #f5f5f2 !important;
+    font-weight: 700;
+    border-top: 1.5px solid #aaa !important;
+  }
+  .cover-grandtotal-row td {
+    background: #eaf0eb !important;
+    font-weight: 800;
+    color: #1a6b3a !important;
+    border-top: 2px solid #3d6e4a !important;
+    font-size: 13px;
+  }
+  .cover-quote-box {
+    margin-top: 20px;
+    background: #f0f7f3;
+    border: 1.5px solid #3d6e4a;
+    border-radius: 8px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cover-quote-label {
+    font-size: 12px;
+    color: #3d6e4a;
+    font-weight: 600;
+  }
+  .cover-quote-val {
+    font-size: 20px;
+    font-weight: 800;
+    color: #1a6b3a;
+    font-variant-numeric: tabular-nums;
+  }
+  .cover-note-line {
+    font-size: 11px;
+    color: #666;
+    margin-top: 16px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+  }
+}
+
 /* ── PRINT / PDF ── */
 @page { size: A4; margin: 12mm 10mm; }
 @media print {
@@ -548,23 +715,28 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   .sec-id.b    { background:#e8edf3 !important; color:#445e7a !important; border-color:#9aadc2 !important; }
   .sec-id.gold { background:#f3eedd !important; color:#7a6228 !important; border-color:#c4aa6a !important; }
   .sec-id.red  { background:#f2eae8 !important; color:#7a4a3c !important; border-color:#c49a8a !important; }
+  .sec-id.purple { background:#eeebf3 !important; color:#5a4a78 !important; border-color:#a898c8 !important; }
   .sec-name { color:#111 !important; }
   .sec-total { color:#3d6e4a !important; }
   .sec-total.b    { color:#445e7a !important; }
   .sec-total.gold { color:#7a6228 !important; }
   .sec-total.red  { color:#7a4a3c !important; }
+  .sec-total.purple { color:#5a4a78 !important; }
   .sub-cell { color:#3d6e4a !important; }
   .sub-cell.b    { color:#445e7a !important; }
   .sub-cell.gold { color:#7a6228 !important; }
   .sub-cell.red  { color:#7a4a3c !important; }
+  .sub-cell.purple { color:#5a4a78 !important; }
   .group-badge { background:#eaf0eb !important; color:#3d6e4a !important; border-color:#9abfa2 !important; }
   .group-badge.b    { background:#e8edf3 !important; color:#445e7a !important; border-color:#9aadc2 !important; }
   .group-badge.gold { background:#f3eedd !important; color:#7a6228 !important; border-color:#c4aa6a !important; }
   .group-badge.red  { background:#f2eae8 !important; color:#7a4a3c !important; border-color:#c49a8a !important; }
+  .group-badge.purple { background:#eeebf3 !important; color:#5a4a78 !important; border-color:#a898c8 !important; }
   .group-total-val { color:#3d6e4a !important; }
   .group-total-val.b    { color:#445e7a !important; }
   .group-total-val.gold { color:#7a6228 !important; }
   .group-total-val.red  { color:#7a4a3c !important; }
+  .group-total-val.purple { color:#5a4a78 !important; }
   .group-line { background:#ccc !important; }
   thead th { color:#444 !important; border-bottom-color:#ccc !important; }
   tbody td { border-bottom-color:#eee !important; color:#111 !important; }
@@ -679,13 +851,60 @@ body { padding-bottom: env(safe-area-inset-bottom); }
     <button class="btn btn-ghost" onclick="showTemplates()">📁 模板</button>
     <button class="btn btn-ghost" onclick="showHistory()">📋 歷史報價</button>
     <button class="btn btn-amber" onclick="saveQuote()">💾 存檔</button>
-    <button class="btn btn-green" onclick="window.print()">🖨️ 列印 / PDF</button>
+    <button class="btn btn-green" onclick="doPrint()">🖨️ 列印 / PDF</button>
     <button class="btn" style="background:rgba(168,139,250,0.15);color:#a78bfa;border-color:rgba(168,139,250,0.35)" onclick="printClient()">📄 客戶版列印</button>
     <button class="btn install-btn" onclick="showInstallGuide()" style="background:rgba(91,164,245,0.12);color:var(--blue);border-color:rgba(91,164,245,0.3)">📲 安裝 App</button>
   </div>
 </div>
 
 <div class="container">
+
+<!-- ★★★ 封面頁（僅列印時顯示） ★★★ -->
+<div id="cover-page">
+  <div class="cover-header">
+    <div class="cover-logo-block">
+      <div class="cover-logo-en">KAIYU&nbsp;&nbsp;DESIGN</div>
+      <div class="cover-logo-sub">室內設計報價系統</div>
+    </div>
+    <div class="cover-company-block">
+      <div class="cover-company-name">洄游設計室內裝修有限公司</div>
+      <div class="cover-doc-type">工程報價單</div>
+    </div>
+  </div>
+
+  <div class="cover-title-row">
+    <div class="cover-title">工 程 報 價 單</div>
+  </div>
+
+  <table class="cover-info-table" id="cover-info-table">
+    <tr><td>客戶姓名</td><td id="ci-name">—</td><td>聯絡電話</td><td id="ci-phone">—</td></tr>
+    <tr><td>專案地址</td><td colspan="3" id="ci-addr">—</td></tr>
+    <tr><td>空間類型</td><td id="ci-space">—</td><td>設計風格</td><td id="ci-style">—</td></tr>
+    <tr><td>坪數</td><td id="ci-area">—</td><td>報價日期</td><td id="ci-date">—</td></tr>
+  </table>
+
+  <div class="cover-breakdown-title">費用結構</div>
+  <table class="cover-breakdown-table" id="cover-breakdown-table">
+    <thead>
+      <tr><th>分類</th><th>說明</th><th style="text-align:right">金額</th></tr>
+    </thead>
+    <tbody id="cover-breakdown-tbody">
+    </tbody>
+  </table>
+
+  <div class="cover-quote-box">
+    <div>
+      <div class="cover-quote-label">每坪單價</div>
+      <div style="font-size:11px;color:#5a9e72;margin-top:2px" id="cover-per-ping">—</div>
+    </div>
+    <div style="text-align:right">
+      <div class="cover-quote-label">含稅總價（含5%稅金）</div>
+      <div class="cover-quote-val" id="cover-total">NT$ 0</div>
+    </div>
+  </div>
+
+  <div class="cover-note-line" id="cover-note-line">備註：本報價有效期限14天</div>
+</div>
 
 <!-- 客戶資訊 -->
 <div class="card">
@@ -710,15 +929,17 @@ body { padding-bottom: env(safe-area-inset-bottom); }
     </div>
     <div class="field">
       <label>設計風格</label>
-      <select id="style-type">
+      <select id="style-type" onchange="onStyleTypeChange(this)">
         <option>現代簡約</option><option>北歐風</option><option>日式無印</option>
         <option>工業風</option><option>古典歐式</option><option>輕奢風</option>
+        <option value="__custom__">✏️ 自訂</option>
       </select>
+      <input type="text" id="style-type-custom" placeholder="輸入自訂風格..." style="display:none;margin-top:4px">
     </div>
   </div>
   <div class="grid2" style="margin-bottom:10px">
     <div class="field"><label>坪數</label><input type="number" id="area" value="30" min="1" max="999" step="0.5" onchange="recalc()"></div>
-    <div class="field"><label>備註（客戶可見）</label><input type="text" id="note" placeholder="例：本報價有效期 30 天，不含家電採購..."></div>
+    <div class="field"><label>備註（客戶可見）</label><input type="text" id="note" placeholder="本報價有效期限14天"></div>
   </div>
 </div>
 
@@ -753,7 +974,11 @@ body { padding-bottom: env(safe-area-inset-bottom); }
         <div class="metric-val v-gold" id="per-ping">NT$ 0</div>
       </div>
       <div class="metric">
-        <div class="metric-label">總價</div>
+        <div class="metric-label">5% 稅金</div>
+        <div class="metric-val" id="tax-amount" style="color:var(--red)">NT$ 0</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">含稅總價</div>
         <div class="metric-val v-green" id="quote-total">NT$ 0</div>
       </div>
     </div>
@@ -825,7 +1050,7 @@ body { padding-bottom: env(safe-area-inset-bottom); }
   <button class="btn btn-ghost" onclick="clearAll()">🗑 清除全部</button>
   <button class="btn btn-ghost" onclick="copyText()">📋 複製文字報價</button>
   <button class="btn btn-amber" onclick="saveQuote()">💾 存入歷史</button>
-  <button class="btn btn-green" onclick="window.print()">🖨️ 列印 / 輸出 PDF</button>
+  <button class="btn btn-green" onclick="doPrint()">🖨️ 列印 / 輸出 PDF</button>
   <button class="btn" style="background:rgba(168,139,250,0.15);color:#a78bfa;border-color:rgba(168,139,250,0.35)" onclick="printClient()">📄 客戶版列印</button>
 </div>
 
@@ -990,6 +1215,7 @@ const GROUPS = [
   { id:'A', label:'B類 基礎工程類', icon:'🏗️' },
   { id:'B', label:'C類 材料道具類', icon:'📦' },
   { id:'E', label:'D類 施工管理費', icon:'🏢' },
+  { id:'F', label:'E類 發票／稅金', icon:'🧾' },
 ];
 
 const SECTIONS = [
@@ -1059,10 +1285,13 @@ const SECTIONS = [
   { id:'E01', dispId:'D01', group:'E', label:'施工管理費', icon:'🏢',
     items:['施工管理費'],
     specs:['一般'], units:['%'], _isManage:true },
+  { id:'F01', dispId:'E01', group:'F', label:'發票稅金（5%）', icon:'🧾',
+    items:['營業稅（5%）'],
+    specs:['含稅'], units:['式'], _isTax:true },
 ];
 
-const PIE_COLORS = ['#a08840','#5e8c6a','#6882a0','#a06858']; // 莫蘭迪：砂金、鼠尾草、粉藍、磚赭
-const SEC_COLORS = { D:'gold', A:'green', B:'b', E:'red' };
+const PIE_COLORS = ['#a08840','#5e8c6a','#6882a0','#a06858','#8878a8']; // 莫蘭迪：砂金、鼠尾草、粉藍、磚赭、薰衣草紫
+const SEC_COLORS = { D:'gold', A:'green', B:'b', E:'red', F:'purple' };
 
 function fmt(n){ return 'NT$\u00a0'+Math.round(n).toLocaleString('zh-TW'); }
 
@@ -1137,7 +1366,7 @@ function addRow(secId, data){
   const tr = document.createElement('tr');
   const d = data||{};
   const color = SEC_COLORS[sec.group]||'green';
-  const cls = color==='b' ? ' b' : color==='gold' ? ' gold' : '';
+  const cls = color==='b' ? ' b' : color==='gold' ? ' gold' : color==='purple' ? ' purple' : '';
 
   // item — detect if saved value is custom (not in list)
   const isCustomItem = d.item && !sec.items.includes(d.item);
@@ -1261,7 +1490,7 @@ function a03AddItemInGroup(secId, cat, d){
   const subAddRow=tbody.querySelector(`tr.a03-sub-add-row[data-cat="${cat}"]`);
   const sec=SECTIONS.find(s=>s.id===secId);
   const color=SEC_COLORS[sec.group]||'green';
-  const cls=color==='b'?' b':color==='gold'?' gold':'';
+  const cls=color==='b'?' b':color==='gold'?' gold':color==='purple'?' purple':'';
   const defCost=d.cost!==undefined?d.cost:(d.price||3000);
   // sub-item select for this category
   const subItems=getA03SubItems(cat);
@@ -1533,7 +1762,7 @@ function confirmCustomSpec(input){
 function getSectionTotal(secId){
   let quoteT=0, costT=0;
   const sec=SECTIONS.find(s=>s.id===secId);
-  const isManage=sec&&sec._isManage;
+  const isManage=sec&&(sec._isManage||sec._isTax);
   document.querySelectorAll(`#tbody-${secId} tr`).forEach(tr=>{
     if(tr.classList.contains('a03-cat-hdr')||tr.classList.contains('a03-sub-add-row')) return;
     const priceEl=tr.querySelector('.price-inp');
@@ -1637,12 +1866,14 @@ function dismissConsistency(){
 }
 
 function recalc(){
-  // 先算非 E 類
-  const nonE = SECTIONS.filter(s=>s.group!=='E');
+  // Pass 1: 非 E / 非 F 類
+  const nonEF = SECTIONS.filter(s=>s.group!=='E'&&s.group!=='F');
   const eSecList = SECTIONS.filter(s=>s.group==='E');
-  const nonEResults = nonE.map(s=>getSectionTotal(s.id));
-  const nonESum = nonEResults.reduce((a,r)=>a+r.quoteT,0);
-  // E01 施工管理費：自動設定單價 = 工程總價 × qty%
+  const fSecList = SECTIONS.filter(s=>s.group==='F');
+  const nonEFResults = nonEF.map(s=>getSectionTotal(s.id));
+  const nonEFSum = nonEFResults.reduce((a,r)=>a+r.quoteT,0);
+
+  // Pass 2: E01 施工管理費 auto price = 工程總價 × qty%
   eSecList.forEach(sec=>{
     const tbody=document.getElementById('tbody-'+sec.id);
     if(!tbody) return;
@@ -1652,7 +1883,7 @@ function recalc(){
       const priceEl=tr.querySelector('.price-inp');
       if(qtyEl&&priceEl){
         const pct=parseFloat(qtyEl.value)||5;
-        const autoPrice=Math.round(nonESum*pct/100);
+        const autoPrice=Math.round(nonEFSum*pct/100);
         priceEl.value=autoPrice;
         priceEl.readOnly=true;
         priceEl.style.color='var(--red)';
@@ -1660,20 +1891,46 @@ function recalc(){
     });
   });
   const eResults = eSecList.map(s=>getSectionTotal(s.id));
-  // 重組為與 SECTIONS 同順序（非E在前，E在後）
-  const results=SECTIONS.map(s=>{
-    const idx=nonE.findIndex(x=>x.id===s.id);
-    if(idx>=0) return nonEResults[idx];
-    const ei=eSecList.findIndex(x=>x.id===s.id);
-    return eResults[ei]||{quoteT:0,costT:0};
+  const eSum = eResults.reduce((a,r)=>a+r.quoteT,0);
+  const pretaxSum = nonEFSum + eSum;
+
+  // Pass 3: F01 稅金 auto price = pretaxSum × 5%
+  fSecList.forEach(sec=>{
+    const tbody=document.getElementById('tbody-'+sec.id);
+    if(!tbody) return;
+    tbody.querySelectorAll('tr').forEach(tr=>{
+      if(tr.classList.contains('a03-cat-hdr')||tr.classList.contains('a03-sub-add-row')) return;
+      const priceEl=tr.querySelector('.price-inp');
+      if(priceEl){
+        const taxAmt=Math.round(pretaxSum*0.05);
+        priceEl.value=taxAmt;
+        priceEl.readOnly=true;
+        priceEl.style.color='var(--purple)';
+      }
+    });
   });
-  const quoteSum=results.reduce((a,r)=>a+r.quoteT,0);
-  const costSum=results.reduce((a,r)=>a+r.costT,0);
+  const fResults = fSecList.map(s=>getSectionTotal(s.id));
+  const fSum = fResults.reduce((a,r)=>a+r.quoteT,0);
+
+  // 重組為與 SECTIONS 同順序
+  const results=SECTIONS.map(s=>{
+    const idx=nonEF.findIndex(x=>x.id===s.id);
+    if(idx>=0) return nonEFResults[idx];
+    const ei=eSecList.findIndex(x=>x.id===s.id);
+    if(ei>=0) return eResults[ei]||{quoteT:0,costT:0};
+    const fi=fSecList.findIndex(x=>x.id===s.id);
+    return fResults[fi]||{quoteT:0,costT:0};
+  });
+
+  const quoteSum=results.reduce((a,r)=>a+r.quoteT,0); // 含稅總價
+  const costSum=results.filter((_,i)=>SECTIONS[i].group!=='F').reduce((a,r)=>a+r.costT,0);
   const area=parseFloat(document.getElementById('area').value)||1;
   document.getElementById('cost-total').textContent=fmt(costSum);
   document.getElementById('quote-total').textContent=fmt(quoteSum);
-  document.getElementById('per-ping').textContent=fmt(quoteSum/area);
-  const ap=costSum>0?((quoteSum-costSum)/costSum*100):0;
+  document.getElementById('per-ping').textContent=fmt(pretaxSum/area);
+  const taxEl=document.getElementById('tax-amount');
+  if(taxEl) taxEl.textContent=fmt(fSum);
+  const ap=costSum>0?((pretaxSum-costSum)/costSum*100):0;
   const apEl=document.getElementById('actual-profit-label');
   if(apEl) apEl.textContent=ap.toFixed(1)+'%';
   GROUPS.forEach(grp=>{
@@ -1765,7 +2022,7 @@ function drawPie(vals){
   ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#edeae4'; ctx.fill();
 
   // Group labels A/B/C on outer rim
-  const groupLabels=['A','B','C','D'];
+  const groupLabels=['A','B','C','D','E'];
   GROUPS.forEach((grp,gi)=>{
     const secs=SECTIONS.filter(s=>s.group===grp.id);
     const grpTotal=secs.reduce((a,s)=>a+(vals[SECTIONS.indexOf(s)]||0),0);
@@ -1875,7 +2132,7 @@ function getQuoteData(){
     email:document.getElementById('client-email').value,
     addr:document.getElementById('project-addr').value,
     area:document.getElementById('area').value,
-    style:document.getElementById('style-type').value,
+    style:getStyleLabel(),
     spaceType:document.getElementById('space-type').value,
     note:document.getElementById('note').value,
     bankName:document.getElementById('bank-name').value,
@@ -2152,7 +2409,94 @@ function saveHistoryToCloud(data){
   db.ref('history').push({ ...data, _savedAt: Date.now() }).catch(()=>{});
 }
 
+function onStyleTypeChange(sel){
+  const ci = document.getElementById('style-type-custom');
+  if(sel.value === '__custom__'){
+    ci.style.display = 'block';
+    ci.focus();
+  } else {
+    ci.style.display = 'none';
+  }
+}
+
+function getStyleLabel(){
+  const sel = document.getElementById('style-type');
+  if(sel.value==='__custom__'){
+    return document.getElementById('style-type-custom').value || '自訂';
+  }
+  return sel.value;
+}
+
+function fillCoverPage(){
+  const qd = getQuoteData();
+  // Basic info
+  const setT=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v||'—'; };
+  setT('ci-name', document.getElementById('client-name').value);
+  setT('ci-phone', document.getElementById('client-phone').value);
+  setT('ci-addr', document.getElementById('project-addr').value);
+  const spaceEl=document.getElementById('space-type');
+  setT('ci-space', spaceEl ? spaceEl.options[spaceEl.selectedIndex].text : '');
+  setT('ci-style', getStyleLabel());
+  const area=parseFloat(document.getElementById('area').value)||1;
+  setT('ci-area', area + ' 坪');
+  setT('ci-date', new Date().toLocaleDateString('zh-TW'));
+  // Cover total and per-ping
+  const totalEl=document.getElementById('quote-total');
+  const perPingEl=document.getElementById('per-ping');
+  if(totalEl) setT('cover-total', totalEl.textContent);
+  if(perPingEl) setT('cover-per-ping', '每坪 ' + perPingEl.textContent);
+  // Note
+  const noteEl=document.getElementById('note');
+  const noteLine=document.getElementById('cover-note-line');
+  if(noteLine){
+    const noteVal = noteEl ? noteEl.value.trim() : '';
+    noteLine.textContent = '備註：' + (noteVal || '本報價有效期限14天');
+  }
+  // Breakdown table
+  const tbody=document.getElementById('cover-breakdown-tbody');
+  if(!tbody) return;
+  tbody.innerHTML='';
+  let preTotal=0;
+  let taxTotal=0;
+  GROUPS.forEach(grp=>{
+    const secs=SECTIONS.filter(s=>s.group===grp.id);
+    let grpTotal=0;
+    secs.forEach(sec=>{
+      const el=document.getElementById('total-'+sec.id);
+      const v=el?parseFloat(el.textContent.replace(/[^\d]/g,''))||0:0;
+      grpTotal+=v;
+    });
+    if(grpTotal===0) return;
+    const isTax = secs.some(s=>s._isTax);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${grp.label}</td><td>${isTax?'5% 營業稅（開立發票）':grp.icon+' 小計'}</td><td>${fmt(grpTotal)}</td>`;
+    tbody.appendChild(tr);
+    if(isTax){ taxTotal=grpTotal; }
+    else preTotal+=grpTotal;
+  });
+  // Pre-tax subtotal row (insert before the tax row which is the last current row)
+  if(taxTotal>0){
+    const sub=document.createElement('tr');
+    sub.className='cover-total-row';
+    sub.innerHTML=`<td colspan="2">未稅合計</td><td>${fmt(preTotal)}</td>`;
+    const lastRow=tbody.lastElementChild;
+    tbody.insertBefore(sub, lastRow);
+  }
+  // Grand total row
+  const totalText=totalEl?totalEl.textContent:fmt(0);
+  const gt=document.createElement('tr');
+  gt.className='cover-grandtotal-row';
+  gt.innerHTML=`<td colspan="2">含稅總價</td><td>${totalText}</td>`;
+  tbody.appendChild(gt);
+}
+
+function doPrint(){
+  fillCoverPage();
+  window.print();
+}
+
 function printClient(){
+  fillCoverPage();
   document.body.classList.add('print-client');
   window.print();
   // 列印對話框關閉後移除 class
@@ -2202,6 +2546,19 @@ function loadQuote(data){
   document.getElementById('bank-account').value=data.bankAccount||'';
   document.getElementById('valid-days').value=data.validDays||30;
   document.getElementById('start-date').value=data.startDate||'';
+  // Restore style-type
+  (function(){
+    const sel=document.getElementById('style-type');
+    const ci=document.getElementById('style-type-custom');
+    if(data.style){
+      const presets=Array.from(sel.options).map(o=>o.value).filter(v=>v!=='__custom__');
+      if(presets.includes(data.style)){
+        sel.value=data.style; ci.style.display='none'; ci.value='';
+      } else {
+        sel.value='__custom__'; ci.style.display='block'; ci.value=data.style;
+      }
+    }
+  })();
   // Restore pay-terms
   (function(){
     const sel=document.getElementById('pay-terms');
