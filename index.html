@@ -567,22 +567,80 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   .cover-title-row { margin: 24px 0 28px; }
 }
 /* 螢幕上隱藏封面資訊細節（列印時才顯示） */
-#cover-info-table, .cover-breakdown-title,
-#cover-breakdown-table, .cover-quote-box, .cover-note-line {
+.cover-quote-box, .cover-note-line {
   display: none;
 }
-/* 以下樣式僅在列印時生效 */
+#cover-info-table {
+  display: table;
+}
+.cover-breakdown-title {
+  display: block;
+}
+#cover-breakdown-table {
+  display: table;
+}
 .cover-info-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
   margin-bottom: 20px;
 }
+.cover-info-table td {
+  padding: 7px 12px;
+  border: 1px solid var(--border2);
+  color: var(--text);
+}
+.cover-info-table td:first-child {
+  background: var(--surface2);
+  font-weight: 600;
+  color: var(--text2);
+  width: 90px;
+  white-space: nowrap;
+}
+.cover-breakdown-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text2);
+  margin: 18px 0 7px;
+  padding-left: 8px;
+  border-left: 3px solid var(--green);
+}
 .cover-breakdown-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
   margin-bottom: 16px;
+}
+.cover-breakdown-table th {
+  background: var(--surface2);
+  font-weight: 700;
+  color: var(--text2);
+  padding: 7px 12px;
+  border: 1px solid var(--border2);
+  text-align: left;
+}
+.cover-breakdown-table td {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.cover-breakdown-table td:last-child {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.cover-total-row td {
+  background: var(--surface2) !important;
+  font-weight: 700;
+  border-top: 1.5px solid var(--border2) !important;
+}
+.cover-grandtotal-row td {
+  background: var(--green-dim) !important;
+  font-weight: 800;
+  color: var(--green) !important;
+  border-top: 2px solid var(--green) !important;
+  font-size: 13px;
 }
 .cover-quote-box {
   margin-top: 16px;
@@ -603,19 +661,12 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   .cover-logo-en { color: #2a2826 !important; }
   .cover-company-name { color: #2a2826 !important; }
   .cover-title { color: #2a2826 !important; }
-  /* 列印時顯示所有封面細節 */
+  /* 列印時顯示封面細節（不含總價框） */
   #cover-info-table, .cover-breakdown-title,
-  #cover-breakdown-table, .cover-quote-box, .cover-note-line {
+  #cover-breakdown-table, .cover-note-line {
     display: block !important;
   }
   #cover-breakdown-table { display: table !important; }
-  .cover-quote-box {
-    display: flex !important;
-    background: #f0f7f3;
-    border: 1.5px solid #3d6e4a;
-    border-radius: 8px;
-    padding: 14px 18px;
-  }
   .cover-info-table td { padding:7px 12px; border:1px solid #ddd; color:#222; }
   .cover-info-table td:first-child { background:#f5f5f2; font-weight:600; color:#444; width:90px; white-space:nowrap; }
   .cover-breakdown-title { font-size:12px; font-weight:700; letter-spacing:0.08em; color:#444; margin:18px 0 7px; padding-left:8px; border-left:3px solid #3d6e4a; }
