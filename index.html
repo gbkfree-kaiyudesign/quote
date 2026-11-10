@@ -655,12 +655,24 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
 }
 
 /* ── PRINT / PDF ── */
-@page { size: A4; margin: 12mm 10mm; }
+@page {
+  size: A4;
+  margin: 12mm 10mm 16mm;
+  /* 移除瀏覽器預設頁首頁尾（URL、標題） */
+  @top-left { content: none; }
+  @top-center { content: none; }
+  @top-right { content: none; }
+  @bottom-left { content: none; }
+  @bottom-center { content: none; }
+  @bottom-right { content: none; }
+}
 @media print {
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   html, body { width:100% !important; overflow:hidden !important; }
   /* 工程分類從第2頁開始，報價總覽固定在第1頁底部 */
   .sections-page-break { page-break-before: always !important; }
+  /* 匯款資訊和簽名欄不跨頁 */
+  .payment-card, .card:has(#sig-canvas) { break-inside: avoid !important; page-break-inside: avoid !important; }
   /* 0元 section 整個隱藏 */
   .sec-zero { display:none !important; }
   /* 避免 section 在頁尾只剩一小段 */
@@ -993,7 +1005,7 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 <div id="sections-container" class="sections-page-break"></div>
 
 <!-- 匯款資訊 -->
-<div class="card" style="margin-top:28px">
+<div class="card payment-card" style="margin-top:28px">
   <div class="card-title"><div class="card-title-dot"></div>匯款資訊</div>
   <div class="pay-grid" style="margin-bottom:10px">
     <div class="field"><label>銀行名稱</label><input type="text" id="bank-name" placeholder="例：台灣銀行"></div>
@@ -1308,7 +1320,7 @@ function buildSections(){
       const el = document.createElement('div');
       el.className = 'section-card';
       el.id = 'sec-'+sec.id;
-      const idCls = color==='b' ? ' b' : color==='gold' ? ' gold' : '';
+      const idCls = color==='b' ? ' b' : color==='gold' ? ' gold' : color==='red' ? ' red' : color==='purple' ? ' purple' : '';
       el.innerHTML = `
         <div class="section-head" onclick="toggleSec('${sec.id}')">
           <div class="section-head-left">
@@ -1359,7 +1371,7 @@ function addRow(secId, data){
   const tr = document.createElement('tr');
   const d = data||{};
   const color = SEC_COLORS[sec.group]||'green';
-  const cls = color==='b' ? ' b' : color==='gold' ? ' gold' : color==='purple' ? ' purple' : '';
+  const cls = color==='b' ? ' b' : color==='gold' ? ' gold' : color==='red' ? ' red' : color==='purple' ? ' purple' : '';
 
   // item — detect if saved value is custom (not in list)
   const isCustomItem = d.item && !sec.items.includes(d.item);
@@ -1483,7 +1495,7 @@ function a03AddItemInGroup(secId, cat, d){
   const subAddRow=tbody.querySelector(`tr.a03-sub-add-row[data-cat="${cat}"]`);
   const sec=SECTIONS.find(s=>s.id===secId);
   const color=SEC_COLORS[sec.group]||'green';
-  const cls=color==='b'?' b':color==='gold'?' gold':color==='purple'?' purple':'';
+  const cls=color==='b'?' b':color==='gold'?' gold':color==='red'?' red':color==='purple'?' purple':'';
   const defCost=d.cost!==undefined?d.cost:(d.price||3000);
   // sub-item select for this category
   const subItems=getA03SubItems(cat);
