@@ -566,11 +566,12 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
 @media print {
   .cover-title-row { margin: 24px 0 28px; }
 }
-/* 螢幕上封面只顯示 header+title，細節僅列印時才顯示 */
-#cover-info-table, .cover-breakdown-title,
-#cover-breakdown-table, .cover-quote-box, .cover-note-line {
-  display: none;
-}
+/* 封面頁：螢幕與列印皆顯示，僅隱藏總價框 */
+.cover-quote-box { display: none; }
+#cover-info-table { display: table; }
+.cover-breakdown-title { display: block; }
+#cover-breakdown-table { display: table; }
+.cover-note-line { display: block; }
 .cover-info-table {
   width: 100%;
   border-collapse: collapse;
