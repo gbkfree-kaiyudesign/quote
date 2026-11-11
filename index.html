@@ -829,9 +829,10 @@ tr.row-drag-over { box-shadow: inset 0 -2px 0 var(--blue), inset 0 0 0 1px rgba(
   .validate-banner, .cloud-banner { display:none !important; }
 }
 
-/* ── 客戶版列印：只顯示大項目標題+小計 ── */
-body.print-client .section-body { display:none !important; }
-body.print-client .cost-col { display:none !important; }
+/* ── 客戶版列印：顯示項目+數量+加總，隱藏成本與單價 ── */
+body.print-client .section-body { display:block !important; }  /* 顯示項目列 */
+body.print-client .price-col { display:none !important; }      /* 隱藏單價欄 */
+body.print-client .cost-col { display:none !important; }       /* 隱藏成本欄 */
 body.print-client .metric.print-hide { display:none !important; }
 body.print-client .profit-row { display:none !important; }
 body.print-client .print-hide-profit { display:none !important; }
@@ -842,8 +843,15 @@ body.print-client .pie-wrap { display:none !important; }
 body.print-client .chart-section { display:none !important; }
 /* 利潤率、工料總成本 隱藏 */
 body.print-client [data-hide-client] { display:none !important; }
+/* 客戶版隱藏操作欄 */
+body.print-client .lock-td { display:none !important; }
+body.print-client .action-td { display:none !important; }
+body.print-client .a03-sub-add-row { display:none !important; }
+body.print-client .a03-add-sub-btn { display:none !important; }
+body.print-client .area-rm-btn { display:none !important; }
 @media print {
-  body.print-client .section-body { display:none !important; }
+  body.print-client .section-body { display:block !important; }
+  body.print-client .price-col { display:none !important; }
   body.print-client .cost-col { display:none !important; }
   body.print-client .profit-row { display:none !important; }
   body.print-client .print-hide-profit { display:none !important; }
@@ -852,6 +860,9 @@ body.print-client [data-hide-client] { display:none !important; }
   body.print-client .pie-wrap { display:none !important; }
   body.print-client .chart-section { display:none !important; }
   body.print-client [data-hide-client] { display:none !important; }
+  body.print-client .lock-td { display:none !important; }
+  body.print-client .action-td { display:none !important; }
+  body.print-client .a03-sub-add-row { display:none !important; }
   body.print-client .metric:has(.metric-label) { }
 }
 
@@ -875,13 +886,6 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 .cloud-banner button:hover { background:rgba(91,164,245,0.1); }
 
 /* ── Consistency check ── */
-.consist-banner { display:none; background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.35); border-radius:8px; padding:11px 14px; margin-bottom:10px; font-size:12px; color:var(--amber); }
-.consist-banner.show { display:block; }
-.consist-banner ul { margin:6px 0 8px 16px; line-height:1.8; }
-.consist-banner .consist-actions { display:flex; gap:8px; margin-top:8px; }
-.consist-btn { font-size:11px; padding:4px 12px; border-radius:5px; border:1px solid rgba(251,191,36,0.4); background:none; color:var(--amber); cursor:pointer; font-family:inherit; }
-.consist-btn:hover { background:rgba(251,191,36,0.12); }
-.consist-btn.ok { background:rgba(251,191,36,0.15); font-weight:600; }
 /* ── Price validation ── */
 .price-error { border-color:#f87171 !important; box-shadow:0 0 0 2px rgba(240,112,112,0.22) !important; }
 .validate-banner {
@@ -1018,14 +1022,6 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 </div>
 
 <div class="cloud-banner" id="cloud-banner"><span id="cloud-banner-msg" style="flex:1">☁️ 其他裝置有新資料</span><button onclick="applyCloudUpdate()">立即同步</button><button onclick="dismissCloudBanner()" style="opacity:0.6">略過</button></div>
-<div class="consist-banner" id="consist-banner">
-  <strong>⚠️ 數量不一致</strong>
-  <ul id="consist-list"></ul>
-  <div class="consist-actions">
-    <button class="consist-btn ok" onclick="confirmConsistency()">✅ 確認，我知道了</button>
-    <button class="consist-btn" onclick="dismissConsistency()">略過</button>
-  </div>
-</div>
 <div class="validate-banner" id="validate-banner">⚠️ <b>單價不得低於成本：</b><span id="validate-msg"></span></div>
 <!-- 費用結構分析（雙欄，由左填右，無圓餅） -->
 <div class="card chart-section" style="padding:12px 18px 8px">
@@ -1406,10 +1402,10 @@ function buildSections(){
                 <th style="min-width:130px">項目</th>
                 <th style="min-width:58px">數量</th>
                 <th style="min-width:52px">單位</th>
-                <th style="min-width:88px">單價（元）</th>
+                <th class="price-col" style="min-width:88px">單價（元）</th>
                 <th class="cost-col" style="min-width:88px;color:#e84e88">成本（元）</th>
                 <th style="min-width:96px">總價</th>
-                <th style="min-width:76px">${sec.id==='A01'?'說明':'規格'}</th>
+                <th class="spec-col" style="min-width:76px">${sec.id==='A01'?'說明':'規格'}</th>
                 <th></th>
               </tr></thead>
               <tbody id="tbody-${sec.id}"></tbody>
@@ -1629,10 +1625,10 @@ function addRow(secId, data){
     ${itemTd}
     <td><input class="qty-inp" type="number" value="${d.qty||1}" min="0.1" step="${secId==='A08'?'0.1':'0.5'}" onchange="recalc()" style="width:56px"></td>
     <td>${unitSel}</td>
-    <td><input class="price-inp" type="number" value="${d.price||3000}" min="0" step="100" onchange="recalc()" style="width:84px"></td>
+    <td class="price-col"><input class="price-inp" type="number" value="${d.price||3000}" min="0" step="100" onchange="recalc()" style="width:84px"></td>
     <td class="cost-col"><input class="cost-inp" type="number" value="${defCost}" min="0" step="100" onchange="recalc()" style="width:84px;color:#e84e88;font-weight:700"></td>
     <td class="sub-cell${cls}">NT$\u00a00</td>
-    <td style="min-width:120px">${secId==='A01'
+    <td class="spec-col" style="min-width:120px">${secId==='A01'
       ? `<input type="text" class="note-inp spec-sel" placeholder="說明（選填）..." value="${d.note||d.spec||''}" style="width:100%;font-size:12px;color:var(--text2);background:transparent;border:none;border-bottom:1px solid var(--border2);outline:none;padding:3px 0" onchange="recalc()">`
       : `${specSel}<input type="text" class="note-inp" placeholder="說明..." value="${d.note||''}" style="margin-top:3px;width:100%;font-size:11px;color:var(--text2);background:transparent;border:none;border-bottom:1px solid var(--border2);outline:none;padding:2px 0" onchange="recalc()">`
     }</td>
@@ -1720,10 +1716,10 @@ function a03AddItemInGroup(secId, cat, d){
     <td style="min-width:150px"><select class="a03-sub-sel item-sel" onchange="recalc()" style="width:100%">${subOpts}</select></td>
     <td><input class="qty-inp" type="number" value="${d.qty||1}" min="0.1" step="0.5" onchange="recalc()" style="width:56px"></td>
     <td>${unitSel}</td>
-    <td><input class="price-inp" type="number" value="${d.price||0}" min="0" step="100" onchange="recalc()" style="width:84px"></td>
+    <td class="price-col"><input class="price-inp" type="number" value="${d.price||0}" min="0" step="100" onchange="recalc()" style="width:84px"></td>
     <td class="cost-col"><input class="cost-inp" type="number" value="${defCost}" min="0" step="100" onchange="recalc()" style="width:84px;color:#e84e88;font-weight:700"></td>
     <td class="sub-cell${cls}">NT$ 0</td>
-    <td>${specSel}</td>
+    <td class="spec-col">${specSel}</td>
     <td class="action-td"><button class="lock-btn" onclick="toggleLock(this,'${secId}')" title="🔒 鎖定保留此列">🔓</button><button class="rm-btn" onclick="a03RemoveRow(this,'${secId}','${cat}')" title="刪除">×</button></td>`;
   tbody.insertBefore(tr, subAddRow);
   if(d.locked){
@@ -2028,49 +2024,6 @@ function getSecItemQty(secId, keyword){
   return total;
 }
 
-let _consistTimer=null;
-let _consistDismissed=false;
-function scheduleConsistencyCheck(){
-  _consistDismissed=false;
-  clearTimeout(_consistTimer);
-  _consistTimer=setTimeout(runConsistencyCheck, 800);
-}
-function runConsistencyCheck(){
-  if(_consistDismissed) return;
-  const issues=[];
-
-  // ── 1. 冷氣迴路5.5mm ↔ A13 室外機配置
-  const acCircuit = getA03CatItemQty('迴路','新增迴路5.5mm');
-  const acUnit    = getSecItemQty('A13','室外機');
-  if(acCircuit>0 && acUnit>0 && acCircuit!==acUnit){
-    issues.push(`B03 冷氣迴路5.5mm 數量 <b>${acCircuit}</b>，B13 空調室外機 數量 <b>${acUnit}</b>`);
-  }
-
-  // ── 2. 出線 ↔ 開關插座
-  Object.entries(A03_OUTLET_MAP).forEach(([outlet, device])=>{
-    const oQty = getA03CatItemQty('出線', outlet);
-    const dQty = getA03CatItemQty('開關插座', device);
-    if(oQty>0 && dQty>0 && oQty!==dQty){
-      issues.push(`出線「${outlet}」數量 <b>${oQty}</b>，開關插座「${device}」數量 <b>${dQty}</b>`);
-    }
-  });
-
-  const banner=document.getElementById('consist-banner');
-  const list=document.getElementById('consist-list');
-  if(issues.length>0 && banner && list){
-    list.innerHTML=issues.map(i=>`<li>${i}</li>`).join('');
-    banner.classList.add('show');
-  } else if(banner){
-    banner.classList.remove('show');
-  }
-}
-function confirmConsistency(){
-  _consistDismissed=true;
-  document.getElementById('consist-banner')?.classList.remove('show');
-}
-function dismissConsistency(){
-  document.getElementById('consist-banner')?.classList.remove('show');
-}
 
 function recalc(){
   // Pass 1: 非 E / 非 F 類
@@ -2148,7 +2101,6 @@ function recalc(){
   });
   drawPie(results.map(r=>r.quoteT));
   validatePrices();
-  scheduleConsistencyCheck();
   fillCoverPage();
 }
 
