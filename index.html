@@ -354,6 +354,50 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   justify-content: center; margin-top: 8px; transition: all 0.15s;
 }
 .add-btn:hover { background: var(--green-dim); color: var(--green); border-color: var(--green-border); }
+.add-btn.area-btn:hover { background: rgba(104,130,160,0.1); color: var(--blue); border-color: rgba(104,130,160,0.3); }
+
+/* ── AREA LABEL ROW ── */
+.area-label-row td {
+  padding: 3px 8px !important;
+  background: var(--surface3) !important;
+  border-top: 1px solid var(--border2);
+  border-bottom: 1px solid var(--border2);
+}
+.area-label-inner {
+  display: flex; align-items: center; gap: 8px;
+}
+.area-label-tag {
+  font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em;
+  color: var(--blue); background: rgba(104,130,160,0.1);
+  border: 1px solid rgba(104,130,160,0.28);
+  border-radius: 4px; padding: 1px 10px;
+}
+.area-rm-btn {
+  margin-left: auto; background: none; border: none;
+  cursor: pointer; color: var(--text3); font-size: 15px;
+  padding: 0 4px; line-height: 1; border-radius: 3px;
+}
+.area-rm-btn:hover { color: var(--red); background: var(--red-dim); }
+
+/* ── AREA PICKER POPUP ── */
+.area-picker-popup {
+  position: absolute; background: var(--surface);
+  border: 1px solid var(--border2); border-radius: var(--radius);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.13);
+  padding: 10px; z-index: 9999;
+  display: flex; flex-wrap: wrap; gap: 6px; width: 272px;
+}
+.area-picker-title {
+  width: 100%; font-size: 11px; color: var(--text2);
+  letter-spacing: 0.08em; margin-bottom: 2px; padding-left: 2px;
+}
+.area-chip {
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); padding: 5px 12px;
+  font-size: 12px; cursor: pointer; color: var(--text);
+  transition: all 0.12s; white-space: nowrap;
+}
+.area-chip:hover { background: rgba(104,130,160,0.1); color: var(--blue); border-color: rgba(104,130,160,0.3); }
 
 /* ── PIE CHART ── */
 .pie-wrap { display: flex; align-items: flex-start; gap: 28px; flex-wrap: wrap; }
@@ -689,7 +733,7 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
   }
   .cost-col { display:none !important; }
   .lock-th, .lock-td { display:none !important; }
-  .topbar,.action-bar,.add-btn,.rm-btn,.profit-row,.btn,.modal-bg,
+  .topbar,.action-bar,.add-btn,.rm-btn,.area-rm-btn,.profit-row,.btn,.modal-bg,
   .a03-sub-add-row,.a03-add-sub-btn,
   .print-hide-profit,
   .caret,.group-divider .btn { display: none !important; }
@@ -1351,10 +1395,67 @@ function buildSections(){
             </table>
           </div>
           <button class="add-btn" onclick="${sec.id==='A03'?`showA03Picker('${sec.id}')`: `addRow('${sec.id}')`}">＋ 新增項目</button>
+          ${sec.group==='A'?`<button class="add-btn area-btn" onclick="showAreaPicker('${sec.id}',this)">📍 標示區域</button>`:''}
         </div>`;
       cont.appendChild(el);
     });
   });
+}
+
+// ══ AREA LABEL ══
+const AREA_NAMES = ['玄關','客廳','餐廳','廚房','主臥','主浴','客臥','客浴','書房','孩童房','倉儲空間'];
+let _areaPickerSecId = null;
+
+function insertAreaLabel(secId, areaName){
+  const tbody = document.getElementById('tbody-'+secId);
+  if(!tbody) return;
+  const tr = document.createElement('tr');
+  tr.className = 'area-label-row';
+  tr.dataset.areaLabel = areaName;
+  tr.innerHTML = `<td colspan="9"><div class="area-label-inner">
+    <span class="area-label-tag">📍 ${areaName}</span>
+    <button class="area-rm-btn" onclick="this.closest('tr').remove()" title="移除標示">×</button>
+  </div></td>`;
+  tbody.appendChild(tr);
+  // Open section if closed
+  const body = document.getElementById('body-'+secId);
+  const caret = document.getElementById('caret-'+secId);
+  if(body && body.style.display==='none'){ body.style.display=''; caret?.classList.add('open'); }
+}
+
+function showAreaPicker(secId, btn){
+  closeAreaPicker();
+  _areaPickerSecId = secId;
+  const popup = document.createElement('div');
+  popup.className = 'area-picker-popup';
+  popup.id = 'area-picker-popup';
+  popup.innerHTML = `<div class="area-picker-title">選擇區域</div>` +
+    AREA_NAMES.map(a=>`<button class="area-chip" onclick="pickArea('${a}')">${a}</button>`).join('') +
+    `<button class="area-chip" style="color:var(--text2)" onclick="pickAreaCustom()">✏️ 自訂</button>`;
+  const rect = btn.getBoundingClientRect();
+  popup.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+  popup.style.left = Math.max(4, rect.left) + 'px';
+  document.body.appendChild(popup);
+  setTimeout(()=>document.addEventListener('click', _closeAreaPickerHandler), 0);
+}
+function _closeAreaPickerHandler(e){
+  if(!e.target.closest('#area-picker-popup') && !e.target.classList.contains('area-btn')){
+    closeAreaPicker();
+  }
+}
+function closeAreaPicker(){
+  document.getElementById('area-picker-popup')?.remove();
+  document.removeEventListener('click', _closeAreaPickerHandler);
+}
+function pickArea(areaName){
+  if(!_areaPickerSecId) return;
+  insertAreaLabel(_areaPickerSecId, areaName);
+  closeAreaPicker();
+}
+function pickAreaCustom(){
+  const v = prompt('輸入自訂區域名稱：');
+  if(v && v.trim()) pickArea(v.trim());
+  else closeAreaPicker();
 }
 
 function toggleSec(id){
@@ -1366,6 +1467,7 @@ function toggleSec(id){
 }
 
 function addRow(secId, data){
+  if(data && data._areaLabel){ insertAreaLabel(secId, data._areaLabel); return; }
   const sec = SECTIONS.find(s=>s.id===secId);
   const tbody = document.getElementById('tbody-'+secId);
   const tr = document.createElement('tr');
@@ -2110,6 +2212,7 @@ function getQuoteData(){
     rows[sec.id]=[];
     document.querySelectorAll(`#tbody-${sec.id} tr`).forEach(tr=>{
       if(tr.classList.contains('a03-cat-hdr')||tr.classList.contains('a03-sub-add-row')) return;
+      if(tr.dataset.areaLabel){ rows[sec.id].push({_areaLabel:tr.dataset.areaLabel}); return; }
       const catSel2=null; // cat now in tr.dataset.cat
       const rawItemSel=tr.querySelector('.a03-sub-sel')||tr.querySelector('.item-sel');
       const specSel=tr.querySelector('.spec-sel');
