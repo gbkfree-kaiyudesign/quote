@@ -307,8 +307,9 @@ tbody td input:focus, tbody td select:focus { border-color: var(--green); outlin
 .sub-cell.gold { color: var(--gold); }
 
 /* ── LOCK BUTTON ── */
-.lock-th { width: 28px; }
-.lock-td { width: 28px; text-align: center; padding: 2px !important; }
+.lock-th { width: 36px; }
+.lock-td { width: 36px; text-align: center; padding: 2px 1px !important; vertical-align: middle; }
+.lock-td { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 3px 1px !important; }
 .lock-btn {
   background: none; border: none; cursor: pointer;
   font-size: 13px; padding: 3px 4px; border-radius: 4px;
@@ -316,6 +317,14 @@ tbody td input:focus, tbody td select:focus { border-color: var(--green); outlin
 }
 .lock-btn:hover { color: var(--green); background: var(--green-dim); }
 .lock-btn.locked { color: var(--green); }
+.copy-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 13px; padding: 3px 4px; border-radius: 4px;
+  color: var(--text3); line-height: 1; transition: all 0.15s;
+}
+.copy-btn:hover { color: var(--blue); background: rgba(104,130,160,0.1); }
+.action-td { text-align: center; padding: 2px 3px !important; white-space: nowrap; }
+.action-td { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 3px 2px !important; }
 tr[data-locked="true"] { background: rgba(80,232,138,0.04) !important; }
 
 /* ── A03 grouped table ── */
@@ -745,7 +754,7 @@ tr.row-drag-over { box-shadow: inset 0 -2px 0 var(--blue), inset 0 0 0 1px rgba(
   }
   .cost-col { display:none !important; }
   .lock-th, .lock-td { display:none !important; }
-  .topbar,.action-bar,.add-btn,.rm-btn,.area-rm-btn,.profit-row,.btn,.modal-bg,
+  .topbar,.action-bar,.add-btn,.rm-btn,.copy-btn,.area-rm-btn,.profit-row,.btn,.modal-bg,
   .a03-sub-add-row,.a03-add-sub-btn,
   .print-hide-profit,
   .caret,.group-divider .btn { display: none !important; }
@@ -1513,6 +1522,40 @@ function setupRowDrag(tr){
   });
 }
 
+// ══ DUPLICATE ROW ══
+function duplicateRow(btn, secId){
+  const tr = btn.closest('tr');
+  const tbody = tr.parentNode;
+
+  // Area label row
+  if(tr.dataset.areaLabel){
+    insertAreaLabel(secId, tr.dataset.areaLabel);
+    tbody.insertBefore(tbody.lastElementChild, tr.nextSibling);
+    return;
+  }
+
+  // A03 item row
+  const cat = tr.dataset.cat;
+  if(cat){
+    const d = getRowDataForLock(tr, secId);
+    d.locked = false;
+    a03AddItemInGroup(secId, cat, d);
+    // The new row was inserted before subAddRow; find it (it's now just before subAddRow)
+    const subAddRow = tbody.querySelector(`tr.a03-sub-add-row[data-cat="${cat}"]`);
+    const newRow = subAddRow ? subAddRow.previousElementSibling : null;
+    if(newRow) tbody.insertBefore(newRow, tr.nextSibling);
+    return;
+  }
+
+  // Regular row
+  const d = getRowDataForLock(tr, secId);
+  d.locked = false;
+  addRow(secId, d);
+  // addRow appends to end; move it right after current tr
+  const newRow = tbody.lastElementChild;
+  tbody.insertBefore(newRow, tr.nextSibling);
+}
+
 function toggleSec(id){
   const body = document.getElementById('body-'+id);
   const caret = document.getElementById('caret-'+id);
@@ -1573,7 +1616,7 @@ function addRow(secId, data){
   const defCost=d.cost!==undefined?d.cost:(d.price||3000);
 
   // Lock cell
-  const lockTd=`<td class="lock-td"><span class="drag-handle" title="拖曳移動">⠿</span><button class="lock-btn" onclick="toggleLock(this,'${secId}')" title="🔒 鎖定保留此列">🔓</button></td>`;
+  const lockTd=`<td class="lock-td"><span class="drag-handle" title="拖曳移動">⠿</span><button class="copy-btn" onclick="duplicateRow(this,'${secId}')" title="複製此列">⧉</button></td>`;
 
   // Item cell
   if(secId==='A03'){
@@ -1593,7 +1636,7 @@ function addRow(secId, data){
       ? `<input type="text" class="note-inp spec-sel" placeholder="說明（選填）..." value="${d.note||d.spec||''}" style="width:100%;font-size:12px;color:var(--text2);background:transparent;border:none;border-bottom:1px solid var(--border2);outline:none;padding:3px 0" onchange="recalc()">`
       : `${specSel}<input type="text" class="note-inp" placeholder="說明..." value="${d.note||''}" style="margin-top:3px;width:100%;font-size:11px;color:var(--text2);background:transparent;border:none;border-bottom:1px solid var(--border2);outline:none;padding:2px 0" onchange="recalc()">`
     }</td>
-    <td><button class="rm-btn" onclick="this.closest('tr').remove();saveLockedRows(secId);recalc()" title="刪除">×</button></td>`;
+    <td class="action-td"><button class="lock-btn" onclick="toggleLock(this,'${secId}')" title="🔒 鎖定保留此列">🔓</button><button class="rm-btn" onclick="this.closest('tr').remove();saveLockedRows('${secId}');recalc()" title="刪除">×</button></td>`;
   tbody.appendChild(tr);
   // Apply locked state
   if(d.locked){
@@ -1673,7 +1716,7 @@ function a03AddItemInGroup(secId, cat, d){
   const tr=document.createElement('tr');
   tr.className='a03-item-row'; tr.dataset.cat=cat;
   tr.innerHTML=`
-    <td class="lock-td"><span class="drag-handle" title="拖曳移動">⠿</span><button class="lock-btn" onclick="toggleLock(this,'${secId}')" title="🔒 鎖定保留此列">🔓</button></td>
+    <td class="lock-td"><span class="drag-handle" title="拖曳移動">⠿</span><button class="copy-btn" onclick="duplicateRow(this,'${secId}')" title="複製此列">⧉</button></td>
     <td style="min-width:150px"><select class="a03-sub-sel item-sel" onchange="recalc()" style="width:100%">${subOpts}</select></td>
     <td><input class="qty-inp" type="number" value="${d.qty||1}" min="0.1" step="0.5" onchange="recalc()" style="width:56px"></td>
     <td>${unitSel}</td>
@@ -1681,7 +1724,7 @@ function a03AddItemInGroup(secId, cat, d){
     <td class="cost-col"><input class="cost-inp" type="number" value="${defCost}" min="0" step="100" onchange="recalc()" style="width:84px;color:#e84e88;font-weight:700"></td>
     <td class="sub-cell${cls}">NT$ 0</td>
     <td>${specSel}</td>
-    <td><button class="rm-btn" onclick="a03RemoveRow(this,'${secId}','${cat}')" title="刪除">×</button></td>`;
+    <td class="action-td"><button class="lock-btn" onclick="toggleLock(this,'${secId}')" title="🔒 鎖定保留此列">🔓</button><button class="rm-btn" onclick="a03RemoveRow(this,'${secId}','${cat}')" title="刪除">×</button></td>`;
   tbody.insertBefore(tr, subAddRow);
   if(d.locked){
     tr.dataset.locked='true';
