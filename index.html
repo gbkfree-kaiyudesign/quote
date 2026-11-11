@@ -842,7 +842,7 @@ body.print-client .pie-wrap { display:none !important; }
 /* 費用結構分析：客戶版顯示 */
 /* body.print-client .chart-section — 不隱藏，讓客戶看到 */
 /* 每列小計隱藏，只看大項目標題旁的總價 */
-body.print-client .sub-cell { display:none !important; }
+body.print-client .sub-cell { visibility:hidden !important; }
 /* 利潤率、工料總成本 隱藏 */
 body.print-client [data-hide-client] { display:none !important; }
 /* 客戶版隱藏操作欄 */
@@ -861,7 +861,7 @@ body.print-client .area-rm-btn { display:none !important; }
   body.print-client .gantt-wrap { display:none !important; }
   body.print-client .pie-wrap { display:none !important; }
   /* body.print-client .chart-section — 客戶版顯示費用結構分析 */
-  body.print-client .sub-cell { display:none !important; }
+  body.print-client .sub-cell { visibility:hidden !important; }
   body.print-client [data-hide-client] { display:none !important; }
   body.print-client .lock-td { display:none !important; }
   body.print-client .action-td { display:none !important; }
