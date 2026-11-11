@@ -379,6 +379,18 @@ tr[data-locked="true"] { outline: 1px solid rgba(80,232,138,0.18); outline-offse
 }
 .area-rm-btn:hover { color: var(--red); background: var(--red-dim); }
 
+/* ── DRAG-TO-REORDER ── */
+.drag-handle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; cursor: grab; color: var(--text3);
+  font-size: 15px; user-select: none; opacity: 0.45;
+  transition: opacity 0.1s; vertical-align: middle; margin-right: 2px;
+}
+.drag-handle:hover { opacity: 1; color: var(--text2); }
+tr.row-dragging { opacity: 0.3; background: var(--surface2) !important; }
+tr.row-drag-over { box-shadow: inset 0 -2px 0 var(--blue), inset 0 0 0 1px rgba(104,130,160,0.2); }
+@media print { .drag-handle { display: none !important; } }
+
 /* ── AREA PICKER POPUP ── */
 .area-picker-popup {
   position: absolute; background: var(--surface);
@@ -1413,10 +1425,12 @@ function insertAreaLabel(secId, areaName){
   tr.className = 'area-label-row';
   tr.dataset.areaLabel = areaName;
   tr.innerHTML = `<td colspan="9"><div class="area-label-inner">
+    <span class="drag-handle" title="拖曳移動" style="font-size:14px;margin-right:6px">⠿</span>
     <span class="area-label-tag">📍 ${areaName}</span>
     <button class="area-rm-btn" onclick="this.closest('tr').remove()" title="移除標示">×</button>
   </div></td>`;
   tbody.appendChild(tr);
+  setupRowDrag(tr);
   // Open section if closed
   const body = document.getElementById('body-'+secId);
   const caret = document.getElementById('caret-'+secId);
@@ -1456,6 +1470,47 @@ function pickAreaCustom(){
   const v = prompt('輸入自訂區域名稱：');
   if(v && v.trim()) pickArea(v.trim());
   else closeAreaPicker();
+}
+
+// ══ DRAG-TO-REORDER ══
+let _dragRow = null;
+function setupRowDrag(tr){
+  // Only activate drag when mousedown is on the handle
+  tr.addEventListener('mousedown', e=>{
+    tr.draggable = !!e.target.closest('.drag-handle');
+  });
+  tr.addEventListener('dragstart', e=>{
+    if(!tr.draggable) { e.preventDefault(); return; }
+    _dragRow = tr;
+    tr.classList.add('row-dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', '');
+  });
+  tr.addEventListener('dragend', ()=>{
+    tr.classList.remove('row-dragging');
+    tr.draggable = false;
+    document.querySelectorAll('.row-drag-over').forEach(r=>r.classList.remove('row-drag-over'));
+    _dragRow = null;
+  });
+  tr.addEventListener('dragover', e=>{
+    e.preventDefault();
+    if(_dragRow && tr !== _dragRow){
+      document.querySelectorAll('.row-drag-over').forEach(r=>r.classList.remove('row-drag-over'));
+      tr.classList.add('row-drag-over');
+    }
+  });
+  tr.addEventListener('dragleave', ()=>tr.classList.remove('row-drag-over'));
+  tr.addEventListener('drop', e=>{
+    e.preventDefault();
+    tr.classList.remove('row-drag-over');
+    if(_dragRow && _dragRow !== tr){
+      const tbody = tr.parentNode;
+      // Insert before or after based on mouse Y position
+      const rect = tr.getBoundingClientRect();
+      const after = e.clientY > rect.top + rect.height / 2;
+      tbody.insertBefore(_dragRow, after ? tr.nextSibling : tr);
+    }
+  });
 }
 
 function toggleSec(id){
@@ -1518,7 +1573,7 @@ function addRow(secId, data){
   const defCost=d.cost!==undefined?d.cost:(d.price||3000);
 
   // Lock cell
-  const lockTd=`<td class="lock-td"><button class="lock-btn" onclick="toggleLock(this,'${secId}')" title="🔒 鎖定保留此列">🔓</button></td>`;
+  const lockTd=`<td class="lock-td"><span class="drag-handle" title="拖曳移動">⠿</span><button class="lock-btn" onclick="toggleLock(this,'${secId}')" title="🔒 鎖定保留此列">🔓</button></td>`;
 
   // Item cell
   if(secId==='A03'){
@@ -1550,6 +1605,7 @@ function addRow(secId, data){
     const rmBtn2=tr.querySelector('.rm-btn');
     if(rmBtn2) rmBtn2.disabled=true;
   }
+  setupRowDrag(tr);
   recalc();
 }
 
@@ -1617,7 +1673,7 @@ function a03AddItemInGroup(secId, cat, d){
   const tr=document.createElement('tr');
   tr.className='a03-item-row'; tr.dataset.cat=cat;
   tr.innerHTML=`
-    <td class="lock-td"><button class="lock-btn" onclick="toggleLock(this,'${secId}')" title="🔒 鎖定保留此列">🔓</button></td>
+    <td class="lock-td"><span class="drag-handle" title="拖曳移動">⠿</span><button class="lock-btn" onclick="toggleLock(this,'${secId}')" title="🔒 鎖定保留此列">🔓</button></td>
     <td style="min-width:150px"><select class="a03-sub-sel item-sel" onchange="recalc()" style="width:100%">${subOpts}</select></td>
     <td><input class="qty-inp" type="number" value="${d.qty||1}" min="0.1" step="0.5" onchange="recalc()" style="width:56px"></td>
     <td>${unitSel}</td>
@@ -1635,6 +1691,7 @@ function a03AddItemInGroup(secId, cat, d){
     tr.querySelectorAll('input,select').forEach(el=>{ el.disabled=true; });
     tr.querySelector('.rm-btn').disabled=true;
   }
+  setupRowDrag(tr);
   recalc();
 }
 function a03RemoveRow(btn, secId, cat){
