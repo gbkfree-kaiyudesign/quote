@@ -983,7 +983,7 @@ body { padding-bottom: env(safe-area-inset-bottom); }
     </div>
   </div>
 
-  <div class="cover-note-line" id="cover-note-line">備註：本報價有效期限14天</div>
+  <div class="cover-note-line" id="cover-note-line">報價日期：</div>
 </div>
 
 <!-- 客戶資訊 -->
@@ -991,7 +991,7 @@ body { padding-bottom: env(safe-area-inset-bottom); }
   <div class="card-title"><div class="card-title-dot"></div>客戶與專案資訊</div>
   <!-- 第一排：姓名 電話 空間類型 設計風格 -->
   <div style="display:flex;gap:10px;margin-bottom:7px">
-    <div class="field" style="flex:1"><label>客戶姓名</label><input type="text" id="client-name" placeholder="例：林先生" oninput="fillCoverPage()"></div>
+    <div class="field" style="flex:1"><label>客戶姓名</label><input type="text" id="client-name" placeholder="例：林先生" oninput="syncSigName();fillCoverPage()"></div>
     <div class="field" style="flex:1"><label>聯絡電話</label><input type="tel" id="client-phone" placeholder="0912-345-678" oninput="fillCoverPage()"></div>
     <div class="field" style="flex:1">
       <label>空間類型</label>
@@ -1018,7 +1018,7 @@ body { padding-bottom: env(safe-area-inset-bottom); }
   <div style="display:flex;gap:10px">
     <div class="field" style="flex:3"><label>專案地址</label><input type="text" id="project-addr" placeholder="台北市大安區..." oninput="fillCoverPage()"></div>
     <div class="field" style="flex:0.6"><label>坪數</label><input type="number" id="area" value="30" min="1" max="999" step="0.5" onchange="recalc()"></div>
-    <div class="field" style="flex:1.4"><label>備註（客戶可見）</label><input type="text" id="note" placeholder="本報價有效期限14天" oninput="fillCoverPage()"></div>
+    <div class="field" style="flex:1.4"><label>報價日期（客戶可見）</label><input type="text" id="note" placeholder="2026/11/12　本報價有效期限14天" oninput="fillCoverPage()"></div>
   </div>
   <!-- 電子信箱隱藏保留 -->
   <input type="email" id="client-email" style="display:none">
@@ -1093,7 +1093,7 @@ body { padding-bottom: env(safe-area-inset-bottom); }
         style="display:none;margin-top:6px;width:100%"
         onchange="syncCustomPayTerms(this)">
     </div>
-    <div class="field"><label>報價有效期（天）</label><input type="number" id="valid-days" value="30" min="1"></div>
+    <div class="field"><label>報價日期</label><input type="text" id="valid-days" placeholder="2026/11/12　本報價有效期限14天"></div>
     <div class="field"><label>預計開工日</label><input type="text" id="start-date" placeholder="2025/09/01"></div>
   </div>
 </div>
@@ -2614,7 +2614,7 @@ function fillCoverPage(){
   const noteLine=document.getElementById('cover-note-line');
   if(noteLine){
     const noteVal = noteEl ? noteEl.value.trim() : '';
-    noteLine.textContent = '備註：' + (noteVal || '本報價有效期限14天');
+    noteLine.textContent = '報價日期：' + (noteVal || defaultQuoteNote());
   }
   // Breakdown table
   const tbody=document.getElementById('cover-breakdown-tbody');
@@ -2703,12 +2703,12 @@ function loadQuote(data){
   document.getElementById('client-email').value=data.email||'';
   document.getElementById('project-addr').value=data.addr||'';
   document.getElementById('area').value=data.area||30;
-  document.getElementById('note').value=data.note||'';
+  document.getElementById('note').value=data.note||defaultQuoteNote();
   document.getElementById('bank-name').value=data.bankName||'';
   document.getElementById('bank-branch').value=data.bankBranch||'';
   document.getElementById('bank-holder').value=data.bankHolder||'';
   document.getElementById('bank-account').value=data.bankAccount||'';
-  document.getElementById('valid-days').value=data.validDays||30;
+  document.getElementById('valid-days').value=(data.validDays&&isNaN(data.validDays))?data.validDays:defaultQuoteNote();
   document.getElementById('start-date').value=data.startDate||'';
   // Restore style-type
   (function(){
@@ -2736,7 +2736,7 @@ function loadQuote(data){
       document.getElementById('pay-terms-custom').style.display='none';
     }
   })();
-  document.getElementById('sig-name').value=data.sigName||'';
+  document.getElementById('sig-name').value=data.sigName||data.client||'';
   document.getElementById('sig-date').value=data.sigDate||'';
   SECTIONS.forEach(sec=>{
     document.getElementById('tbody-'+sec.id).innerHTML='';
@@ -2786,6 +2786,7 @@ function clearAll(){
   ['client-name','client-phone','client-email','project-addr','note',
    'bank-name','bank-branch','bank-holder','bank-account','start-date','sig-name','sig-date']
     .forEach(id=>{ document.getElementById(id).value=''; });
+  applyDefaultQuoteDate(true);
   document.getElementById('area').value=30;
   clearSig(); recalc();
 }
@@ -2816,8 +2817,8 @@ function copyText(){
   txt+=`工料總成本：${fmt(cost)}\n利潤率：${ap.toFixed(1)}%\n`;
   txt+=`📌 建議報價：${fmt(quote)}\n每坪單價：${fmt(quote/area)}\n`;
   if(data.bankAccount) txt+=`\n匯款：${data.bankHolder} ${data.bankAccount}（${data.bankName} ${data.bankBranch}）\n`;
-  txt+=`付款：${data.payTerms||'—'}　有效期：${data.validDays||30}天\n`;
-  if(data.note) txt+=`\n備註：${data.note}\n`;
+  txt+=`付款：${data.payTerms||'—'}　報價日期：${data.validDays||defaultQuoteNote()}\n`;
+  
   document.getElementById('copy-text').value=txt;
   document.getElementById('copy-modal').classList.add('open');
 }
@@ -2893,7 +2894,23 @@ function initDefaults(){
 }
 
 // ══ DATE ══
-document.getElementById('quote-date').textContent='報價日期：'+new Date().toLocaleDateString('zh-TW');
+function todayStr(){ return new Date().toLocaleDateString('zh-TW'); }
+function defaultQuoteNote(){ return todayStr()+'　本報價有效期限14天'; }
+// 報價日期欄位（頂部 note、匯款區 valid-days）為空時自動填入當天日期
+function applyDefaultQuoteDate(force){
+  ['note','valid-days'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el && (force || !el.value.trim())) el.value=defaultQuoteNote();
+  });
+}
+// 客戶姓名 → 確認人姓名 同步
+function syncSigName(){
+  const c=document.getElementById('client-name');
+  const sg=document.getElementById('sig-name');
+  if(c && sg) sg.value=c.value;
+}
+document.getElementById('quote-date').textContent='報價日期：'+todayStr();
+applyDefaultQuoteDate(false);
 
 buildSections();
 // Load from Firebase cloud first; fall back to local defaults
