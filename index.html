@@ -1644,7 +1644,7 @@ function addRow(secId, data){
 
   // spec — detect if saved value is custom
   const isCustomSpec = d.spec && !sec.specs.includes(d.spec);
-  if(isCustomSpec) sec.specs.push(d.spec);
+  if(isCustomSpec){ sec.specs.push(d.spec); libAdd('specs',secId,d.spec); }
   const specOpts = sec.specs.map(sp=>`<option${d.spec===sp?' selected':''}>${sp}</option>`).join('');
   const specSel = `<select class="spec-sel" onchange="onSpecChange(this);recalc()" style="width:100%">
     ${specOpts}
@@ -1658,6 +1658,7 @@ function addRow(secId, data){
   // Load saved custom units for this section
   const _saved_units = JSON.parse(localStorage.getItem('cu_'+secId)||'[]');
   _saved_units.forEach(u=>{ if(!sec.units.includes(u)) sec.units.push(u); });
+  if(d.unit && !sec.units.includes(d.unit)){ sec.units.push(d.unit); libAdd('units',secId,d.unit); }
   const _uOpts = sec.units.map(u=>`<option${(d.unit===u)?' selected':''}>${u}</option>`).join('');
   const _firstSel = !d.unit ? ' selected' : '';
   const unitSel = `<select class="unit-sel" onchange="onUnitChange(this,'${secId}');recalc()" style="width:100%">
@@ -1756,6 +1757,9 @@ function a03AddItemInGroup(secId, cat, d){
   const defCost=d.cost!==undefined?d.cost:(getItemCost(secId,d.item,cat)??getItemCost(secId,d.item)??(d.price||0));
   // sub-item select for this category
   const subItems=getA03SubItems(cat);
+  if(d.item && !subItems.includes(d.item)){ subItems.push(d.item); libAdd('a03',cat,d.item);
+    if(!A03_CATS[cat]) A03_CATS[cat]=[];
+    if(!A03_CATS[cat].includes(d.item)) A03_CATS[cat].push(d.item); }
   const subOpts=subItems.map(i=>`<option${d.item===i?' selected':''}>${i}</option>`).join('');
   // spec select — use category-specific options if available
   const catSpecList = A03_CAT_SPECS[cat] || sec.specs;
@@ -2799,6 +2803,48 @@ function libMigrateLocal(){
   if(changed) libSave(lib);
   return lib;
 }
+// 從一筆報價資料裡掃出所有自訂項目 / 規格 / 單位，收進項目庫
+function libHarvestQuote(q,lib){
+  if(!q||!q.rows) return false;
+  let changed=false;
+  const push=(t,k,v)=>{
+    v=(v||'').trim(); if(!v||v==='__custom__'||v==='__cu__') return;
+    lib[t]=lib[t]||{}; lib[t][k]=lib[t][k]||[];
+    if(!lib[t][k].includes(v)){ lib[t][k].push(v); changed=true; }
+  };
+  SECTIONS.forEach(sec=>{
+    (q.rows[sec.id]||[]).forEach(r=>{
+      if(!r||r._areaLabel) return;
+      if(sec.id==='A03'){
+        const cat=r.cat||'';
+        if(cat && r.item && !(A03_CATS[cat]||[]).includes(r.item)) push('a03',cat,r.item);
+      } else if(r.item && !(sec.items||[]).includes(r.item)) push('items',sec.id,r.item);
+      if(r.spec && !(sec.specs||[]).includes(r.spec)) push('specs',sec.id,r.spec);
+      if(r.unit && !(sec.units||[]).includes(r.unit)) push('units',sec.id,r.unit);
+    });
+  });
+  return changed;
+}
+// 掃描本機歷史報價（存檔過的每一場）
+function libHarvestLocalHistory(){
+  const lib=libGet(); let changed=false;
+  let list=[]; try{ list=JSON.parse(localStorage.getItem('id_quotes_v3')||'[]'); }catch(e){}
+  list.forEach(q=>{ if(libHarvestQuote(q,lib)) changed=true; });
+  if(changed){ libSave(lib); libApply(lib); }
+  return lib;
+}
+// 掃描雲端歷史報價（其他裝置存過的每一場）
+function libHarvestCloudHistory(){
+  const _d=_db(); if(!_d) return;
+  _d.ref('history').limitToLast(200).once('value').then(snap=>{
+    if(!snap.exists()) return;
+    const lib=libGet(); let changed=false;
+    const val=snap.val();
+    Object.values(val||{}).forEach(q=>{ if(libHarvestQuote(q,lib)) changed=true; });
+    if(changed){ libSave(lib); libApply(lib); }
+  }).catch(()=>{});
+}
+
 // 雲端：先抓一次並合併，之後持續監聽其他裝置新增的項目
 function loadCustomLibFromCloud(){
   const _d=_db(); if(!_d) return;
@@ -3309,12 +3355,14 @@ applyDefaultQuoteDate(false);
 autoCaseNo();
 
 libApply(libMigrateLocal());   // 先套用本機的自訂項目庫
+libHarvestLocalHistory();      // 從存過的每一場報價裡補齊自訂項目
 buildSections();
 // Load from Firebase cloud first; fall back to local defaults
 loadFromCloud().then(()=>{
   startCloudListener(); // Listen for updates from other devices
   loadCostPresetsFromCloud();
   loadCustomLibFromCloud();
+  libHarvestCloudHistory();    // 其他裝置存過的報價也一起掃
 });
 
 // ══ PWA SETUP ══
