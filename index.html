@@ -629,6 +629,15 @@ tr.row-drag-over { box-shadow: inset 0 -2px 0 var(--blue), inset 0 0 0 1px rgba(
   letter-spacing: 0.22em;
   color: var(--text);
 }
+.cover-title-row { position: relative; }
+.cover-case-no {
+  position: absolute; right: 0; bottom: 0;
+  font-size: 10.5px; font-weight: 500; letter-spacing: 0.04em;
+  color: var(--text2);
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+}
+.cover-case-no:empty { display: none; }
+@media print { .cover-case-no { color:#555 !important; } }
 @media print {
   .cover-title-row { margin: 24px 0 28px; }
 }
@@ -930,6 +939,7 @@ body { padding-bottom: env(safe-area-inset-bottom); }
   </div>
   <div class="topbar-actions">
     <button class="btn btn-blue" onclick="showSync()">☁️ 跨裝置</button>
+    <button class="btn btn-ghost" onclick="showCostAdmin()">🔧 成本管理</button>
     <button class="btn btn-ghost" onclick="showTemplates()">📁 模板</button>
     <button class="btn btn-ghost" onclick="showHistory()">📋 歷史報價</button>
     <button class="btn btn-amber" onclick="saveQuote()">💾 存檔</button>
@@ -954,6 +964,7 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 
   <div class="cover-title-row">
     <div class="cover-title">工 程 報 價 單</div>
+    <div class="cover-case-no" id="cover-case-no"></div>
   </div>
 
   <table class="cover-info-table" id="cover-info-table">
@@ -1018,6 +1029,7 @@ body { padding-bottom: env(safe-area-inset-bottom); }
   <div style="display:flex;gap:10px">
     <div class="field" style="flex:3"><label>專案地址</label><input type="text" id="project-addr" placeholder="台北市大安區..." oninput="fillCoverPage()"></div>
     <div class="field" style="flex:0.6"><label>坪數</label><input type="number" id="area" value="30" min="1" max="999" step="0.5" onchange="recalc()"></div>
+    <div class="field" style="flex:1.1"><label>案號</label><input type="text" id="case-no" placeholder="KD-2026-016-QT02-V03" oninput="fillCoverPage()" style="font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:0.02em"></div>
     <div class="field" style="flex:1.4"><label>報價日期（客戶可見）</label><input type="text" id="note" placeholder="2026/11/12　本報價有效期限14天" oninput="fillCoverPage()"></div>
   </div>
   <!-- 電子信箱隱藏保留 -->
@@ -1612,7 +1624,7 @@ function addRow(secId, data){
     onkeydown="if(event.key==='Enter'){confirmCustomUnit(this,'${secId}');event.preventDefault();}"
     onblur="confirmCustomUnit(this,'${secId}')">`;
 
-  const defCost=d.cost!==undefined?d.cost:(d.price||3000);
+  const defCost=d.cost!==undefined?d.cost:(getItemCost(secId,d.item)??(d.price||3000));
 
   // Lock cell
   const lockTd=`<td class="lock-td"><span class="drag-handle" title="拖曳移動">⠿</span><button class="copy-btn" onclick="duplicateRow(this,'${secId}')" title="複製此列">⧉</button></td>`;
@@ -1696,7 +1708,7 @@ function a03AddItemInGroup(secId, cat, d){
   const sec=SECTIONS.find(s=>s.id===secId);
   const color=SEC_COLORS[sec.group]||'green';
   const cls=color==='b'?' b':color==='gold'?' gold':color==='red'?' red':color==='purple'?' purple':'';
-  const defCost=d.cost!==undefined?d.cost:(d.price||3000);
+  const defCost=d.cost!==undefined?d.cost:(getItemCost(secId,d.item,cat)??getItemCost(secId,d.item)??(d.price||0));
   // sub-item select for this category
   const subItems=getA03SubItems(cat);
   const subOpts=subItems.map(i=>`<option${d.item===i?' selected':''}>${i}</option>`).join('');
@@ -1716,7 +1728,7 @@ function a03AddItemInGroup(secId, cat, d){
   tr.className='a03-item-row'; tr.dataset.cat=cat;
   tr.innerHTML=`
     <td class="lock-td"><span class="drag-handle" title="拖曳移動">⠿</span><button class="copy-btn" onclick="duplicateRow(this,'${secId}')" title="複製此列">⧉</button></td>
-    <td style="min-width:150px"><select class="a03-sub-sel item-sel" onchange="recalc()" style="width:100%">${subOpts}</select></td>
+    <td style="min-width:150px"><select class="a03-sub-sel item-sel" onchange="applyPresetCost(this);recalc()" style="width:100%">${subOpts}</select></td>
     <td><input class="qty-inp" type="number" value="${d.qty||1}" min="0.1" step="0.5" onchange="recalc()" style="width:56px"></td>
     <td>${unitSel}</td>
     <td class="price-col"><input class="price-inp" type="number" value="${d.price||0}" min="0" step="100" onchange="recalc()" style="width:84px"></td>
@@ -1914,6 +1926,17 @@ function onItemChange(sel){
   const isCustom = sel.value === '__custom__';
   ci.style.display = isCustom ? 'block' : 'none';
   if(isCustom){ ci.value=''; ci.focus(); }
+  else applyPresetCost(sel);
+}
+// 切換項目時，若成本管理後台有該項目的預設成本 → 自動帶入成本欄
+function applyPresetCost(sel){
+  const tr=sel.closest('tr'); if(!tr) return;
+  const tbody=tr.closest('tbody'); if(!tbody) return;
+  const secId=tbody.id.replace('tbody-','');
+  const cat=tr.dataset.cat||'';
+  const c=getItemCost(secId, sel.value, cat) ?? getItemCost(secId, sel.value);
+  const cEl=tr.querySelector('.cost-inp');
+  if(c!==null && cEl && !cEl.disabled) cEl.value=c;
 }
 function onSpecChange(sel){
   const td = sel.closest('td');
@@ -2292,6 +2315,7 @@ function getQuoteData(){
   });
   return {
     client:document.getElementById('client-name').value,
+    caseNo:document.getElementById('case-no').value,
     phone:document.getElementById('client-phone').value,
     email:document.getElementById('client-email').value,
     addr:document.getElementById('project-addr').value,
@@ -2596,6 +2620,7 @@ function fillCoverPage(){
   // Basic info
   const setT=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v||'—'; };
   setT('ci-name', document.getElementById('client-name').value);
+  { const cn=document.getElementById('cover-case-no'); const v=(document.getElementById('case-no')||{}).value||''; if(cn) cn.textContent=v?('案號 '+v):''; }
   setT('ci-phone', document.getElementById('client-phone').value);
   setT('ci-addr', document.getElementById('project-addr').value);
   const spaceEl=document.getElementById('space-type');
@@ -2667,7 +2692,140 @@ function printClient(){
   setTimeout(()=>document.body.classList.remove('print-client'), 1000);
 }
 
+// ══ COST PRESETS（成本管理後台）══
+const COST_KEY = 'cost_presets_v1';
+function _db(){ try{ return (typeof db!=='undefined')?db:null; }catch(e){ return null; } }
+function getCostPresets(){ try{ return JSON.parse(localStorage.getItem(COST_KEY)||'{}'); }catch(e){ return {}; } }
+function saveCostPresetsData(p){
+  try{ localStorage.setItem(COST_KEY,JSON.stringify(p)); }catch(e){}
+  const _d=_db(); if(_d) try{ _d.ref('cost_presets').set(p).catch(()=>{}); }catch(e){}
+}
+function getItemCost(secId,itemName,cat){
+  if(!itemName) return null;
+  const p=getCostPresets();
+  const key=cat?(cat+'__'+itemName):itemName;
+  const v=p[secId]?.[key];
+  return (v===undefined||v===null||v==='')?null:v;
+}
+// 把目前表格裡已填的成本匯入預設（不覆蓋已有值以外的欄位）
+function importCurrentCosts(p){
+  p=p||getCostPresets();
+  SECTIONS.filter(s=>s.id!=='E01').forEach(sec=>{
+    document.querySelectorAll('#tbody-'+sec.id+' tr').forEach(tr=>{
+      if(tr.classList.contains('a03-cat-hdr')||tr.classList.contains('a03-sub-add-row')||tr.dataset.areaLabel) return;
+      const iSel=tr.querySelector(sec.id==='A03'?'.a03-sub-sel':'.item-sel');
+      const cEl=tr.querySelector('.cost-inp');
+      if(!iSel||!cEl||!iSel.value||iSel.value==='__custom__') return;
+      const cost=parseFloat(cEl.value);
+      if(isNaN(cost)||cost<=0) return;
+      if(!p[sec.id]) p[sec.id]={};
+      const cat=tr.dataset.cat||'';
+      p[sec.id][cat?(cat+'__'+iSel.value):iSel.value]=cost;
+    });
+  });
+  return p;
+}
+let _cpGrp='D';
+function showCostAdmin(){
+  const p=importCurrentCosts();
+  saveCostPresetsData(p);
+  const dlg=document.getElementById('cost-dialog');
+  if(!dlg){ alert('找不到成本管理對話框'); return; }
+  _cpBuild(p);
+  dlg.showModal();
+}
+function _cpBuild(p){
+  p=p||getCostPresets();
+  const grps=GROUPS.filter(g=>g.id!=='F');
+  const tc=document.getElementById('cost-tabs');
+  if(tc){
+    tc.innerHTML=grps.map(g=>{
+      const a=g.id===_cpGrp;
+      return `<button onclick="_cpSwitch('${g.id}')" style="padding:10px 16px;border:none;border-bottom:2px solid ${a?'var(--green)':'transparent'};background:none;color:${a?'var(--green)':'var(--text2)'};font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap">${g.icon} ${g.label}</button>`;
+    }).join('');
+  }
+  _cpBody(p,_cpGrp);
+}
+function _cpSwitch(grpId){ _cpGrp=grpId; _cpBuild(getCostPresets()); }
+function _cpBody(p,grpId){
+  const body=document.getElementById('cost-body'); if(!body) return;
+  const secs=SECTIONS.filter(s=>s.group===grpId&&s.id!=='E01');
+  let h='';
+  secs.forEach(sec=>{
+    h+='<div style="margin-bottom:20px">'
+     +'<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;padding:6px 0;border-bottom:1px solid var(--border2);margin-bottom:10px">'+(sec.icon||'')+' '+(sec.dispId||sec.id)+' '+sec.label+'</div>';
+    if(sec.id==='A03'&&typeof A03_CATS!=='undefined'){
+      Object.keys(A03_CATS).forEach(cat=>{
+        const items=getA03SubItems(cat)||[];
+        if(!items.length) return;
+        h+='<div style="font-size:10px;font-weight:800;color:var(--amber,var(--gold));margin:8px 0 6px">'+cat+'</div>'
+         +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:4px">';
+        items.forEach(item=>{
+          const key=cat+'__'+item;
+          const val=(p[sec.id]&&p[sec.id][key]!==undefined)?p[sec.id][key]:'';
+          h+=_cpCard(sec.id,key,item,val);
+        });
+        h+='</div>';
+      });
+    } else {
+      h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px">';
+      (sec.items||[]).forEach(item=>{
+        const val=(p[sec.id]&&p[sec.id][item]!==undefined)?p[sec.id][item]:'';
+        h+=_cpCard(sec.id,item,item,val);
+      });
+      h+='</div>';
+    }
+    h+='</div>';
+  });
+  body.innerHTML=h||'<div style="color:var(--text2);padding:16px">此類別無項目</div>';
+}
+function _cpCard(secId,key,label,val){
+  const esc=v=>String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  return '<label style="display:block;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;cursor:text">'
+    +'<div style="font-size:11px;color:var(--text2);margin-bottom:6px;line-height:1.4">'+esc(label)+'</div>'
+    +'<div style="display:flex;align-items:center;gap:4px">'
+    +'<input type="number" inputmode="decimal" min="0" step="50" value="'+esc(val)+'" placeholder="—"'
+    +' data-sec="'+esc(secId)+'" data-key="'+esc(key)+'"'
+    +' onchange="cpAutoSave(this)"'
+    +' style="flex:1;min-width:0;width:0;padding:6px 8px;border:1.5px solid var(--border2);border-radius:6px;'
+    +'background:var(--surface3);color:var(--text);font-size:14px;font-weight:600;text-align:right;'
+    +'font-family:inherit;-webkit-appearance:none;appearance:none;box-sizing:border-box">'
+    +'<span style="font-size:12px;color:var(--text2);flex-shrink:0">元</span>'
+    +'</div></label>';
+}
+function cpAutoSave(inp){
+  const p=getCostPresets();
+  const sec=inp.getAttribute('data-sec'),key=inp.getAttribute('data-key'),val=parseFloat(inp.value);
+  if(!p[sec]) p[sec]={};
+  if(!isNaN(val)&&val>=0) p[sec][key]=val; else delete p[sec][key];
+  saveCostPresetsData(p);
+}
+function saveCostPresets(){
+  const p=getCostPresets();
+  document.querySelectorAll('#cost-body input').forEach(inp=>{
+    const sec=inp.getAttribute('data-sec'),key=inp.getAttribute('data-key'),val=parseFloat(inp.value);
+    if(!p[sec]) p[sec]={};
+    if(!isNaN(val)&&val>=0) p[sec][key]=val; else delete p[sec][key];
+  });
+  saveCostPresetsData(p);
+  alert('✅ 成本已儲存！\n之後新增或切換項目時會自動帶入。');
+}
+function resetCostPresets(){
+  if(!confirm('確定清除所有成本預設值？')) return;
+  try{ localStorage.removeItem(COST_KEY); }catch(e){}
+  const _d=_db(); if(_d) try{ _d.ref('cost_presets').remove(); }catch(e){}
+  _cpBuild({});
+}
+function loadCostPresetsFromCloud(){
+  const _d=_db(); if(!_d) return;
+  _d.ref('cost_presets').once('value').then(snap=>{
+    if(snap.exists()) localStorage.setItem(COST_KEY,JSON.stringify(snap.val()));
+  }).catch(()=>{});
+}
+
 function saveQuote(){
+  stampQuoteDate();           // 存檔 = 報價日期更新為今天
+  fillCoverPage();
   const data=getQuoteData();
   if(!data.client){ alert('請先填入客戶姓名再存檔'); return; }
   // Local save
@@ -2677,7 +2835,7 @@ function saveQuote(){
   // Cloud save
   saveToCloud(data).then(()=>{
     saveHistoryToCloud(data);
-    alert(`✅ 已存檔並同步至雲端\n客戶：${data.client}（${data.date}）\n其他裝置開啟後將自動顯示最新資料`);
+    alert(`✅ 已存檔並同步至雲端\n客戶：${data.client}${data.caseNo?'　'+data.caseNo:''}（${data.date}）\n其他裝置開啟後將自動顯示最新資料`);
   }).catch(()=>{
     alert(`✅ 已存檔（本機）\n⚠️ 雲端同步失敗，請確認網路連線`);
   });
@@ -2699,16 +2857,17 @@ function loadQuote(data){
   });
   // manual
   document.getElementById('client-name').value=data.client||'';
+  document.getElementById('case-no').value=data.caseNo||'';
   document.getElementById('client-phone').value=data.phone||'';
   document.getElementById('client-email').value=data.email||'';
   document.getElementById('project-addr').value=data.addr||'';
   document.getElementById('area').value=data.area||30;
-  document.getElementById('note').value=data.note||defaultQuoteNote();
+  document.getElementById('note').value=normalizeQuoteNote(data.note, data.date);
   document.getElementById('bank-name').value=data.bankName||'';
   document.getElementById('bank-branch').value=data.bankBranch||'';
   document.getElementById('bank-holder').value=data.bankHolder||'';
   document.getElementById('bank-account').value=data.bankAccount||'';
-  document.getElementById('valid-days').value=(data.validDays&&isNaN(data.validDays))?data.validDays:defaultQuoteNote();
+  document.getElementById('valid-days').value=(data.validDays&&isNaN(data.validDays))?normalizeQuoteNote(data.validDays, data.date):quoteNoteFor(data.date);
   document.getElementById('start-date').value=data.startDate||'';
   // Restore style-type
   (function(){
@@ -2783,7 +2942,7 @@ document.addEventListener('click',e=>{ if(e.target.classList.contains('modal-bg'
 function clearAll(){
   if(!confirm('確定清除所有資料？')) return;
   SECTIONS.forEach(s=>{ document.getElementById('tbody-'+s.id).innerHTML=''; });
-  ['client-name','client-phone','client-email','project-addr','note',
+  ['client-name','case-no','client-phone','client-email','project-addr','note',
    'bank-name','bank-branch','bank-holder','bank-account','start-date','sig-name','sig-date']
     .forEach(id=>{ document.getElementById(id).value=''; });
   applyDefaultQuoteDate(true);
@@ -2897,10 +3056,30 @@ function initDefaults(){
 function todayStr(){ return new Date().toLocaleDateString('zh-TW'); }
 function defaultQuoteNote(){ return todayStr()+'　本報價有效期限14天'; }
 // 報價日期欄位（頂部 note、匯款區 valid-days）為空時自動填入當天日期
+const QUOTE_DATE_RE=/\d{4}[\/\-.]\d{1,2}[\/\-.]\d{1,2}/;
+function quoteNoteFor(dateStr){ return (dateStr||todayStr())+'　本報價有效期限14天'; }
+// 補齊報價日期文字：有日期就原樣保留；沒有日期就用 dateStr（存檔日期）補在前面
+function normalizeQuoteNote(v,dateStr){
+  v=(v||'').trim();
+  if(!v) return quoteNoteFor(dateStr);
+  if(QUOTE_DATE_RE.test(v)) return v;
+  return (dateStr||todayStr())+'　'+v;
+}
+// 存檔時：把報價日期換成「今天」（舊日期會被覆蓋）
+function stampQuoteDate(){
+  ['note','valid-days'].forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    const v=el.value.trim();
+    el.value = !v ? defaultQuoteNote()
+             : QUOTE_DATE_RE.test(v) ? v.replace(QUOTE_DATE_RE, todayStr())
+             : todayStr()+'　'+v;
+  });
+}
+// 開啟新報價時：欄位是空的才填今天
 function applyDefaultQuoteDate(force){
   ['note','valid-days'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el && (force || !el.value.trim())) el.value=defaultQuoteNote();
+    const el=document.getElementById(id); if(!el) return;
+    if(force || !el.value.trim()) el.value=defaultQuoteNote();
   });
 }
 // 客戶姓名 → 確認人姓名 同步
@@ -2916,6 +3095,7 @@ buildSections();
 // Load from Firebase cloud first; fall back to local defaults
 loadFromCloud().then(()=>{
   startCloudListener(); // Listen for updates from other devices
+  loadCostPresetsFromCloud();
 });
 
 // ══ PWA SETUP ══
@@ -2993,5 +3173,24 @@ function showInstallGuide(){
 
 
 </script>
+<!-- 成本管理後台：native dialog -->
+<dialog id="cost-dialog" style="width:min(680px,100vw);max-height:90dvh;height:90dvh;border:1px solid var(--border2);border-radius:14px;background:var(--surface);color:var(--text);padding:0;overflow:hidden;flex-direction:column">
+  <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border2);flex-shrink:0;background:var(--surface)">
+    <button onclick="document.getElementById('cost-dialog').close()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:2px 8px;border-radius:6px">‹</button>
+    <div style="flex:1">
+      <div style="font-size:15px;font-weight:700">🔧 成本管理後台</div>
+      <div style="font-size:11px;color:var(--text2)">新增或切換項目時自動帶入預設成本；開啟時會先匯入目前表格裡的成本</div>
+    </div>
+    <button onclick="resetCostPresets()" class="btn btn-ghost" style="font-size:12px">清除全部</button>
+    <button onclick="saveCostPresets()" style="background:var(--green);color:#0a1f12;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">💾 儲存</button>
+  </div>
+  <div id="cost-tabs" style="display:flex;gap:0;overflow-x:auto;border-bottom:1px solid var(--border2);background:var(--surface);flex-shrink:0;-webkit-overflow-scrolling:touch"></div>
+  <div id="cost-body" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px"></div>
+</dialog>
+<style>
+  #cost-dialog[open]{ display:flex; position:fixed; inset:0; margin:auto; }
+  #cost-dialog::backdrop{ background:rgba(0,0,0,0.45); }
+  @media print { #cost-dialog { display:none !important; } }
+</style>
 </body>
 </html>
