@@ -630,14 +630,18 @@ tr.row-drag-over { box-shadow: inset 0 -2px 0 var(--blue), inset 0 0 0 1px rgba(
   color: var(--text);
 }
 .cover-title-row { position: relative; }
-.cover-case-no {
+input#case-no.cover-case-no {
   position: absolute; right: 0; bottom: 0;
-  font-size: 10.5px; font-weight: 500; letter-spacing: 0.04em;
+  width: 230px; text-align: right;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.04em;
   color: var(--text2);
   font-family: ui-monospace, Menlo, Consolas, monospace;
+  background: transparent; border: none; border-bottom: 1px dashed transparent;
+  padding: 2px 0; outline: none; box-shadow: none;
 }
-.cover-case-no:empty { display: none; }
-@media print { .cover-case-no { color:#555 !important; } }
+input#case-no.cover-case-no:hover, input#case-no.cover-case-no:focus { border-bottom-color: var(--border2); color: var(--text); box-shadow:none; }
+input#case-no.cover-case-no::placeholder { color: var(--text3); }
+@media print { input#case-no.cover-case-no { color:#555 !important; border:none !important; background:transparent !important; } }
 @media print {
   .cover-title-row { margin: 24px 0 28px; }
 }
@@ -964,7 +968,7 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 
   <div class="cover-title-row">
     <div class="cover-title">工 程 報 價 單</div>
-    <div class="cover-case-no" id="cover-case-no"></div>
+    <input type="text" class="cover-case-no" id="case-no" value="KD-2026-016-NTP-QT02-v03" placeholder="案號" title="案號（公司內部管理用）" spellcheck="false">
   </div>
 
   <table class="cover-info-table" id="cover-info-table">
@@ -1029,7 +1033,6 @@ body { padding-bottom: env(safe-area-inset-bottom); }
   <div style="display:flex;gap:10px">
     <div class="field" style="flex:3"><label>專案地址</label><input type="text" id="project-addr" placeholder="台北市大安區..." oninput="fillCoverPage()"></div>
     <div class="field" style="flex:0.6"><label>坪數</label><input type="number" id="area" value="30" min="1" max="999" step="0.5" onchange="recalc()"></div>
-    <div class="field" style="flex:1.1"><label>案號</label><input type="text" id="case-no" placeholder="KD-2026-016-QT02-V03" oninput="fillCoverPage()" style="font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:0.02em"></div>
     <div class="field" style="flex:1.4"><label>報價日期（客戶可見）</label><input type="text" id="note" placeholder="2026/11/12　本報價有效期限14天" oninput="fillCoverPage()"></div>
   </div>
   <!-- 電子信箱隱藏保留 -->
@@ -2620,7 +2623,6 @@ function fillCoverPage(){
   // Basic info
   const setT=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v||'—'; };
   setT('ci-name', document.getElementById('client-name').value);
-  { const cn=document.getElementById('cover-case-no'); const v=(document.getElementById('case-no')||{}).value||''; if(cn) cn.textContent=v?('案號 '+v):''; }
   setT('ci-phone', document.getElementById('client-phone').value);
   setT('ci-addr', document.getElementById('project-addr').value);
   const spaceEl=document.getElementById('space-type');
@@ -2942,7 +2944,7 @@ document.addEventListener('click',e=>{ if(e.target.classList.contains('modal-bg'
 function clearAll(){
   if(!confirm('確定清除所有資料？')) return;
   SECTIONS.forEach(s=>{ document.getElementById('tbody-'+s.id).innerHTML=''; });
-  ['client-name','case-no','client-phone','client-email','project-addr','note',
+  ['client-name','client-phone','client-email','project-addr','note',
    'bank-name','bank-branch','bank-holder','bank-account','start-date','sig-name','sig-date']
     .forEach(id=>{ document.getElementById(id).value=''; });
   applyDefaultQuoteDate(true);
