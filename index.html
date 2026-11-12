@@ -2354,7 +2354,9 @@ function getQuoteData(){
     startDate:document.getElementById('start-date').value,
     sigName:document.getElementById('sig-name').value,
     sigDate:document.getElementById('sig-date').value,
-    rows, date:new Date().toLocaleDateString('zh-TW')
+    rows, date:new Date().toLocaleDateString('zh-TW'),
+    quoteTotal:(document.getElementById('quote-total')||{}).textContent||'',   // 存檔當下的含稅總價（歷史清單顯示用）
+    costTotal:(document.getElementById('cost-total')||{}).textContent||''
   };
 }
 
@@ -2940,12 +2942,13 @@ function showHistory(){
     qs.sort((a,b)=>(b.id||0)-(a.id||0));
     const open=_histOpen.has(name)?' open':'';
     const items=qs.map(q=>{
-      const quote=SECTIONS.reduce((a,s)=>a+(q.rows?.[s.id]||[]).filter(r=>!r._areaLabel).reduce((b,r)=>b+(+r.price||0)*(+r.qty||0),0),0);
+      // 優先用存檔時記錄的含稅總價；舊紀錄沒有的話才用列加總估算
+      const quote=q.quoteTotal ? q.quoteTotal : fmt(SECTIONS.reduce((a,s)=>a+(q.rows?.[s.id]||[]).filter(r=>!r._areaLabel).reduce((b,r)=>b+(+r.price||0)*(+r.qty||0),0),0))+'（估）';
       const t=q.id?new Date(q.id).toLocaleString('zh-TW',{hour12:false}):(q.date||'');
       return `<div class="hist-item">
         <div style="min-width:0">
           <div style="font-size:13px;font-weight:600;display:flex;align-items:center;flex-wrap:wrap">${_escH(q.addr||'未填地址')}${q.caseNo?`<span class="hist-case">${_escH(q.caseNo)}</span>`:''}</div>
-          <div class="hist-meta">${_escH(t)} · ${_escH(q.area)}坪 · ${_escH(q.style||'')} · 報價 ${fmt(quote)}</div>
+          <div class="hist-meta">${_escH(t)} · ${_escH(q.area)}坪 · ${_escH(q.style||'')} · 含稅總價 ${_escH(quote)}</div>
         </div>
         <div class="hist-btns">
           <button class="hist-btn" onclick="loadHistoryQuote(${q.id})">載入</button>
