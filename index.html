@@ -270,6 +270,18 @@ select option { background: var(--surface); color: var(--text); }
 .sec-name { font-size: 13px; font-weight: 600; }
 .sec-icon { font-size: 14px; }
 .sec-right { display: flex; align-items: center; gap: 10px; }
+/* 區段成本 / 利潤率（僅內部可見，客戶版與轉出時隱藏） */
+.sec-cost, .grp-cost {
+  font-size: 11px; font-weight: 700; color: #e84e88;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.sec-profit, .grp-profit {
+  font-size: 11px; font-weight: 700; color: var(--green);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+  background: rgba(80,232,138,0.1); border-radius: 4px; padding: 1px 7px;
+}
+.sec-profit.low, .grp-profit.low { color: var(--red); background: var(--red-dim); }
+.sec-cost:empty, .sec-profit:empty, .grp-cost:empty, .grp-profit:empty { display: none; }
 .sec-total { font-size: 12px; font-weight: 700; color: var(--green); font-variant-numeric: tabular-nums; }
 .sec-total.b { color: var(--blue); }
 .sec-total.gold { color: var(--gold); }
@@ -797,6 +809,7 @@ tr.row-drag-over { box-shadow: inset 0 -2px 0 var(--blue), inset 0 0 0 1px rgba(
   .topbar,.action-bar,.add-btn,.rm-btn,.copy-btn,.area-rm-btn,.profit-row,.btn,.modal-bg,
   .a03-sub-add-row,.a03-add-sub-btn,
   .print-hide-profit,
+  .sec-cost,.sec-profit,.grp-cost,.grp-profit,
   .caret,.group-divider .btn { display: none !important; }
   /* 簽名欄列印時保留並加大 */
   .sig-wrap {
@@ -875,6 +888,8 @@ body.print-client .price-col { display:none !important; }      /* 隱藏單價�
 body.print-client .cost-col { display:none !important; }       /* 隱藏成本欄 */
 body.print-client .metric.print-hide { display:none !important; }
 body.print-client .profit-row { display:none !important; }
+body.print-client .sec-cost, body.print-client .sec-profit,
+body.print-client .grp-cost, body.print-client .grp-profit { display:none !important; }
 body.print-client .print-hide-profit { display:none !important; }
 body.print-client .pie-canvas-wrap { display:none !important; }
 body.print-client .gantt-wrap { display:none !important; }
@@ -896,6 +911,8 @@ body.print-client .area-rm-btn { display:none !important; }
   body.print-client .price-col { display:none !important; }
   body.print-client .cost-col { display:none !important; }
   body.print-client .profit-row { display:none !important; }
+  body.print-client .sec-cost, body.print-client .sec-profit,
+  body.print-client .grp-cost, body.print-client .grp-profit { display:none !important; }
   body.print-client .print-hide-profit { display:none !important; }
   body.print-client .pie-canvas-wrap { display:none !important; }
   body.print-client .gantt-wrap { display:none !important; }
@@ -1432,6 +1449,8 @@ function buildSections(){
     divider.innerHTML = `
       <span class="group-badge${cls}">${grp.icon} ${grp.label}</span>
       <div class="group-line"></div>
+      <span class="grp-cost" id="grp-cost-${grp.id}" title="此大類成本"></span>
+      <span class="grp-profit" id="grp-profit-${grp.id}" title="此大類利潤率"></span>
       <span class="group-total-label">小計</span>
       <span class="group-total-val${cls}" id="grp-total-${grp.id}">NT$\u00a00</span>`;
     cont.appendChild(divider);
@@ -1450,6 +1469,8 @@ function buildSections(){
             <span class="sec-name">${sec.label}</span>
           </div>
           <div class="sec-right">
+            <span class="sec-cost" id="cost-${sec.id}" title="此分類成本"></span>
+            <span class="sec-profit" id="profit-${sec.id}" title="此分類利潤率"></span>
             <span class="sec-total${idCls}" id="total-${sec.id}">NT$\u00a00</span>
             <span class="caret" id="caret-${sec.id}">▶</span>
           </div>
@@ -2061,6 +2082,17 @@ function getSectionTotal(secId){
     }
   });
   document.getElementById('total-'+secId).textContent=fmt(quoteT);
+  // 成本 / 利潤率（E 施工管理費、F 稅金無成本概念，不顯示）
+  const cEl=document.getElementById('cost-'+secId), pEl=document.getElementById('profit-'+secId);
+  const showCP = sec && sec.group!=='F' && !isManage && quoteT>0;
+  if(cEl) cEl.textContent = showCP&&costT>0 ? '成本 '+fmt(costT) : '';
+  if(pEl){
+    if(showCP&&costT>0){
+      const m=(quoteT-costT)/quoteT*100;
+      pEl.textContent=m.toFixed(1)+'%';
+      pEl.classList.toggle('low', m<20);
+    } else pEl.textContent='';
+  }
   // 標記 0 元 section，列印時隱藏 body
   const card=document.getElementById('sec-'+secId);
   if(card){ quoteT===0?card.classList.add('sec-zero'):card.classList.remove('sec-zero'); }
@@ -2177,6 +2209,20 @@ function recalc(){
     const gt=secs.reduce((a,s)=>a+(results[SECTIONS.indexOf(s)]?.quoteT||0),0);
     const el=document.getElementById('grp-total-'+grp.id);
     if(el) el.textContent=fmt(gt);
+    // 大類成本 / 利潤率
+    const gc=secs.reduce((a,s)=>{
+      const r=results[SECTIONS.indexOf(s)];
+      return a+((s.group==='F'||s._isManage||s._isTax)?0:(r?.costT||0));
+    },0);
+    const gcEl=document.getElementById('grp-cost-'+grp.id), gpEl=document.getElementById('grp-profit-'+grp.id);
+    if(gcEl) gcEl.textContent = gc>0 ? '成本 '+fmt(gc) : '';
+    if(gpEl){
+      if(gc>0&&gt>0){
+        const m=(gt-gc)/gt*100;
+        gpEl.textContent=m.toFixed(1)+'%';
+        gpEl.classList.toggle('low', m<20);
+      } else gpEl.textContent='';
+    }
   });
   drawPie(results.map(r=>r.quoteT));
   validatePrices();
