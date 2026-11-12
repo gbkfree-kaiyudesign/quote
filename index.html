@@ -438,20 +438,21 @@ tr.row-drag-over { box-shadow: inset 0 -2px 0 var(--blue), inset 0 0 0 1px rgba(
 /* ── 百分比圓環（五大類，橫排於費用結構分析右下） ── */
 .pct-rings {
   display: flex; justify-content: flex-start; align-items: flex-start;
-  gap: 10px; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
+  gap: 4px; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
   margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border2);
   break-inside: avoid; page-break-inside: avoid;
 }
 .pct-rings:empty { display: none; }
-.pct-ring { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 0 0 auto; }
+.pct-ring { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1 1 0; min-width: 0; }
 .pct-ring svg { display: block; transform: rotate(-90deg); }
 .pct-ring .pr-val {
-  font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums;
+  font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums;
   fill: currentColor; transform: rotate(90deg); transform-origin: center;
 }
 .pct-ring .pr-label {
-  font-size: 9.5px; font-weight: 600; letter-spacing: 0.02em;
-  color: var(--text2); text-align: center; width: 80px; line-height: 1.3;
+  font-size: 9px; font-weight: 600; letter-spacing: 0;
+  color: var(--text2); text-align: center; width: 100%; line-height: 1.3;
+  overflow-wrap: anywhere;
 }
 .pct-ring .pr-label b { display: block; font-weight: 700; color: currentColor; }
 @media print { .pct-rings { overflow: visible !important; } }
@@ -2403,7 +2404,7 @@ function drawPie(vals){
   });
   // ── 五大類百分比圓環（接在清單最後，排在 E 類下方）──
   if(lHtml){
-    const R=24, SW=6.5, C=2*Math.PI*R, BOX=(R+SW/2)*2;
+    const R=21, SW=6, C=2*Math.PI*R, BOX=(R+SW/2)*2;
     let rHtml='';
     GROUPS.forEach((grp,gi)=>{
       const secs=SECTIONS.filter(s=>s.group===grp.id);
