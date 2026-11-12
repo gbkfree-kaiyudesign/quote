@@ -643,18 +643,32 @@ tr.row-drag-over { box-shadow: inset 0 -2px 0 var(--blue), inset 0 0 0 1px rgba(
   color: var(--text);
 }
 .cover-title-row { position: relative; }
-input#case-no.cover-case-no {
-  position: absolute; right: 0; bottom: 0;
-  width: 230px; text-align: right;
-  font-size: 11px; font-weight: 500; letter-spacing: 0.04em;
-  color: var(--text2);
-  font-family: ui-monospace, Menlo, Consolas, monospace;
-  background: transparent; border: none; border-bottom: 1px dashed transparent;
-  padding: 2px 0; outline: none; box-shadow: none;
+.case-no-wrap {
+  position: absolute; right: 0; bottom: -2px;
+  display: inline-flex; align-items: center; gap: 1px;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.03em; color: var(--text2);
+  font-family: ui-monospace, Menlo, Consolas, monospace; white-space: nowrap;
 }
-input#case-no.cover-case-no:hover, input#case-no.cover-case-no:focus { border-bottom-color: var(--border2); color: var(--text); box-shadow:none; }
-input#case-no.cover-case-no::placeholder { color: var(--text3); }
-@media print { input#case-no.cover-case-no { color:#555 !important; border:none !important; background:transparent !important; } }
+.case-no-wrap .cn-fix { color: var(--text3); }
+.case-no-wrap .cn-year { color: var(--text2); }
+#case-no-wrap input.cn-num, #case-no-wrap select.cn-sel {
+  font: inherit; color: var(--text); background: transparent;
+  border: none; border-bottom: 1px dashed var(--border2); border-radius: 0;
+  padding: 1px 0; margin: 0; outline: none; box-shadow: none; height: auto; line-height: 1.3;
+  text-align: center; -moz-appearance: textfield; cursor: pointer;
+}
+#case-no-wrap input.cn-num:hover, #case-no-wrap select.cn-sel:hover,
+#case-no-wrap input.cn-num:focus, #case-no-wrap select.cn-sel:focus { border-bottom-color: var(--blue); background: rgba(104,130,160,0.08); }
+#case-no-wrap input.cn-3 { width: 34px; }
+#case-no-wrap input.cn-2 { width: 26px; }
+#case-no-wrap input.cn-num::-webkit-inner-spin-button { opacity: 1; height: 12px; }
+#case-no-wrap select.cn-sel { width: 36px; -webkit-appearance: none; appearance: none; padding-right: 0; text-align-last: center; }
+.case-no-print { display: none; }
+@media print {
+  .case-no-wrap { bottom: 0; color:#555 !important; }
+  .case-no-wrap .cn-fix, .case-no-wrap .cn-year, #case-no-wrap input, #case-no-wrap select { display: none !important; }
+  .case-no-print { display: inline !important; color:#555 !important; font-family: ui-monospace, Menlo, Consolas, monospace; }
+}
 @media print {
   .cover-title-row { margin: 24px 0 28px; }
 }
@@ -981,7 +995,22 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 
   <div class="cover-title-row">
     <div class="cover-title">工 程 報 價 單</div>
-    <input type="text" class="cover-case-no" id="case-no" value="" placeholder="案號" title="案號（公司內部管理用）" spellcheck="false">
+    <div class="case-no-wrap" id="case-no-wrap" title="案號：年份依報價日期、區域依地址自動帶入；流水號 / QT / v 可上下調整">
+      <span class="cn-fix">KD-</span><span class="cn-year" id="cn-year">2026</span><span class="cn-fix">-</span>
+      <input type="number" id="cn-seq" class="cn-num cn-3" min="1" max="999" value="1" onchange="composeCaseNo()" oninput="composeCaseNo()">
+      <span class="cn-fix">-</span>
+      <select id="cn-region" class="cn-sel" onchange="composeCaseNo()" title="區域：TP 台北市 / NTP 新北市 / KL 基隆 / TY 桃園 / HC 新竹 / TC 台中 / TN 台南 / KH 高雄">
+        <option value="TP" title="台北市">TP</option><option value="NTP" title="新北市">NTP</option><option value="KL" title="基隆市">KL</option>
+        <option value="TY" title="桃園市">TY</option><option value="HC" title="新竹市／縣">HC</option><option value="TC" title="台中市">TC</option>
+        <option value="TN" title="台南市">TN</option><option value="KH" title="高雄市">KH</option>
+      </select>
+      <span class="cn-fix">-QT</span>
+      <input type="number" id="cn-qt" class="cn-num cn-2" min="1" max="99" value="1" onchange="composeCaseNo()" oninput="composeCaseNo()">
+      <span class="cn-fix">-v</span>
+      <input type="number" id="cn-ver" class="cn-num cn-2" min="1" max="99" value="1" onchange="composeCaseNo()" oninput="composeCaseNo()">
+      <input type="hidden" id="case-no" value="">
+      <span class="case-no-print" id="case-no-print"></span>
+    </div>
   </div>
 
   <table class="cover-info-table" id="cover-info-table">
@@ -2875,8 +2904,7 @@ function loadQuote(data){
   });
   // manual
   document.getElementById('client-name').value=data.client||'';
-  document.getElementById('case-no').value=data.caseNo||'';
-  autoCaseNo();
+  if(!parseCaseNo(data.caseNo)) autoCaseNo(true);   // 舊紀錄沒有案號 → 依地址/日期產生
   document.getElementById('client-phone').value=data.phone||'';
   document.getElementById('client-email').value=data.email||'';
   document.getElementById('project-addr').value=data.addr||'';
@@ -3156,16 +3184,37 @@ function quoteYear(){
   const m=v.match(QUOTE_DATE_RE);
   return m ? m[0].slice(0,4) : String(new Date().getFullYear());
 }
-const CASE_RE=/^KD-(\d{4})-([^-]+)-([A-Z]{2,3})-([^-]+)-([^-]+)$/i;
+const CASE_RE=/^KD-(\d{4})-(\d+)-([A-Z]{2,3})-QT(\d+)-v(\d+)$/i;
+const pad=(n,w)=>String(Math.max(1,parseInt(n,10)||1)).padStart(w,'0');
+// 由各個小欄位組成案號字串 → 寫進隱藏的 #case-no（存檔 / 列印用）
+function composeCaseNo(){
+  const g=id=>document.getElementById(id);
+  if(!g('cn-year')) return '';
+  const v=`KD-${g('cn-year').textContent}-${pad(g('cn-seq').value,3)}-${g('cn-region').value}-QT${pad(g('cn-qt').value,2)}-v${pad(g('cn-ver').value,2)}`;
+  g('case-no').value=v;
+  g('case-no-print').textContent=v;
+  return v;
+}
+// 把案號字串拆回各欄位（載入舊報價用）；解析失敗回傳 false
+function parseCaseNo(str){
+  const m=(str||'').trim().match(CASE_RE); if(!m) return false;
+  const g=id=>document.getElementById(id);
+  g('cn-year').textContent=m[1];
+  g('cn-seq').value=parseInt(m[2],10)||1;
+  const reg=m[3].toUpperCase();
+  if([...g('cn-region').options].some(o=>o.value===reg)) g('cn-region').value=reg;
+  g('cn-qt').value=parseInt(m[4],10)||1;
+  g('cn-ver').value=parseInt(m[5],10)||1;
+  composeCaseNo(); return true;
+}
+// 年份依報價日期、區域依地址自動更新；force=true 時流水號 / QT / v 重設為 1
 function autoCaseNo(force){
-  const el=document.getElementById('case-no'); if(!el) return;
-  const year=quoteYear();
-  const region=regionCodeFromAddr(document.getElementById('project-addr').value);
-  const cur=el.value.trim();
-  const m=cur.match(CASE_RE);
-  if(!cur || force){ el.value=`KD-${year}-001-${region}-QT01-v01`; return; }
-  // 已有案號：只更新年份與區域，保留流水號 / QT / v
-  if(m) el.value=`KD-${year}-${m[2]}-${region}-${m[4]}-${m[5]}`;
+  const g=id=>document.getElementById(id);
+  if(!g('cn-year')) return;
+  g('cn-year').textContent=quoteYear();
+  g('cn-region').value=regionCodeFromAddr(g('project-addr').value);
+  if(force){ g('cn-seq').value=1; g('cn-qt').value=1; g('cn-ver').value=1; }
+  composeCaseNo();
 }
 
 // 客戶姓名 → 確認人姓名 同步
