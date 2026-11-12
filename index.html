@@ -557,6 +557,19 @@ tr.row-drag-over { box-shadow: inset 0 -2px 0 var(--blue), inset 0 0 0 1px rgba(
 .unsplash-credit { font-size:10px; color:var(--text3); text-align:right; margin-top:6px; }
 
 /* ── HISTORY ── */
+.hist-folder { border:1px solid var(--border2); border-radius:10px; margin-bottom:8px; overflow:hidden; background:var(--surface); }
+.hist-folder-hdr {
+  display:flex; align-items:center; gap:10px; padding:10px 14px; cursor:pointer; user-select:none;
+  background:var(--surface2); font-size:13px; font-weight:700;
+}
+.hist-folder-hdr:hover { background:var(--surface3); }
+.hist-folder-hdr .hf-caret { font-size:10px; color:var(--text3); transition:transform .15s; }
+.hist-folder.open .hist-folder-hdr .hf-caret { transform:rotate(90deg); }
+.hist-folder-hdr .hf-count { margin-left:auto; font-size:11px; font-weight:600; color:var(--text2); background:var(--surface); border:1px solid var(--border2); border-radius:999px; padding:1px 9px; }
+.hist-folder-hdr .hf-last { font-size:11px; font-weight:400; color:var(--text3); }
+.hist-folder-body { display:none; padding:8px 10px 2px; }
+.hist-folder.open .hist-folder-body { display:block; }
+.hist-case { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:11px; color:var(--blue); background:rgba(104,130,160,0.1); border-radius:4px; padding:0 6px; margin-left:6px; }
 .hist-item {
   background: var(--surface2); border: 1px solid var(--border);
   border-radius: 8px; padding: 10px 14px;
@@ -968,7 +981,7 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 
   <div class="cover-title-row">
     <div class="cover-title">工 程 報 價 單</div>
-    <input type="text" class="cover-case-no" id="case-no" value="KD-2026-016-NTP-QT02-v03" placeholder="案號" title="案號（公司內部管理用）" spellcheck="false">
+    <input type="text" class="cover-case-no" id="case-no" value="" placeholder="案號" title="案號（公司內部管理用）" spellcheck="false">
   </div>
 
   <table class="cover-info-table" id="cover-info-table">
@@ -1031,9 +1044,9 @@ body { padding-bottom: env(safe-area-inset-bottom); }
   </div>
   <!-- 第二排：地址(長) 坪數(小) 備註 -->
   <div style="display:flex;gap:10px">
-    <div class="field" style="flex:3"><label>專案地址</label><input type="text" id="project-addr" placeholder="台北市大安區..." oninput="fillCoverPage()"></div>
+    <div class="field" style="flex:3"><label>專案地址</label><input type="text" id="project-addr" placeholder="台北市大安區..." oninput="autoCaseNo();fillCoverPage()"></div>
     <div class="field" style="flex:0.6"><label>坪數</label><input type="number" id="area" value="30" min="1" max="999" step="0.5" onchange="recalc()"></div>
-    <div class="field" style="flex:1.4"><label>報價日期（客戶可見）</label><input type="text" id="note" placeholder="2026/11/12　本報價有效期限14天" oninput="fillCoverPage()"></div>
+    <div class="field" style="flex:1.4"><label>報價日期（客戶可見）</label><input type="text" id="note" placeholder="2026/11/12　本報價有效期限14天" oninput="autoCaseNo();fillCoverPage()"></div>
   </div>
   <!-- 電子信箱隱藏保留 -->
   <input type="email" id="client-email" style="display:none">
@@ -2827,6 +2840,7 @@ function loadCostPresetsFromCloud(){
 
 function saveQuote(){
   stampQuoteDate();           // 存檔 = 報價日期更新為今天
+  autoCaseNo();
   fillCoverPage();
   const data=getQuoteData();
   if(!data.client){ alert('請先填入客戶姓名再存檔'); return; }
@@ -2860,6 +2874,7 @@ function loadQuote(data){
   // manual
   document.getElementById('client-name').value=data.client||'';
   document.getElementById('case-no').value=data.caseNo||'';
+  autoCaseNo();
   document.getElementById('client-phone').value=data.phone||'';
   document.getElementById('client-email').value=data.email||'';
   document.getElementById('project-addr').value=data.addr||'';
@@ -2906,27 +2921,58 @@ function loadQuote(data){
   closeModal(); recalc();
 }
 
+const _histOpen=new Set();   // 記住哪些客戶資料夾是展開的
+function _escH(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
 function showHistory(){
   const list=JSON.parse(localStorage.getItem('id_quotes_v3')||'[]');
   const cont=document.getElementById('history-content');
-  if(!list.length){ cont.innerHTML='<div class="empty">尚無歷史記錄</div>'; }
-  else {
-    cont.innerHTML='<div>'+list.map(q=>{
-      const quote=SECTIONS.reduce((a,s)=>a+(q.rows?.[s.id]||[]).reduce((b,r)=>b+r.price*r.qty,0),0);
-      const cost=quote;
+  if(!list.length){ cont.innerHTML='<div class="empty">尚無歷史記錄</div>'; document.getElementById('history-modal').classList.add('open'); return; }
+  // 依客戶姓名分組（同名排在一起），資料夾依最近存檔排序
+  const groups=new Map();
+  list.forEach(q=>{
+    const key=(q.client||'').trim()||'（未填姓名）';
+    if(!groups.has(key)) groups.set(key,[]);
+    groups.get(key).push(q);
+  });
+  const ordered=[...groups.entries()].sort((a,b)=>Math.max(...b[1].map(q=>q.id||0))-Math.max(...a[1].map(q=>q.id||0)));
+  if(_histOpen.size===0 && ordered.length) _histOpen.add(ordered[0][0]);
+  cont.innerHTML=ordered.map(([name,qs])=>{
+    qs.sort((a,b)=>(b.id||0)-(a.id||0));
+    const open=_histOpen.has(name)?' open':'';
+    const items=qs.map(q=>{
+      const quote=SECTIONS.reduce((a,s)=>a+(q.rows?.[s.id]||[]).filter(r=>!r._areaLabel).reduce((b,r)=>b+(+r.price||0)*(+r.qty||0),0),0);
+      const t=q.id?new Date(q.id).toLocaleString('zh-TW',{hour12:false}):(q.date||'');
       return `<div class="hist-item">
-        <div>
-          <div style="font-size:13px;font-weight:600">${q.client} — ${q.addr||'未填地址'}</div>
-          <div class="hist-meta">${q.date} · ${q.area}坪 · ${q.style||''} · 報價 ${fmt(quote)}</div>
+        <div style="min-width:0">
+          <div style="font-size:13px;font-weight:600;display:flex;align-items:center;flex-wrap:wrap">${_escH(q.addr||'未填地址')}${q.caseNo?`<span class="hist-case">${_escH(q.caseNo)}</span>`:''}</div>
+          <div class="hist-meta">${_escH(t)} · ${_escH(q.area)}坪 · ${_escH(q.style||'')} · 報價 ${fmt(quote)}</div>
         </div>
         <div class="hist-btns">
-          <button class="hist-btn" onclick="loadQuote(${JSON.stringify(q).replace(/"/g,'&quot;')})">載入</button>
+          <button class="hist-btn" onclick="loadHistoryQuote(${q.id})">載入</button>
           <button class="hist-btn del" onclick="deleteQuote(${q.id})">刪除</button>
         </div>
       </div>`;
-    }).join('')+'</div>';
-  }
+    }).join('');
+    return `<div class="hist-folder${open}" data-name="${_escH(name)}">
+      <div class="hist-folder-hdr" onclick="toggleHistFolder(this)">
+        <span class="hf-caret">▶</span>📁 ${_escH(name)}
+        <span class="hf-last">最近 ${_escH(qs[0].date||'')}</span>
+        <span class="hf-count">${qs.length} 筆</span>
+      </div>
+      <div class="hist-folder-body">${items}</div>
+    </div>`;
+  }).join('');
   document.getElementById('history-modal').classList.add('open');
+}
+function toggleHistFolder(hdr){
+  const f=hdr.closest('.hist-folder'); const name=f.dataset.name;
+  f.classList.toggle('open');
+  if(f.classList.contains('open')) _histOpen.add(name); else _histOpen.delete(name);
+}
+function loadHistoryQuote(id){
+  const q=JSON.parse(localStorage.getItem('id_quotes_v3')||'[]').find(x=>x.id===id);
+  if(!q){ alert('找不到這筆紀錄'); return; }
+  loadQuote(q); closeModal();
 }
 
 function deleteQuote(id){
@@ -2948,6 +2994,7 @@ function clearAll(){
    'bank-name','bank-branch','bank-holder','bank-account','start-date','sig-name','sig-date']
     .forEach(id=>{ document.getElementById(id).value=''; });
   applyDefaultQuoteDate(true);
+  autoCaseNo(true);
   document.getElementById('area').value=30;
   clearSig(); recalc();
 }
@@ -3084,6 +3131,40 @@ function applyDefaultQuoteDate(force){
     if(force || !el.value.trim()) el.value=defaultQuoteNote();
   });
 }
+// ══ 案號自動產生：KD-年份-流水號-區域-QT版-v版 ══
+// 年份 = 報價日期、區域 = 依地址判斷；流水號 / QT / v 由使用者自行填寫（預設 001 / QT01 / v01）
+const REGION_CODES=[
+  ['NTP',/新北|板橋|三重|中和|永和|新莊|新店|土城|蘆洲|汐止|樹林|淡水|林口|三峽|鶯歌|五股|泰山|八里|瑞芳|深坑|石碇|坪林|三芝|石門|金山|萬里|平溪|雙溪|貢寮|烏來/],
+  ['TP', /台北市|臺北市|北市|大安|信義區|中山區|中正區|松山|大同區|萬華|文山|南港|內湖|士林|北投/],
+  ['KL', /基隆/],
+  ['TY', /桃園|中壢|平鎮|八德|楊梅|蘆竹|大溪|龜山|龍潭|大園|觀音|新屋/],
+  ['HC', /新竹|竹北|竹東|湖口|新豐|竹南|頭份/],
+  ['TC', /台中|臺中/],
+  ['TN', /台南|臺南/],
+  ['KH', /高雄|鳳山|左營|三民|楠梓|岡山/],
+];
+function regionCodeFromAddr(addr){
+  addr=(addr||'').trim();
+  for(const [code,re] of REGION_CODES){ if(re.test(addr)) return code; }
+  return 'TP';
+}
+function quoteYear(){
+  const v=(document.getElementById('note')||{}).value||'';
+  const m=v.match(QUOTE_DATE_RE);
+  return m ? m[0].slice(0,4) : String(new Date().getFullYear());
+}
+const CASE_RE=/^KD-(\d{4})-([^-]+)-([A-Z]{2,3})-([^-]+)-([^-]+)$/i;
+function autoCaseNo(force){
+  const el=document.getElementById('case-no'); if(!el) return;
+  const year=quoteYear();
+  const region=regionCodeFromAddr(document.getElementById('project-addr').value);
+  const cur=el.value.trim();
+  const m=cur.match(CASE_RE);
+  if(!cur || force){ el.value=`KD-${year}-001-${region}-QT01-v01`; return; }
+  // 已有案號：只更新年份與區域，保留流水號 / QT / v
+  if(m) el.value=`KD-${year}-${m[2]}-${region}-${m[4]}-${m[5]}`;
+}
+
 // 客戶姓名 → 確認人姓名 同步
 function syncSigName(){
   const c=document.getElementById('client-name');
@@ -3092,6 +3173,7 @@ function syncSigName(){
 }
 document.getElementById('quote-date').textContent='報價日期：'+todayStr();
 applyDefaultQuoteDate(false);
+autoCaseNo();
 
 buildSections();
 // Load from Firebase cloud first; fall back to local defaults
