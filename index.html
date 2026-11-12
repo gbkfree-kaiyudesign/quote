@@ -1631,7 +1631,7 @@ function addRow(secId, data){
 
   // item — detect if saved value is custom (not in list)
   const isCustomItem = d.item && !sec.items.includes(d.item);
-  if(isCustomItem) sec.items.push(d.item); // restore into list
+  if(isCustomItem){ sec.items.push(d.item); if(secId!=='A03') libAdd('items',secId,d.item); } // restore into list + 收進項目庫
   const itemOpts = sec.items.map(it=>`<option${d.item===it?' selected':''}>${it}</option>`).join('');
   const itemSel = `<select class="item-sel" onchange="onItemChange(this);recalc()" style="width:100%">
     ${itemOpts}
@@ -1852,6 +1852,7 @@ function a03AddCustomSub(){
   const item=v.trim();
   const saved=JSON.parse(localStorage.getItem('a03s_'+_a03PickerCat)||'[]');
   if(!saved.includes(item)){saved.push(item);localStorage.setItem('a03s_'+_a03PickerCat,JSON.stringify(saved));}
+  libAdd('a03',_a03PickerCat,item);
   if(!A03_CATS[_a03PickerCat]) A03_CATS[_a03PickerCat]=[];
   if(!A03_CATS[_a03PickerCat].includes(item)) A03_CATS[_a03PickerCat].push(item);
   a03PickItem(item);
@@ -1945,6 +1946,7 @@ function confirmCustomUnit(input, secId){
   const sec = SECTIONS.find(s=>s.id===secId);
   if(!sec) return;
   if(!sec.units.includes(val)) sec.units.push(val);
+  libAdd('units',secId,val);
   const saved = JSON.parse(localStorage.getItem('cu_'+secId)||'[]');
   if(!saved.includes(val)){
     saved.push(val);
@@ -1999,8 +2001,9 @@ function confirmCustomItem(input){
   const sel = td.querySelector('.item-sel');
   const secId = input.closest('tbody').id.replace('tbody-','');
   const sec = SECTIONS.find(s=>s.id===secId);
-  // 加入 section items（讓之後新增的列也能選到）
+  // 加入 section items（讓之後新增的列也能選到），並寫進跨報價通用的項目庫
   if(!sec.items.includes(val)) sec.items.push(val);
+  libAdd('items',secId,val);
   // 在所有同 section 的 item-sel 加入這個選項（如果還沒有），但只切換當前列
   document.querySelectorAll(`#tbody-${secId} .item-sel`).forEach(s=>{
     if(![...s.options].some(o=>o.value===val)){
@@ -2021,6 +2024,7 @@ function confirmCustomSpec(input){
   const secId = input.closest('tbody').id.replace('tbody-','');
   const sec = SECTIONS.find(s=>s.id===secId);
   if(!sec.specs.includes(val)) sec.specs.push(val);
+  libAdd('specs',secId,val);
   document.querySelectorAll(`#tbody-${secId} .spec-sel`).forEach(s=>{
     if(![...s.options].some(o=>o.value===val)){
       const opt = document.createElement('option');
@@ -2738,6 +2742,83 @@ function printClient(){
   setTimeout(()=>document.body.classList.remove('print-client'), 1000);
 }
 
+// ══ 自訂項目庫（items / specs / units / A03 子項目）：跨報價、跨裝置通用 ══
+// 存於 localStorage custom_lib_v1，並同步到 Firebase custom_lib
+const LIB_KEY='custom_lib_v1';
+function libGet(){ try{ return JSON.parse(localStorage.getItem(LIB_KEY)||'{}'); }catch(e){ return {}; } }
+function libSave(lib){
+  try{ localStorage.setItem(LIB_KEY,JSON.stringify(lib)); }catch(e){}
+  const _d=_db(); if(_d) try{ _d.ref('custom_lib').set(lib).catch(()=>{}); }catch(e){}
+}
+// type: 'items' | 'specs' | 'units' | 'a03'；key: secId 或 A03 分類名
+function libAdd(type,key,val){
+  val=(val||'').trim(); if(!val||val==='__custom__'||val==='__cu__') return;
+  const lib=libGet();
+  if(!lib[type]) lib[type]={};
+  if(!lib[type][key]) lib[type][key]=[];
+  if(lib[type][key].includes(val)) return;
+  lib[type][key].push(val);
+  libSave(lib);
+}
+// 把項目庫套進 SECTIONS / A03_CATS，並補進畫面上已存在的下拉選單
+function libApply(lib){
+  lib=lib||libGet();
+  const addOpt=(selector,val,beforeValue)=>{
+    document.querySelectorAll(selector).forEach(sel=>{
+      if([...sel.options].some(o=>o.value===val)) return;
+      const opt=document.createElement('option'); opt.value=val; opt.textContent=val;
+      const before=[...sel.options].find(o=>o.value===beforeValue);
+      before?sel.insertBefore(opt,before):sel.appendChild(opt);
+    });
+  };
+  SECTIONS.forEach(sec=>{
+    (lib.items?.[sec.id]||[]).forEach(v=>{ if(!sec.items.includes(v)){ sec.items.push(v); } addOpt(`#tbody-${sec.id} .item-sel:not(.a03-sub-sel)`,v,'__custom__'); });
+    (lib.specs?.[sec.id]||[]).forEach(v=>{ if(sec.specs&&!sec.specs.includes(v)){ sec.specs.push(v); } addOpt(`#tbody-${sec.id} .spec-sel`,v,'__custom__'); });
+    (lib.units?.[sec.id]||[]).forEach(v=>{ if(sec.units&&!sec.units.includes(v)){ sec.units.push(v); } addOpt(`#tbody-${sec.id} .unit-sel`,v,'__cu__'); });
+  });
+  if(typeof A03_CATS!=='undefined'){
+    Object.entries(lib.a03||{}).forEach(([cat,arr])=>{
+      if(!A03_CATS[cat]) A03_CATS[cat]=[];
+      arr.forEach(v=>{ if(!A03_CATS[cat].includes(v)) A03_CATS[cat].push(v); });
+      // 同步舊的 a03s_ 本機鍵，讓 getA03SubItems 也看得到
+      try{ const saved=JSON.parse(localStorage.getItem('a03s_'+cat)||'[]'); arr.forEach(v=>{ if(!saved.includes(v)) saved.push(v); }); localStorage.setItem('a03s_'+cat,JSON.stringify(saved)); }catch(e){}
+    });
+  }
+}
+// 把舊版只存在本機的自訂單位 / A03 子項目 併入項目庫（一次性遷移）
+function libMigrateLocal(){
+  const lib=libGet(); let changed=false;
+  SECTIONS.forEach(sec=>{
+    let u=[]; try{ u=JSON.parse(localStorage.getItem('cu_'+sec.id)||'[]'); }catch(e){}
+    u.forEach(v=>{ lib.units=lib.units||{}; lib.units[sec.id]=lib.units[sec.id]||[]; if(!lib.units[sec.id].includes(v)){ lib.units[sec.id].push(v); changed=true; } });
+  });
+  if(typeof A03_CATS!=='undefined') Object.keys(A03_CATS).forEach(cat=>{
+    let a=[]; try{ a=JSON.parse(localStorage.getItem('a03s_'+cat)||'[]'); }catch(e){}
+    a.forEach(v=>{ lib.a03=lib.a03||{}; lib.a03[cat]=lib.a03[cat]||[]; if(!lib.a03[cat].includes(v)){ lib.a03[cat].push(v); changed=true; } });
+  });
+  if(changed) libSave(lib);
+  return lib;
+}
+// 雲端：先抓一次並合併，之後持續監聽其他裝置新增的項目
+function loadCustomLibFromCloud(){
+  const _d=_db(); if(!_d) return;
+  const merge=remote=>{
+    const lib=libGet(); let changed=false;
+    ['items','specs','units','a03'].forEach(t=>{
+      Object.entries(remote?.[t]||{}).forEach(([k,arr])=>{
+        lib[t]=lib[t]||{}; lib[t][k]=lib[t][k]||[];
+        (arr||[]).forEach(v=>{ if(!lib[t][k].includes(v)){ lib[t][k].push(v); changed=true; } });
+      });
+    });
+    if(changed) try{ localStorage.setItem(LIB_KEY,JSON.stringify(lib)); }catch(e){}
+    libApply(lib);
+    // 本機有而雲端沒有的 → 推上去（只比內容，不比順序，避免兩台裝置互相覆寫）
+    const localMore=['items','specs','units','a03'].some(t=>Object.entries(lib[t]||{}).some(([k,arr])=>arr.some(v=>!(remote?.[t]?.[k]||[]).includes(v))));
+    if(localMore) try{ _d.ref('custom_lib').set(lib).catch(()=>{}); }catch(e){}
+  };
+  try{ _d.ref('custom_lib').on('value',snap=>merge(snap.exists()?snap.val():{})); }catch(e){}
+}
+
 // ══ COST PRESETS（成本管理後台）══
 const COST_KEY = 'cost_presets_v1';
 function _db(){ try{ return (typeof db!=='undefined')?db:null; }catch(e){ return null; } }
@@ -3227,11 +3308,13 @@ document.getElementById('quote-date').textContent='報價日期：'+todayStr();
 applyDefaultQuoteDate(false);
 autoCaseNo();
 
+libApply(libMigrateLocal());   // 先套用本機的自訂項目庫
 buildSections();
 // Load from Firebase cloud first; fall back to local defaults
 loadFromCloud().then(()=>{
   startCloudListener(); // Listen for updates from other devices
   loadCostPresetsFromCloud();
+  loadCustomLibFromCloud();
 });
 
 // ══ PWA SETUP ══
