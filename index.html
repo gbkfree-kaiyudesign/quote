@@ -91,6 +91,16 @@ body {
 .logo-sub  { font-size: 9.5px; letter-spacing: 0.14em; color: var(--text2); text-transform: uppercase; }
 
 .topbar-actions { display: flex; gap: 7px; align-items: center; }
+/* 窄螢幕：按鈕列在自己裡面左右滑動，不要把整頁撐寬（整頁變寬會讓彈出視窗跑出畫面） */
+@media (max-width: 1100px) {
+  .topbar { gap: 10px; }
+  .topbar-actions {
+    flex: 1 1 auto; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; padding: 4px 2px; mask-image: linear-gradient(90deg, #000 88%, transparent);
+  }
+  .topbar-actions::-webkit-scrollbar { display: none; }
+  .topbar-actions .btn { flex-shrink: 0; }
+}
 
 /* ── BUTTONS ── */
 .btn {
@@ -169,6 +179,82 @@ body {
 .sa-none { font-size: 11px; color: var(--text3); }
 .sa-add-scope { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
 .sa-add-scope select { flex: 1; font-size: 12.5px; }
+
+/* 左右兩欄：左 子項目 / 右 規格清單 */
+.sa-split { display: flex; gap: 14px; align-items: flex-start; min-height: 360px; }
+.sa-left {
+  width: 190px; flex-shrink: 0; display: flex; flex-direction: column; gap: 3px;
+  max-height: 58dvh; overflow-y: auto; padding-right: 4px;
+}
+.sa-left-sep {
+  font-size: 10px; font-weight: 700; color: var(--text3); letter-spacing: 0.08em;
+  margin: 10px 4px 4px; padding-top: 8px; border-top: 1px solid var(--border2);
+}
+.sa-li {
+  display: flex; align-items: center; gap: 6px; width: 100%; text-align: left;
+  padding: 8px 10px; border-radius: 8px; border: 1px solid transparent;
+  background: none; color: var(--text); font-size: 12.5px; font-family: inherit; cursor: pointer;
+}
+.sa-li:hover { background: var(--surface2); }
+.sa-li.on { background: var(--green-dim); border-color: var(--green-border); font-weight: 700; }
+.sa-li.def { font-weight: 600; }
+.sa-li-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sa-tag {
+  font-size: 9.5px; font-weight: 600; color: var(--text3); white-space: nowrap;
+  border: 1px solid var(--border2); border-radius: 999px; padding: 0 7px; background: var(--surface);
+}
+.sa-tag.own { color: var(--green); border-color: var(--green-border); background: var(--green-dim); }
+.sa-right {
+  flex: 1; min-width: 0; border: 1px solid var(--border2); border-radius: 10px;
+  background: var(--surface2); padding: 14px 16px;
+}
+.sa-r-hd { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.sa-r-title { font-size: 15px; font-weight: 700; flex: 1; }
+.sa-reset {
+  font-size: 11px; padding: 3px 10px; border-radius: 6px; border: 1px solid var(--border2);
+  background: var(--surface); color: var(--text2); cursor: pointer; font-family: inherit; white-space: nowrap;
+}
+.sa-reset:hover { color: var(--red); border-color: rgba(160,104,88,0.35); background: var(--red-dim); }
+.sa-note {
+  font-size: 11px; color: var(--blue); background: var(--blue-dim);
+  border-radius: 6px; padding: 6px 10px; margin-bottom: 12px; line-height: 1.6;
+}
+.sa-sec-l { font-size: 10.5px; font-weight: 700; color: var(--text2); letter-spacing: 0.06em; margin-bottom: 7px; }
+.sa-hint { font-weight: 400; color: var(--text3); letter-spacing: 0; margin-left: 6px; }
+.sa-specs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 9px; }
+.sa-spec {
+  display: inline-flex; align-items: center; gap: 2px;
+  font-size: 12px; padding: 3px 4px 3px 11px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--green-border); color: var(--text);
+}
+.sa-spec.inh { border-style: dashed; border-color: var(--border2); color: var(--text2); }
+.sa-spec button {
+  background: none; border: none; cursor: pointer; color: var(--text3);
+  font-size: 14px; line-height: 1; padding: 0 5px; border-radius: 50%; font-family: inherit;
+}
+.sa-spec button:hover { color: var(--red); background: var(--red-dim); }
+.sa-add { display: flex; gap: 6px; }
+.sa-add input { flex: 1; min-width: 0; font-size: 12.5px; }
+.sa-add select { width: 120px; flex-shrink: 0; font-size: 12px; }
+.sa-preview {
+  font-size: 12px; line-height: 1.8; color: var(--text);
+  background: var(--surface); border: 1px solid var(--border2); border-radius: 8px; padding: 8px 12px;
+}
+@media (max-width: 640px) {
+  .sa-split { flex-direction: column; }
+  .sa-left { width: 100%; max-height: 180px; }
+}
+
+/* 找回被誤刪的品牌 */
+.br-rec {
+  border: 1px solid rgba(160,120,64,0.4); background: var(--amber-dim);
+  border-radius: 10px; padding: 10px 12px; margin-bottom: 18px;
+}
+.br-rec-hd { font-size: 12px; font-weight: 700; color: var(--amber); margin-bottom: 8px; line-height: 1.5; }
+.br-rec-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.br-rec-name { flex: 1; font-size: 13px; font-weight: 600; }
+.br-rec-row select { width: 84px; font-size: 12px; padding: 4px 6px; }
+.br-rec-act { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
 
 .sa-list { border: 1px solid var(--border2); border-radius: 9px; padding: 9px 11px; margin-bottom: 9px; background: var(--surface2); }
 .sa-list-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
@@ -466,6 +552,12 @@ select option { background: var(--surface); color: var(--text); }
 .group-badge.red { background: rgba(240,112,112,0.12); color: var(--red); border-color: rgba(240,112,112,0.3); }
 .group-badge.purple { background: var(--purple-dim); color: var(--purple); border-color: var(--purple-border); }
 .group-line { flex: 1; height: 1px; background: var(--border2); }
+/* 手機：大類分隔列放不下成本＋利潤率＋小計時，讓右側數字換到第二行靠右 */
+@media (max-width: 640px) {
+  .group-divider { flex-wrap: wrap; row-gap: 6px; gap: 8px; }
+  .group-divider .group-line { min-width: 24px; }
+  .group-divider .grp-cost { margin-left: auto; }
+}
 .group-total-label { font-size: 11px; color: var(--text2); white-space: nowrap; }
 .group-total-val { font-size: 12px; font-weight: 700; color: var(--green); font-variant-numeric: tabular-nums; }
 .group-total-val.b { color: var(--blue); }
@@ -3476,9 +3568,26 @@ function flatBrandRates(){
 }
 // 規格欄只放品牌（不放國產/進口等）的分類
 const BRAND_ONLY_SECS=new Set(['B01','B02','B03','B04','B05','A13','A08']);
+const BRAND_TS_KEY='brand_rates_ts';
+// 雲端用陣列 [{cat,name,rate}]；詢價存「詢價」字樣——Firebase 會直接刪掉 null 值，舊版就是這樣把詢價品牌弄丟的
+function brandRatesToCloud(r, ts){
+  const list=[];
+  BRAND_CATS.forEach(cat=>Object.entries(r[cat]||{}).forEach(([name,rate])=>{
+    list.push({ cat, name, rate:(rate==null||rate==='詢價')?'詢價':+rate });
+  }));
+  return { ts, list };
+}
+function brandRatesFromCloud(v){
+  const out={}; BRAND_CATS.forEach(c=>out[c]={});
+  const arr=Array.isArray(v.list)?v.list:Object.values(v.list||{});
+  arr.forEach(x=>{ if(!x||!x.name) return; const cat=BRAND_CATS.includes(x.cat)?x.cat:'衛浴';
+    out[cat][x.name]=(x.rate==null||x.rate==='詢價')?null:+x.rate; });
+  return out;
+}
 function saveBrandRates(r){
-  try{ localStorage.setItem(BRAND_KEY,JSON.stringify(r)); }catch(e){}
-  const _d=_db(); if(_d) try{ _d.ref('brand_rates').set(r).catch(()=>{}); }catch(e){}
+  const ts=Date.now();
+  try{ localStorage.setItem(BRAND_KEY,JSON.stringify(r)); localStorage.setItem(BRAND_TS_KEY,String(ts)); }catch(e){}
+  const _d=_db(); if(_d) try{ _d.ref('brand_rates_v2').set(brandRatesToCloud(r,ts)).catch(()=>{}); }catch(e){}
 }
 // 規格文字 → 折數（不分大小寫；找不到回傳 null）
 // 這個規格是不是品牌表裡的品牌
@@ -3512,7 +3621,7 @@ function brandOptGroups(selected, skip){
   const r=getBrandRates();
   const have=new Set((skip||[]).map(x=>String(x).toLowerCase()));
   return BRAND_CATS.map(cat=>{
-    const names=Object.keys(r[cat]||{}).filter(b=>!have.has(b.toLowerCase()));
+    const names=brandNamesSorted(cat).filter(b=>!have.has(b.toLowerCase()));
     if(!names.length) return '';
     return `<optgroup label="${BRAND_ICONS[cat]||''} ${cat}">${
       names.map(b=>`<option${selected===b?' selected':''}>${_escO(b)}</option>`).join('')}</optgroup>`;
@@ -3611,11 +3720,66 @@ function brToggleAsk(chk){
   if(chk.checked){ rate.value=''; suf.textContent='折數浮動'; }
   else { rate.value=rate.value||60; suf.textContent=`折　＝ ×${(parseFloat(rate.value)/100).toFixed(2)}`; rate.focus(); }
 }
+// 可能被舊版同步誤刪的品牌：預設品牌不見了的、報價裡用過但品牌表沒有的
+const BRAND_RECOVER_IGNORE='brand_recover_ignore';
+function brRecoverCandidates(){
+  const have=new Set(Object.keys(flatBrandRates()).map(k=>k.toLowerCase()));
+  let ignore=[]; try{ ignore=JSON.parse(localStorage.getItem(BRAND_RECOVER_IGNORE)||'[]'); }catch(e){}
+  const ign=new Set(ignore.map(x=>String(x).toLowerCase()));
+  const generic=new Set(['國產','進口','精品','一般','加強','特殊','智能','國產系統','進口系統','不鏽鋼','鍍鈦','強化','超白']);
+  Object.values(BUILTIN_SPECS).forEach(a=>a.forEach(v=>generic.add(String(v).toLowerCase())));
+  if(typeof A03_CAT_SPECS!=='undefined') Object.values(A03_CAT_SPECS).forEach(a=>(a||[]).forEach(v=>generic.add(String(v).toLowerCase())));
+  Object.values(SPEC_TEMPLATES).forEach(a=>a.forEach(v=>generic.add(v.toLowerCase())));
+  Object.values(getSpecCfg().rules).forEach(r=>Object.values(r).forEach(rule=>(rule.specs||[]).forEach(v=>generic.add(String(v).toLowerCase()))));
+  const SEC_CAT={B01:'衛浴',B02:'衛浴',B03:'家電',B04:'家電',B05:'家電',A13:'家電',A08:'廚具'};
+  const out=new Map();
+  const add=(name,cat)=>{ name=String(name||'').trim(); const l=name.toLowerCase();
+    if(!name||have.has(l)||generic.has(l)||ign.has(l)||out.has(l)) return; out.set(l,{name,cat}); };
+  Object.entries(BRAND_DEFAULTS).forEach(([cat,o])=>Object.keys(o).forEach(n=>add(n,cat)));
+  const scan=rows=>Object.entries(rows||{}).forEach(([sec,arr])=>{ const cat=SEC_CAT[sec]; if(!cat) return;
+    (Array.isArray(arr)?arr:[]).forEach(r=>r&&r.spec&&add(r.spec,cat)); });
+  try{ JSON.parse(localStorage.getItem('id_quotes_v3')||'[]').forEach(q=>scan(q.rows)); }catch(e){}
+  try{ scan(getQuoteData().rows); }catch(e){}
+  return [...out.values()];
+}
+function brRecoverAdd(btn){
+  brSaveInner(true);                       // 先保存畫面上還沒存的修改
+  const row=btn.closest('.br-rec-row');
+  const name=row.dataset.name, cat=row.querySelector('select').value;
+  const r=getBrandRates(); (r[cat]=r[cat]||{})[name]=null;
+  saveBrandRates(r); refreshAllSpecSelects(); saBuild();
+}
+function brRecoverAll(){
+  brSaveInner(true);
+  const r=getBrandRates();
+  document.querySelectorAll('.br-rec-row').forEach(row=>{ const cat=row.querySelector('select').value; (r[cat]=r[cat]||{})[row.dataset.name]=null; });
+  saveBrandRates(r); refreshAllSpecSelects(); saBuild();
+}
+function brRecoverIgnore(){
+  let ignore=[]; try{ ignore=JSON.parse(localStorage.getItem(BRAND_RECOVER_IGNORE)||'[]'); }catch(e){}
+  document.querySelectorAll('.br-rec-row').forEach(row=>ignore.push(row.dataset.name));
+  try{ localStorage.setItem(BRAND_RECOVER_IGNORE,JSON.stringify([...new Set(ignore)])); }catch(e){}
+  brSaveInner(true); saBuild();
+}
 function brBuild(target){
   const body=target||document.getElementById('brand-body'); if(!body) return;
   const r=getBrandRates();
-  body.innerHTML = BRAND_CATS.map(cat=>{
-    const brands=Object.entries(r[cat]||{});
+  const cands=brRecoverCandidates();
+  const rec = cands.length ? `<div class="br-rec">
+      <div class="br-rec-hd">⚠️ 這些品牌可能被之前的雲端同步誤刪了（詢價品牌存檔時會被刪掉，已修正）</div>
+      ${cands.map(c=>`<div class="br-rec-row" data-name="${_escO(c.name)}">
+        <span class="br-rec-name">${_escO(c.name)}</span>
+        <select>${BRAND_CATS.map(x=>`<option${x===c.cat?' selected':''}>${x}</option>`).join('')}</select>
+        <button class="br-cat-add" onclick="brRecoverAdd(this)">加回為詢價</button>
+      </div>`).join('')}
+      <div class="br-rec-act">
+        <button class="br-cat-add" onclick="brRecoverAll()">全部加回為詢價</button>
+        <button class="br-cat-add" onclick="brRecoverIgnore()">都不需要，隱藏</button>
+      </div>
+    </div>` : '';
+  body.innerHTML = rec + BRAND_CATS.map(cat=>{
+    const all=Object.entries(r[cat]||{});
+    const brands=[...all.filter(([,v])=>v!=null), ...all.filter(([,v])=>v==null)];   // 詢價排最後
     return `<div class="br-cat" data-cat="${cat}">
       <div class="br-cat-hd">
         <span class="br-cat-name">${BRAND_ICONS[cat]||''} ${cat}</span>
@@ -3648,7 +3812,9 @@ function brCount(){
   });
 }
 function brSave(){ brSaveInner(); document.getElementById('spec-dialog')?.close(); }
-function brSaveInner(){
+function brSaveInner(silent){
+  if(!document.querySelector('.br-cat')) return;   // 品牌分頁沒開，不用存
+  const fixedMap={}, askMap={}; BRAND_CATS.forEach(c=>{ fixedMap[c]={}; askMap[c]={}; });
   const out={}; BRAND_CATS.forEach(c=>out[c]={});
   let dup=[];
   document.querySelectorAll('.br-cat').forEach(c=>{
@@ -3662,138 +3828,219 @@ function brSaveInner(){
       // 同名品牌只能存在一處，避免比對時結果不定
       const other=BRAND_CATS.find(x=>x!==cat && Object.keys(out[x]).some(k=>k.toLowerCase()===name.toLowerCase()));
       if(other){ dup.push(`${name}（已在「${other}」）`); return; }
-      out[cat][name]= ask ? null : +(pct/100).toFixed(4);
+      out[cat][name]=true;   // 只用來檢查重複
+      if(ask) askMap[cat][name]=null; else fixedMap[cat][name]=+(pct/100).toFixed(4);
     });
   });
-  saveBrandRates(out);
-  refreshAllSpecSelects();
-  if(dup.length) alert('⚠️ 重複未存入：'+dup.join('、'));
+  // 固定折數在前、詢價在後
+  const final={}; BRAND_CATS.forEach(c=>final[c]={...fixedMap[c],...askMap[c]});
+  const before=JSON.stringify(getBrandRates());
+  if(JSON.stringify(final)!==before){ saveBrandRates(final); refreshAllSpecSelects(); }
+  if(dup.length && !silent) alert('⚠️ 重複未存入：'+dup.join('、'));
 }
 function syncAllBrandFields(){ document.querySelectorAll('tbody tr').forEach(tr=>syncBrandField(tr)); }
+// 即時同步，較新的為準
 function loadBrandRatesFromCloud(){
   const _d=_db(); if(!_d) return;
-  _d.ref('brand_rates').once('value').then(snap=>{
+  let legacyChecked=false;
+  _d.ref('brand_rates_v2').on('value', snap=>{
+    const localTs=+(localStorage.getItem(BRAND_TS_KEY)||0);
     if(snap.exists()){
-      try{ localStorage.setItem(BRAND_KEY,JSON.stringify(snap.val())); }catch(e){}
-      refreshAllSpecSelects();
+      const v=snap.val(), remoteTs=+(v.ts||0);
+      if(remoteTs>localTs){
+        try{ localStorage.setItem(BRAND_KEY,JSON.stringify(brandRatesFromCloud(v))); localStorage.setItem(BRAND_TS_KEY,String(remoteTs)); }catch(e){}
+        refreshAllSpecSelects(); if(_saTab==='brands') saRefreshIfOpen();
+      } else if(localTs>remoteTs){
+        try{ _d.ref('brand_rates_v2').set(brandRatesToCloud(getBrandRates(),localTs)).catch(()=>{}); }catch(e){}
+      }
+      return;
     }
-  }).catch(()=>{});
+    if(legacyChecked) return; legacyChecked=true;
+    if(localTs){ try{ _d.ref('brand_rates_v2').set(brandRatesToCloud(getBrandRates(),localTs)).catch(()=>{}); }catch(e){} return; }
+    if(localStorage.getItem(BRAND_KEY)){ saveBrandRates(getBrandRates()); refreshAllSpecSelects(); return; }
+    _d.ref('brand_rates').once('value').then(s2=>{
+      if(s2.exists()){
+        const m=migrateBrandRates(s2.val());
+        if(m){ saveBrandRates(m); refreshAllSpecSelects(); }
+      }
+    }).catch(()=>{});
+  });
 }
 
 // ══════════════════════════════════════════════
-//  規格管理：每個大項目／子項目要顯示哪些規格
-//  規格來源 = 具名規格清單（線徑、環保標章…）＋ 品牌表（衛浴／廚具／家電）
+//  規格管理 v2
+//  每個大項目 → 每個子項目，直接設定「主頁下拉會出現的規格」＋ 要不要加品牌
+//  雲端格式改成陣列（Firebase 不會吃掉 null / 空陣列 / 含 . / 的名稱），並且即時同步、以最新修改為準
 // ══════════════════════════════════════════════
 const SPEC_CFG_KEY='spec_config_v1';
-const SPEC_CFG_DEFAULT={
-  lists:{
-    '線徑':     ['1.6MM 單線','2.0MM 單線','2.0MM 絞線','5.5MM²','8MM²','14MM²'],
-    '環保標章': ['E1 低甲醛','E0 超低甲醛','F☆☆☆☆','V313 防潮'],
-    '玻璃厚度': ['5mm','8mm','10mm','強化5mm','強化8mm','強化10mm'],
-    '工法':     ['一般','加強','特殊'],
-  },
-  rules:{
-    'A03':{ '出線':{lists:['線徑'],brands:[]},
-            '迴路':{lists:['線徑'],brands:[]},
-            '開關插座':{lists:[],brands:['家電']},
-            '衛浴':{lists:[],brands:['衛浴']} },
-    'A08':{ _def:{lists:['環保標章'],brands:['衛浴','廚具','家電']} },
-    'A10':{ _def:{lists:['玻璃厚度'],brands:[]} },
-    'A13':{ _def:{lists:[],brands:['家電']} },
-    'B01':{ _def:{lists:[],brands:['衛浴','廚具','家電']} },
-    'B02':{ _def:{lists:[],brands:['衛浴']} },
-    'B03':{ _def:{lists:[],brands:['家電']} },
-    'B04':{ _def:{lists:[],brands:['衛浴','廚具','家電']} },
-    'B05':{ _def:{lists:[],brands:['衛浴','廚具','家電']} },
-  },
+const BUILTIN_SPECS=Object.fromEntries(SECTIONS.map(x=>[x.id,[...(x.specs||[])]]));
+const SPEC_TS_KEY ='spec_config_ts';
+const SPEC_TEMPLATES={
+  '線徑':     ['1.6MM 單線','2.0MM 單線','2.0MM 絞線','5.5MM²','8MM²','14MM²'],
+  '環保標章': ['E1 低甲醛','E0 超低甲醛','F☆☆☆☆','V313 防潮'],
+  '玻璃厚度': ['5mm','8mm','10mm','強化5mm','強化8mm','強化10mm'],
+  '工法':     ['一般','加強','特殊'],
 };
+const SPEC_CFG_DEFAULT={ rules:{
+  'A03':{ '出線':{specs:[...SPEC_TEMPLATES['線徑']],brands:[]},
+          '迴路':{specs:[...SPEC_TEMPLATES['線徑']],brands:[]},
+          '開關插座':{specs:[],brands:['家電']},
+          '衛浴':{specs:[],brands:['衛浴']} },
+  'A08':{ _def:{specs:[...SPEC_TEMPLATES['環保標章']],brands:[]} },
+  'A10':{ _def:{specs:[...SPEC_TEMPLATES['玻璃厚度']],brands:[]} },
+  'A13':{ _def:{specs:[],brands:['家電']} },
+  'B01':{ _def:{specs:[],brands:['衛浴','廚具','家電']} },
+  'B02':{ _def:{specs:[],brands:['衛浴']} },
+  'B03':{ _def:{specs:[],brands:['家電']} },
+  'B04':{ _def:{specs:[],brands:['衛浴','廚具','家電']} },
+  'B05':{ _def:{specs:[],brands:['衛浴','廚具','家電']} },
+}};
+
+// 舊版 {lists, rules:{lists,brands}} → 新版 {rules:{specs,brands}}
+function migrateSpecCfg(v){
+  if(!v||typeof v!=='object') return null;
+  const lists=v.lists||{};
+  const rules={};
+  Object.entries(v.rules||{}).forEach(([sec,r])=>{
+    Object.entries(r||{}).forEach(([scope,rule])=>{
+      if(!rule||typeof rule!=='object') return;
+      let specs = Array.isArray(rule.specs) ? rule.specs.slice() : [];
+      if(!rule.specs && Array.isArray(rule.lists)){
+        rule.lists.forEach(n=>(lists[n]||SPEC_TEMPLATES[n]||[]).forEach(x=>{ if(!specs.includes(x)) specs.push(x); }));
+        // 舊版沒勾任何東西的空設定 = 其實是想沿用預設 → 丟掉
+        if(!specs.length && !(rule.brands||[]).length) return;
+        // 你說過「出線只會填線徑」：舊版亂勾的玻璃厚度、品牌一併清掉
+        if(sec==='A03' && scope==='出線'){ specs=[...SPEC_TEMPLATES['線徑']]; rule={...rule,brands:[]}; }
+      }
+      (rules[sec]=rules[sec]||{})[scope]={ specs, brands:Array.isArray(rule.brands)?rule.brands.filter(b=>BRAND_CATS.includes(b)):[] };
+    });
+  });
+  return { rules };
+}
 function getSpecCfg(){
   try{
-    const v=JSON.parse(localStorage.getItem(SPEC_CFG_KEY)||'null');
-    if(v&&typeof v==='object') return { lists:v.lists||{}, rules:v.rules||{} };
+    const raw=JSON.parse(localStorage.getItem(SPEC_CFG_KEY)||'null');
+    const v=migrateSpecCfg(raw);
+    if(v) return v;
   }catch(e){}
   return JSON.parse(JSON.stringify(SPEC_CFG_DEFAULT));
 }
-function saveSpecCfg(c){
-  try{ localStorage.setItem(SPEC_CFG_KEY,JSON.stringify(c)); }catch(e){}
-  const _d=_db(); if(_d) try{ _d.ref('spec_config').set(c).catch(()=>{}); }catch(e){}
+// 雲端用陣列，避開 Firebase 對 key 與空值的限制
+function specCfgToCloud(c, ts){
+  const rules=[];
+  Object.entries(c.rules||{}).forEach(([sec,r])=>Object.entries(r||{}).forEach(([scope,rule])=>{
+    rules.push({ sec, scope, specs:rule.specs||[], brands:rule.brands||[], set:1 });
+  }));
+  return { ts, rules };
 }
+function specCfgFromCloud(v){
+  const rules={};
+  const arr=Array.isArray(v.rules)?v.rules:Object.values(v.rules||{});
+  arr.forEach(x=>{
+    if(!x||!x.sec||x.scope==null) return;
+    const toArr=a=>Array.isArray(a)?a:(a&&typeof a==='object'?Object.values(a):[]);
+    (rules[x.sec]=rules[x.sec]||{})[x.scope]={ specs:toArr(x.specs), brands:toArr(x.brands) };
+  });
+  return { rules };
+}
+function saveSpecCfg(c){
+  const ts=Date.now();
+  try{ localStorage.setItem(SPEC_CFG_KEY,JSON.stringify({rules:c.rules})); localStorage.setItem(SPEC_TS_KEY,String(ts)); }catch(e){}
+  const _d=_db(); if(_d) try{ _d.ref('spec_config_v2').set(specCfgToCloud(c,ts)).catch(()=>{}); }catch(e){}
+}
+// 即時同步：較新的那一份為準；舊格式雲端資料只在本機沒有時間戳時採用一次
 function loadSpecCfgFromCloud(){
   const _d=_db(); if(!_d) return;
-  _d.ref('spec_config').once('value').then(snap=>{
+  let legacyChecked=false;
+  _d.ref('spec_config_v2').on('value', snap=>{
+    const localTs=+(localStorage.getItem(SPEC_TS_KEY)||0);
     if(snap.exists()){
-      const v=snap.val();
-      try{ localStorage.setItem(SPEC_CFG_KEY,JSON.stringify({lists:v.lists||{},rules:v.rules||{}})); }catch(e){}
-      refreshAllSpecSelects();
+      const v=snap.val(), remoteTs=+(v.ts||0);
+      if(remoteTs>localTs){
+        const c=specCfgFromCloud(v);
+        try{ localStorage.setItem(SPEC_CFG_KEY,JSON.stringify(c)); localStorage.setItem(SPEC_TS_KEY,String(remoteTs)); }catch(e){}
+        refreshAllSpecSelects(); saRefreshIfOpen();
+      } else if(localTs>remoteTs){
+        try{ _d.ref('spec_config_v2').set(specCfgToCloud(getSpecCfg(),localTs)).catch(()=>{}); }catch(e){}
+      }
+      return;
     }
-  }).catch(()=>{});
+    if(legacyChecked) return; legacyChecked=true;
+    if(localTs){ try{ _d.ref('spec_config_v2').set(specCfgToCloud(getSpecCfg(),localTs)).catch(()=>{}); }catch(e){} return; }
+    // 第一次升級：這台裝置本來就有設定 → 以本機為準（就是後台畫面上看到的那份）
+    if(localStorage.getItem(SPEC_CFG_KEY)){ saveSpecCfg(getSpecCfg()); refreshAllSpecSelects(); return; }
+    _d.ref('spec_config').once('value').then(s2=>{
+      if(s2.exists()){
+        const c=migrateSpecCfg(s2.val());
+        if(c){ saveSpecCfg(c); refreshAllSpecSelects(); saRefreshIfOpen(); }
+      }
+    }).catch(()=>{});
+  });
 }
-// 這個分類的可設定子項目（A03 用分類名，其餘用項目名）
+
+// 這個分類可設定的子項目（水電用工種分類，其餘用項目名，含你自己加的項目）
 function specScopeList(secId){
   if(secId==='A03') return Object.keys(A03_CATS||{}).filter(c=>c!=='自訂');
   const sec=SECTIONS.find(s=>s.id===secId);
-  return (sec&&sec.items)?[...sec.items]:[];
+  return (sec&&sec.items)?[...new Set(sec.items)]:[];
 }
-// 某一列的 scope：A03 看分類，其餘看項目
+// 原始規格（還沒設定時主頁顯示的那份）
+function origSpecs(secId, scope){
+  const sec=SECTIONS.find(s=>s.id===secId);
+  if(secId==='A03' && scope && scope!=='_def' && typeof A03_CAT_SPECS!=='undefined' && A03_CAT_SPECS[scope]) return [...A03_CAT_SPECS[scope]];
+  return sec&&sec.specs?[...sec.specs]:[];
+}
+// 某一層實際生效的設定：自己的 → 整個分類預設 → 原始規格
+function effectiveSpec(secId, scope){
+  const r=getSpecCfg().rules[secId]||{};
+  if(scope!=='_def' && r[scope]) return { src:'own', specs:r[scope].specs||[], brands:r[scope].brands||[] };
+  if(r._def) return { src:scope==='_def'?'own':'def', specs:r._def.specs||[], brands:r._def.brands||[] };
+  return { src:'orig', specs:origSpecs(secId, scope), brands:[] };
+}
+// 某一列的 scope：水電看工種分類，其餘看項目名
 function rowScopeKey(tr){
   if(!tr) return '';
   if(tr.dataset.cat) return tr.dataset.cat;
   const sel=tr.querySelector('.item-sel');
   return sel?(sel.value==='__custom__'?(tr.querySelector('.custom-item')?.value||''):sel.value):'';
 }
-function specRuleFor(secId, scope){
-  const cfg=getSpecCfg(), r=cfg.rules[secId];
-  if(!r) return null;
-  return (scope&&r[scope]) || r._def || null;
+// 品牌依大類列出，固定折數在前、詢價放最後
+function brandNamesSorted(cat){
+  const r=getBrandRates()[cat]||{};
+  const ks=Object.keys(r);
+  return [...ks.filter(k=>r[k]!=null), ...ks.filter(k=>r[k]==null)];
 }
-// 產生規格選項：有規則就照規則，沒有就沿用原本的 sec.specs + 品牌
+// 主頁規格下拉的選項
 function specOptionsFor(secId, scope, selected, fallbackList){
-  const cfg=getSpecCfg();
-  const rule=specRuleFor(secId, scope);
   const esc=_escO;
-  if(!rule){
-    const list=fallbackList||[];
-    if(BRAND_ONLY_SECS.has(secId)){
-      const keep=(selected&&!isBrand(selected))?`<option selected>${esc(selected)}</option>`:'';
-      return keep+brandOptGroups(selected,[]);
-    }
-    return list.map(sp=>`<option${selected===sp?' selected':''}>${esc(sp)}</option>`).join('')
-         + brandOptGroups(selected, list);
-  }
+  const eff=effectiveSpec(secId, scope);
+  const specs = eff.src==='orig' && fallbackList ? fallbackList : eff.specs;
   const groups=[];
-  (rule.lists||[]).forEach(name=>{
-    const items=cfg.lists[name]||[];
-    if(items.length) groups.push({label:name, items});
-  });
-  const rates=getBrandRates();
-  (rule.brands||[]).forEach(cat=>{
-    const items=Object.keys(rates[cat]||{});
+  if(specs.length) groups.push({label:'規格', items:specs});
+  (eff.brands||[]).forEach(cat=>{
+    const items=brandNamesSorted(cat);
     if(items.length) groups.push({label:(BRAND_ICONS[cat]||'')+' '+cat, items});
   });
   const all=new Set(); groups.forEach(g=>g.items.forEach(v=>all.add(String(v).toLowerCase())));
-  // 目前選到但不在清單裡的值（舊資料）→ 保留在最前面
-  let html = (selected && !all.has(String(selected).toLowerCase()))
-    ? `<option selected>${esc(selected)}</option>` : '';
+  // 目前選到、但已經不在清單裡的值（舊資料）→ 保留在最前面，不讓報價內容消失
+  let html=(selected && !all.has(String(selected).toLowerCase())) ? `<option selected>${esc(selected)}</option>` : '';
   if(!groups.length) return html;
-  if(groups.length===1 && !html){
-    return groups[0].items.map(v=>`<option${selected===v?' selected':''}>${esc(v)}</option>`).join('');
+  if(groups.length===1){
+    return html+groups[0].items.map(v=>`<option${selected===v?' selected':''}>${esc(v)}</option>`).join('');
   }
-  html += groups.map(g=>`<optgroup label="${esc(g.label)}">${
+  return html+groups.map(g=>`<optgroup label="${esc(g.label)}">${
     g.items.map(v=>`<option${selected===v?' selected':''}>${esc(v)}</option>`).join('')}</optgroup>`).join('');
-  return html;
 }
-// 重建某一列的規格選單（項目換了之後要叫）
 function refreshSpecSelect(tr){
   if(!tr) return;
   const tbody=tr.closest('tbody'); if(!tbody) return;
   const secId=tbody.id.replace('tbody-','');
   const sel=tr.querySelector('.spec-sel'); if(!sel||sel.value==='__custom__') return;
-  const sec=SECTIONS.find(s=>s.id===secId);
-  const fallback=(secId==='A03'&&sec)?(sec.specs||[]):((sec&&sec.specs)||[]);
+  const scope=rowScopeKey(tr);
   const cur=sel.value;
-  sel.innerHTML=specOptionsFor(secId, rowScopeKey(tr), cur, fallback)+'<option value="__custom__">✏️ 自訂</option>';
+  sel.innerHTML=specOptionsFor(secId, scope, cur, origSpecs(secId, scope))+'<option value="__custom__">✏️ 自訂</option>';
   if([...sel.options].some(o=>o.value===cur)) sel.value=cur;
-  else if(sel.options.length) { sel.selectedIndex=0; }
+  else if(sel.options.length>1) sel.selectedIndex=0;
   syncBrandField(tr, true);
 }
 function refreshAllSpecSelects(){
@@ -3801,32 +4048,40 @@ function refreshAllSpecSelects(){
   recalc();
 }
 
-// ══ 規格管理後台 UI ══
-let _saTab='rules', _saSec='A03';
+// ══ 規格管理後台 UI（左：子項目 / 右：這個子項目的規格清單）══
+let _saTab='rules', _saSec='A03', _saScope='_def';
 function showSpecAdmin(tab){
   if(tab) _saTab=tab;
   const dlg=document.getElementById('spec-dialog');
   if(!dlg){ alert('找不到規格管理對話框'); return; }
-  saBuild(); dlg.showModal();
+  saBuild(); if(!dlg.open) dlg.showModal();
 }
-function saSwitch(t){ _saTab=t; saBuild(); }
+function saRefreshIfOpen(){
+  const dlg=document.getElementById('spec-dialog');
+  if(!dlg||!dlg.open) return;
+  const a=document.activeElement;
+  if(a && dlg.contains(a) && /INPUT|TEXTAREA/.test(a.tagName)) return;  // 正在打字就先不重畫
+  saBuild();
+}
+function saSwitch(t){ if(_saTab==='brands' && t!=='brands') brSaveInner(); _saTab=t; saBuild(); }
+document.addEventListener('DOMContentLoaded',()=>{
+  const dlg=document.getElementById('spec-dialog');
+  dlg?.addEventListener('cancel',()=>{ if(_saTab==='brands') brSaveInner(); });
+});
 function saBuild(){
   const tabs=document.getElementById('sa-tabs'), body=document.getElementById('sa-body');
   if(!tabs||!body) return;
-  const T=[['rules','📋 各項目規格'],['lists','📑 規格清單'],['brands','🏷️ 品牌折數']];
+  const T=[['rules','📋 各項目規格'],['brands','🏷️ 品牌折數']];
   tabs.innerHTML=T.map(([k,l])=>`<button class="sa-tab${k===_saTab?' on':''}" onclick="saSwitch('${k}')">${l}</button>`).join('');
-  if(_saTab==='rules') saBuildRules(body);
-  else if(_saTab==='lists') saBuildLists(body);
-  else brBuild(body);
+  if(_saTab==='rules') saBuildRules(body); else brBuild(body);
   const foot=document.getElementById('sa-foot');
   foot.innerHTML = _saTab==='rules'
-    ? '點一下色塊就是開關。沒有設定的分類會沿用原本的規格選單。'
-    : _saTab==='lists'
-    ? '清單裡的項目用逗號或換行分隔，設定好後到「各項目規格」勾選要用在哪裡。'
-    : '折數填 <b>62</b> 代表 62 折（成本 = 定價 × 0.62）。勾「詢價」代表折數浮動，不自動算成本。';
+    ? '每一次修改都會立刻存檔並同步到其他裝置。子項目沒有自己的設定時，會沿用「整個分類」。'
+    : '折數填 <b>62</b> 代表 62 折（成本 = 定價 × 0.62）。勾「詢價」代表折數浮動，不自動算成本，會排在該類最下面。';
 }
 
 function saBuildRules(body){
+  const esc=_escO;
   const cfg=getSpecCfg();
   const secOpts=GROUPS.filter(g=>g.id!=='F').map(g=>{
     const secs=SECTIONS.filter(s=>s.group===g.id&&s.id!=='E01');
@@ -3834,113 +4089,99 @@ function saBuildRules(body){
     return `<optgroup label="${g.icon} ${g.label}">${secs.map(s=>
       `<option value="${s.id}"${s.id===_saSec?' selected':''}>${s.dispId||s.id} ${s.label}${cfg.rules[s.id]?' ●':''}</option>`).join('')}</optgroup>`;
   }).join('');
-  const sec=SECTIONS.find(s=>s.id===_saSec);
   const rules=cfg.rules[_saSec]||{};
   const scopes=specScopeList(_saSec);
-  const rows=[['_def','整個分類（預設）'],...Object.keys(rules).filter(k=>k!=='_def').map(k=>[k,k])];
-  const unused=scopes.filter(k=>!rules[k]);
+  // 有設定但不在預設項目清單裡的（例如自訂項目）也列出來
+  Object.keys(rules).forEach(k=>{ if(k!=='_def' && !scopes.includes(k)) scopes.push(k); });
+  if(_saScope!=='_def' && !scopes.includes(_saScope)) _saScope='_def';
+
+  const leftItem=(key,label)=>{
+    const own = key==='_def' ? !!rules._def : !!rules[key];
+    const tag = own ? '<span class="sa-tag own">自訂</span>'
+              : key==='_def' ? '<span class="sa-tag">原始</span>' : '<span class="sa-tag">沿用</span>';
+    return `<button class="sa-li${key===_saScope?' on':''}${key==='_def'?' def':''}" data-scope="${esc(key)}" onclick="_saScope=this.dataset.scope;saBuild()">
+      <span class="sa-li-name">${key==='_def'?'⌂ ':''}${esc(label)}</span>${tag}</button>`;
+  };
   body.innerHTML=`
     <div class="sa-pick">
-      <span class="sa-pick-l">設定哪個分類</span>
-      <select onchange="_saSec=this.value;saBuild()">${secOpts}</select>
+      <span class="sa-pick-l">大項目</span>
+      <select onchange="_saSec=this.value;_saScope='_def';saBuild()">${secOpts}</select>
     </div>
-    <div class="sa-rules">
-      ${rows.map(([key,label])=>{
-        const r=rules[key]||{lists:[],brands:[]};
-        const isDef=key==='_def';
-        return `<div class="sa-rule">
-          <div class="sa-rule-hd">
-            <span class="sa-rule-name${isDef?' def':''}">${isDef?'⌂ ':'└ '}${_escO(label)}</span>
-            ${rules[key]?`<button class="sa-rm" onclick="saRuleDel('${_escO(key)}')" title="${isDef?'取消整個分類的設定':'取消這個子項目的設定'}">×</button>`:''}
-          </div>
-          ${rules[key]?`<div class="sa-chips">
-            <span class="sa-chips-l">品牌</span>
-            ${BRAND_CATS.map(c=>`<button class="sa-chip br${(r.brands||[]).includes(c)?' on':''}" onclick="saToggle('${_escO(key)}','brands','${c}')">${BRAND_ICONS[c]||''} ${c}</button>`).join('')}
-            <span class="sa-chips-l" style="margin-left:10px">清單</span>
-            ${Object.keys(cfg.lists).map(n=>`<button class="sa-chip${(r.lists||[]).includes(n)?' on':''}" onclick="saToggle('${_escO(key)}','lists','${_escO(n)}')">${_escO(n)}</button>`).join('')
-              ||'<span class="sa-none">尚未建立清單</span>'}
-          </div>`:`<div class="sa-chips"><button class="sa-chip add" onclick="saRuleAdd('${_escO(key)}')">＋ 設定這一層</button><span class="sa-none">目前沿用原本的規格選單</span></div>`}
-        </div>`;
-      }).join('')}
-      ${unused.length?`<div class="sa-add-scope">
-        <select id="sa-scope-sel"><option value="">＋ 指定子項目…</option>${unused.map(k=>`<option>${_escO(k)}</option>`).join('')}</select>
-        <button class="ms-btn" onclick="saAddScope()">新增</button>
-      </div>`:''}
-    </div>`;
-}
-function saMutate(fn){
-  const cfg=getSpecCfg();
-  if(!cfg.rules[_saSec]) cfg.rules[_saSec]={};
-  fn(cfg.rules[_saSec], cfg);
-  if(!Object.keys(cfg.rules[_saSec]).length) delete cfg.rules[_saSec];
-  saveSpecCfg(cfg); saBuild(); refreshAllSpecSelects();
-}
-function saRuleAdd(key){ saMutate(r=>{ r[key]={lists:[],brands:[]}; }); }
-function saRuleDel(key){ saMutate(r=>{ delete r[key]; }); }
-function saAddScope(){
-  const v=document.getElementById('sa-scope-sel').value;
-  if(v) saMutate(r=>{ r[v]={lists:[],brands:[]}; });
-}
-function saToggle(key, field, val){
-  saMutate(r=>{
-    const rule=r[key]||(r[key]={lists:[],brands:[]});
-    rule[field]=rule[field]||[];
-    const i=rule[field].indexOf(val);
-    i>=0?rule[field].splice(i,1):rule[field].push(val);
-  });
-}
-
-function saBuildLists(body){
-  const cfg=getSpecCfg();
-  const names=Object.keys(cfg.lists);
-  body.innerHTML=`<div class="sa-lists">
-    ${names.map(n=>`<div class="sa-list" data-name="${_escO(n)}">
-      <div class="sa-list-hd">
-        <input type="text" value="${_escO(n)}" data-sl-name placeholder="清單名稱（例：線徑）">
-        <button class="sa-rm" onclick="saListDel('${_escO(n)}')" title="刪除清單">×</button>
+    <div class="sa-split">
+      <div class="sa-left">
+        ${leftItem('_def','整個分類')}
+        <div class="sa-left-sep">子項目</div>
+        ${scopes.map(k=>leftItem(k,k)).join('')||'<div class="sa-none" style="padding:8px 10px">沒有子項目</div>'}
       </div>
-      <textarea data-sl-items rows="2" placeholder="項目用逗號或換行分隔">${_escO((cfg.lists[n]||[]).join('、'))}</textarea>
-    </div>`).join('')||'<div class="sa-none" style="padding:14px 0">尚未建立規格清單</div>'}
-    <button class="ms-add" onclick="saListAdd()">＋ 新增規格清單</button>
-  </div>`;
+      <div class="sa-right" id="sa-right">${saRightHtml()}</div>
+    </div>`;
+  // 輸入框 Enter 加入
+  const inp=document.getElementById('sa-add-inp');
+  if(inp) inp.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); saAddSpec(inp.value); } };
 }
-function saReadLists(){
-  const cfg=getSpecCfg(), out={};
-  document.querySelectorAll('.sa-list').forEach(el=>{
-    const name=el.querySelector('[data-sl-name]').value.trim();
-    if(!name) return;
-    const items=el.querySelector('[data-sl-items]').value
-      .split(/[、,，\n]/).map(x=>x.trim()).filter(Boolean);
-    out[name]=items;
-  });
-  // 清單改名時，把規則裡的名稱一起換掉
-  const old=Object.keys(cfg.lists), neu=Object.keys(out);
-  if(old.length===neu.length) old.forEach((o,i)=>{
-    if(o!==neu[i]) Object.values(cfg.rules).forEach(r=>Object.values(r).forEach(rule=>{
-      const j=(rule.lists||[]).indexOf(o); if(j>=0) rule.lists[j]=neu[i];
-    }));
-  });
-  cfg.lists=out;
-  return cfg;
+function saRightHtml(){
+  const esc=_escO;
+  const eff=effectiveSpec(_saSec,_saScope);
+  const isDef=_saScope==='_def';
+  const name=isDef?'整個分類':_saScope;
+  const srcNote = eff.src==='own' ? ''
+    : eff.src==='def' ? `<div class="sa-note">目前沿用「整個分類」的設定。直接修改就會變成「${esc(name)}」專屬的規格。</div>`
+    : `<div class="sa-note">目前用的是系統原本的規格。直接修改就會存成你的設定。</div>`;
+  const chips = eff.specs.length
+    ? eff.specs.map((v,i)=>`<span class="sa-spec${eff.src!=='own'?' inh':''}">${esc(v)}<button onclick="saRemoveSpec(${i})" title="移除">×</button></span>`).join('')
+    : '<span class="sa-none">（沒有規格文字）</span>';
+  const tplOpts=Object.keys(SPEC_TEMPLATES).map(k=>`<option value="${esc(k)}">${esc(k)}</option>`).join('');
+  // 預覽：跟主頁下拉一模一樣
+  const prev=[];
+  if(eff.specs.length) prev.push(eff.specs.join('、'));
+  (eff.brands||[]).forEach(c=>{ const n=brandNamesSorted(c); if(n.length) prev.push(`${BRAND_ICONS[c]||''} ${n.join('、')}`); });
+  return `
+    <div class="sa-r-hd">
+      <span class="sa-r-title">${isDef?'⌂ ':''}${esc(name)}</span>
+      ${eff.src==='own' ? `<button class="sa-reset" onclick="saResetScope()">${isDef?'清除分類設定':'恢復沿用整個分類'}</button>`:''}
+    </div>
+    ${srcNote}
+    <div class="sa-sec-l">規格選項</div>
+    <div class="sa-specs">${chips}</div>
+    <div class="sa-add">
+      <input type="text" id="sa-add-inp" placeholder="輸入規格，按 Enter 加入（可用「、」一次加多個）">
+      <select onchange="if(this.value){saAddSpec((SPEC_TEMPLATES[this.value]||[]).join('、'));this.value='';}">
+        <option value="">從範本加入…</option>${tplOpts}
+      </select>
+    </div>
+    <div class="sa-sec-l" style="margin-top:16px">加入品牌 <span class="sa-hint">勾了就會把該類所有品牌接在規格後面</span></div>
+    <div class="sa-chips">${BRAND_CATS.map(c=>`<button class="sa-chip br${(eff.brands||[]).includes(c)?' on':''}" onclick="saToggleBrand('${c}')">${BRAND_ICONS[c]||''} ${c}</button>`).join('')}</div>
+    <div class="sa-sec-l" style="margin-top:16px">主頁下拉會看到</div>
+    <div class="sa-preview">${prev.length?prev.map(p=>`<div>${esc(p)}</div>`).join(''):'<span class="sa-none">只有「✏️ 自訂」</span>'}</div>`;
 }
-function saListAdd(){
-  const cfg=saReadLists();
-  let n='新清單', i=2; while(cfg.lists[n]) n='新清單'+(i++);
-  cfg.lists[n]=[];
-  saveSpecCfg(cfg); saBuild();
+// 修改前先把繼承來的內容複製成自己的設定（copy-on-write）
+function saMutateScope(fn){
+  const cfg=getSpecCfg();
+  const eff=effectiveSpec(_saSec,_saScope);
+  const r=cfg.rules[_saSec]=cfg.rules[_saSec]||{};
+  if(!r[_saScope]) r[_saScope]={ specs:[...eff.specs], brands:[...(eff.brands||[])] };
+  fn(r[_saScope]);
+  saveSpecCfg(cfg); saBuild(); refreshAllSpecSelects();
+  setTimeout(()=>document.getElementById('sa-add-inp')?.focus(),0);
 }
-function saListDel(name){
-  if(!confirm(`刪除規格清單「${name}」？\n已勾選這份清單的項目會改回其他來源。`)) return;
-  const cfg=saReadLists();
-  delete cfg.lists[name];
-  Object.values(cfg.rules).forEach(r=>Object.values(r).forEach(rule=>{
-    const j=(rule.lists||[]).indexOf(name); if(j>=0) rule.lists.splice(j,1);
-  }));
+function saAddSpec(text){
+  const items=String(text||'').split(/[、,，\n]/).map(x=>x.trim()).filter(Boolean);
+  if(!items.length) return;
+  saMutateScope(rule=>{ items.forEach(x=>{ if(!rule.specs.some(s=>s.toLowerCase()===x.toLowerCase())) rule.specs.push(x); }); });
+}
+function saRemoveSpec(i){ saMutateScope(rule=>{ rule.specs.splice(i,1); }); }
+function saToggleBrand(cat){
+  saMutateScope(rule=>{ const i=rule.brands.indexOf(cat); i>=0?rule.brands.splice(i,1):rule.brands.push(cat); });
+}
+function saResetScope(){
+  const cfg=getSpecCfg();
+  const r=cfg.rules[_saSec]; if(!r) return;
+  delete r[_saScope];
+  if(!Object.keys(r).length) delete cfg.rules[_saSec];
   saveSpecCfg(cfg); saBuild(); refreshAllSpecSelects();
 }
 function saSave(){
-  if(_saTab==='lists'){ saveSpecCfg(saReadLists()); refreshAllSpecSelects(); }
-  else if(_saTab==='brands'){ brSaveInner(); }
+  if(_saTab==='brands') brSaveInner();
   document.getElementById('spec-dialog').close();
 }
 
@@ -4528,12 +4769,12 @@ function showInstallGuide(){
 <!-- 規格管理後台（各項目規格 / 規格清單 / 品牌折數） -->
 <dialog id="spec-dialog" style="width:min(720px,100vw);max-height:88dvh;height:88dvh;border:1px solid var(--border2);border-radius:14px;background:var(--surface);color:var(--text);padding:0;overflow:hidden;flex-direction:column">
   <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border2);flex-shrink:0">
-    <button onclick="document.getElementById('spec-dialog').close()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:2px 8px;border-radius:6px">‹</button>
+    <button onclick="saSave()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:2px 8px;border-radius:6px">‹</button>
     <div style="flex:1">
       <div style="font-size:15px;font-weight:700">📋 規格管理</div>
-      <div style="font-size:11px;color:var(--text2)">設定每個大項目的規格選單來源</div>
+      <div style="font-size:11px;color:var(--text2)">左邊選子項目，右邊就是主頁會出現的規格</div>
     </div>
-    <button onclick="saSave()" style="background:var(--green);color:#0a1f12;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">💾 儲存</button>
+    <button onclick="saSave()" style="background:var(--green);color:#0a1f12;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">✓ 完成</button>
   </div>
   <div id="sa-tabs" style="display:flex;gap:0;overflow-x:auto;border-bottom:1px solid var(--border2);flex-shrink:0"></div>
   <div id="sa-body" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px"></div>
