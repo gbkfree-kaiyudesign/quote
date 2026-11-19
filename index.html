@@ -113,6 +113,125 @@ body {
 /* ── LAYOUT ── */
 .container { max-width: 940px; margin: 0 auto; padding: 20px 16px 80px; }
 
+/* ══ 量尺計算面板（固定於右側，捲動時跟著） ══ */
+.measure-tab {
+  position: fixed; right: 0; top: 50%; transform: translateY(-50%);
+  z-index: 880; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: var(--surface); color: var(--blue);
+  border: 1px solid var(--border2); border-right: none;
+  border-radius: 10px 0 0 10px; padding: 12px 7px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em; line-height: 1.2;
+  cursor: pointer; writing-mode: vertical-rl; text-orientation: upright;
+  box-shadow: -2px 0 10px rgba(0,0,0,0.07); font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+.measure-tab:hover { background: var(--blue-dim); }
+body.measure-open .measure-tab { display: none; }
+
+.measure-panel {
+  position: fixed; top: 0; right: 0; bottom: 0; width: 376px; max-width: 100vw;
+  background: var(--surface); border-left: 1px solid var(--border2);
+  box-shadow: -6px 0 28px rgba(0,0,0,0.12);
+  z-index: 890; display: flex; flex-direction: column;
+  transform: translateX(100%); transition: transform 0.22s ease;
+  padding-right: env(safe-area-inset-right);
+}
+.measure-panel.open { transform: none; }
+@media (min-width: 1360px) {
+  body.measure-open .container { margin-right: 376px; }
+  body.measure-open .topbar { padding-right: calc(376px + 16px); }
+}
+.ms-head {
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+  padding: 13px 14px; border-bottom: 1px solid var(--border2); background: var(--surface);
+}
+.ms-head-title { font-size: 14px; font-weight: 700; flex: 1; }
+.ms-head-sub { font-size: 10.5px; color: var(--text2); font-weight: 400; margin-top: 1px; }
+.ms-x {
+  background: none; border: none; cursor: pointer; color: var(--text2);
+  font-size: 20px; line-height: 1; padding: 2px 7px; border-radius: 6px; font-family: inherit;
+}
+.ms-x:hover { background: var(--surface3); color: var(--text); }
+.ms-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px 12px 4px; }
+.ms-foot {
+  flex-shrink: 0; border-top: 1px solid var(--border2); background: var(--surface2);
+  padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+}
+.ms-empty { color: var(--text3); font-size: 12px; text-align: center; padding: 26px 10px; line-height: 1.7; }
+
+.ms-row {
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 9px; padding: 8px 9px; margin-bottom: 8px;
+}
+.ms-row-top { display: flex; align-items: center; gap: 5px; margin-bottom: 6px; }
+.ms-row-top select, .ms-row-top input { font-size: 12px; padding: 5px 7px; }
+.ms-area { flex: 1; min-width: 0; }
+.ms-type { width: 74px; flex-shrink: 0; }
+.ms-dims { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.ms-dims input[type=number] {
+  width: 54px; font-size: 12px; padding: 5px 5px; text-align: right;
+  font-variant-numeric: tabular-nums; -moz-appearance: textfield;
+}
+.ms-dims input[type=number]::-webkit-inner-spin-button { display: none; }
+.ms-x-sign { color: var(--text3); font-size: 11px; margin: 0 -1px; }
+.ms-unit { color: var(--text2); font-size: 10px; margin-left: -1px; }
+.ms-out {
+  margin-left: auto; display: flex; align-items: baseline; gap: 5px;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.ms-out b { font-size: 14px; font-weight: 800; color: var(--green); }
+.ms-out span { font-size: 10px; color: var(--text2); }
+.ms-row-acts { display: flex; align-items: center; gap: 5px; margin-top: 6px; }
+.ms-note {
+  flex: 1; min-width: 0; font-size: 11px; padding: 4px 6px;
+  background: transparent; border: none; border-bottom: 1px solid var(--border2);
+  border-radius: 0; color: var(--text2);
+}
+.ms-btn {
+  font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px;
+  border: 1px solid var(--border2); background: var(--surface);
+  color: var(--text); cursor: pointer; font-family: inherit; white-space: nowrap;
+  transition: all 0.12s;
+}
+.ms-btn:hover { background: var(--surface3); }
+.ms-btn.use { color: var(--green); border-color: var(--green-border); }
+.ms-btn.use:hover { background: var(--green-dim); }
+.ms-btn.del { color: var(--text3); padding: 4px 8px; }
+.ms-btn.del:hover { color: var(--red); background: var(--red-dim); border-color: rgba(160,104,88,0.3); }
+.ms-add {
+  width: 100%; border: 1px dashed var(--border2); background: none; color: var(--text2);
+  border-radius: 8px; padding: 9px; font-size: 12px; cursor: pointer; font-family: inherit;
+}
+.ms-add:hover { border-color: var(--green-border); color: var(--green); background: var(--green-dim); }
+.ms-sum { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 11.5px; color: var(--text2); }
+.ms-sum b { font-size: 13px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
+.ms-sum .ms-chip {
+  background: var(--surface); border: 1px solid var(--border2); border-radius: 999px;
+  padding: 2px 9px; font-size: 11px; white-space: nowrap;
+}
+.ms-grp-title {
+  font-size: 10px; font-weight: 700; color: var(--text3); letter-spacing: 0.08em;
+  margin: 10px 0 5px; padding-bottom: 3px; border-bottom: 1px solid var(--border);
+}
+.ms-grp-title:first-child { margin-top: 0; }
+
+/* 送到報價：分類選單 */
+.ms-pick-popup {
+  position: fixed; background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--radius); box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+  padding: 8px; z-index: 9999; width: 250px; max-height: 60vh; overflow-y: auto;
+}
+.ms-pick-popup .msp-t { font-size: 10px; font-weight: 700; color: var(--text3); letter-spacing: 0.07em; padding: 4px 6px 6px; }
+.ms-pick-popup button {
+  display: block; width: 100%; text-align: left; background: none; border: none;
+  padding: 6px 8px; border-radius: 6px; font-size: 12px; color: var(--text);
+  cursor: pointer; font-family: inherit;
+}
+.ms-pick-popup button:hover { background: var(--green-dim); color: var(--green); }
+.ms-pick-popup .msp-id { color: var(--text3); font-size: 10px; margin-right: 6px; font-family: ui-monospace,Menlo,Consolas,monospace; }
+
+@media print { .measure-panel, .measure-tab { display: none !important; } }
+
 /* ── CARDS ── */
 .card {
   background: var(--surface);
@@ -835,6 +954,7 @@ tr.row-drag-over { box-shadow: inset 0 -2px 0 var(--blue), inset 0 0 0 1px rgba(
   }
   .cost-col { display:none !important; }
   .lock-th, .lock-td { display:none !important; }
+  .action-th, .action-td, .lock-btn { display:none !important; }
   .topbar,.action-bar,.add-btn,.rm-btn,.copy-btn,.area-rm-btn,.profit-row,.btn,.modal-bg,
   .a03-sub-add-row,.a03-add-sub-btn,
   .print-hide-profit,
@@ -931,7 +1051,8 @@ body.print-client .sub-cell { visibility:hidden !important; }
 body.print-client [data-hide-client] { display:none !important; }
 /* 客戶版隱藏操作欄 */
 body.print-client .lock-td { display:none !important; }
-body.print-client .action-td { display:none !important; }
+body.print-client .action-td, body.print-client .action-th,
+body.print-client .lock-th, body.print-client .lock-btn { display:none !important; }
 body.print-client .a03-sub-add-row { display:none !important; }
 body.print-client .a03-add-sub-btn { display:none !important; }
 body.print-client .area-rm-btn { display:none !important; }
@@ -950,7 +1071,8 @@ body.print-client .area-rm-btn { display:none !important; }
   body.print-client .sub-cell { visibility:hidden !important; }
   body.print-client [data-hide-client] { display:none !important; }
   body.print-client .lock-td { display:none !important; }
-  body.print-client .action-td { display:none !important; }
+  body.print-client .action-td, body.print-client .action-th,
+  body.print-client .lock-th, body.print-client .lock-btn { display:none !important; }
   body.print-client .a03-sub-add-row { display:none !important; }
   body.print-client .metric:has(.metric-label) { }
 }
@@ -1516,13 +1638,13 @@ function buildSections(){
                 <th class="cost-col" style="min-width:88px;color:#e84e88">成本（元）</th>
                 <th style="min-width:96px">總價</th>
                 <th class="spec-col" style="min-width:76px">${sec.id==='A01'?'說明':'規格'}</th>
-                <th></th>
+                <th class="action-th"></th>
               </tr></thead>
               <tbody id="tbody-${sec.id}"></tbody>
             </table>
           </div>
           <button class="add-btn" onclick="${sec.id==='A03'?`showA03Picker('${sec.id}')`: `addRow('${sec.id}')`}">＋ 新增項目</button>
-          ${sec.group==='A'?`<button class="add-btn area-btn" onclick="showAreaPicker('${sec.id}',this)">📍 標示區域</button>`:''}
+          ${(sec.group!=='E'&&sec.group!=='F')?`<button class="add-btn area-btn" onclick="showAreaPicker('${sec.id}',this)">📍 標示區域</button>`:''}
         </div>`;
       cont.appendChild(el);
     });
@@ -1789,7 +1911,7 @@ function a03EnsureCatGroup(secId, cat){
   // Category header row
   const hdr=document.createElement('tr');
   hdr.className='a03-cat-hdr'; hdr.dataset.cat=cat;
-  hdr.innerHTML=`<td class="lock-td"></td><td colspan="7" class="a03-cat-label">⬡ ${cat}</td><td></td>`;
+  hdr.innerHTML=`<td class="lock-td"></td><td colspan="7" class="a03-cat-label">⬡ ${cat}</td><td class="action-td"></td>`;
   tbody.appendChild(hdr);
   // Sub-add row
   const subAdd=document.createElement('tr');
@@ -2489,6 +2611,7 @@ function getQuoteData(){
     sigName:document.getElementById('sig-name').value,
     sigDate:document.getElementById('sig-date').value,
     rows, date:new Date().toLocaleDateString('zh-TW'),
+    measure:_measure,                                                          // 量尺計算資料
     quoteTotal:(document.getElementById('quote-total')||{}).textContent||'',   // 存檔當下的含稅總價（歷史清單顯示用）
     costTotal:(document.getElementById('cost-total')||{}).textContent||''
   };
@@ -2843,6 +2966,202 @@ function printClient(){
   setTimeout(()=>document.body.classList.remove('print-client'), 1000);
 }
 
+// ══════════════════════════════════════════════
+//  量尺計算面板
+//  輸入公分 → 自動換算 m² / 坪 / 米，可一鍵送進任一報價分類
+// ══════════════════════════════════════════════
+const PING_PER_M2 = 1/3.305785;           // 1 m² = 0.3025 坪
+const MS_TYPES = {
+  floor:  { label:'地坪', dims:['長','寬'], unit:'坪' },
+  wall:   { label:'壁面', dims:['長','高'], unit:'坪' },
+  ceil:   { label:'天花', dims:['長','寬'], unit:'坪' },
+  len:    { label:'長度', dims:['長'],      unit:'m'  },
+  count:  { label:'數量', dims:[],          unit:'式' },
+};
+let _measure = [];        // [{id, area, type, a, b, n, note}]
+
+function msNewRow(){ return { id:Date.now()+Math.random().toString(36).slice(2,6), area:AREA_NAMES[0], type:'floor', a:'', b:'', n:1, note:'' }; }
+
+// 一列的計算結果
+function msCalc(r){
+  const a=parseFloat(r.a)||0, b=parseFloat(r.b)||0, n=parseFloat(r.n)||1;
+  if(r.type==='count') return { val:n, unit:'式', m2:0, ping:0 };
+  if(r.type==='len')   return { val:+(a/100*n).toFixed(2), unit:'m', m2:0, ping:0 };
+  const m2 = (a/100)*(b/100)*n;
+  return { val:+(m2*PING_PER_M2).toFixed(2), unit:'坪', m2:+m2.toFixed(2), ping:+(m2*PING_PER_M2).toFixed(2) };
+}
+
+function measureToggle(open){
+  const p=document.getElementById('measure-panel');
+  const want = open===undefined ? !p.classList.contains('open') : open;
+  p.classList.toggle('open', want);
+  document.body.classList.toggle('measure-open', want);
+  try{ localStorage.setItem('ms_open', want?'1':'0'); }catch(e){}
+  if(want && !_measure.length){ _measure.push(msNewRow()); }
+  measureRender();
+}
+
+function measureAddRow(area){
+  const r=msNewRow();
+  if(area) r.area=area;
+  // 沿用上一列的區域，連續量同一個空間時比較順手
+  else if(_measure.length) r.area=_measure[_measure.length-1].area;
+  _measure.push(r);
+  measureRender(); measureSave();
+  setTimeout(()=>{
+    const el=document.querySelector(`.ms-row[data-id="${r.id}"] input[type=number]`);
+    el?.focus();
+  },30);
+}
+function measureDelRow(id){ _measure=_measure.filter(r=>r.id!==id); measureRender(); measureSave(); }
+function measureSet(id, key, val){
+  const r=_measure.find(x=>x.id===id); if(!r) return;
+  r[key]=val;
+  if(key==='type') measureRender(); else measureRenderFoot(), measureRenderOut(id);
+  measureSave();
+}
+function measureRenderOut(id){
+  const r=_measure.find(x=>x.id===id); if(!r) return;
+  const out=document.querySelector(`.ms-row[data-id="${id}"] .ms-out`);
+  if(out){ const c=msCalc(r); out.innerHTML=`<b>${c.val}</b><span>${c.unit}</span>${c.m2?`<span>· ${c.m2}m²</span>`:''}`; }
+}
+
+function measureRender(){
+  const body=document.getElementById('ms-body'); if(!body) return;
+  if(!_measure.length){
+    body.innerHTML='<div class="ms-empty">尚未輸入尺寸<br>按右上角「＋ 新增」開始丈量</div>'
+      +'<button class="ms-add" onclick="measureAddRow()">＋ 新增一列</button>';
+    measureRenderFoot(); return;
+  }
+  const esc=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const areaOpts=a=>[...new Set([...AREA_NAMES,a].filter(Boolean))]
+    .map(x=>`<option${x===a?' selected':''}>${esc(x)}</option>`).join('')
+    +`<option value="__c__">✏️ 自訂…</option>`;
+  // 依區域分組顯示
+  let html='', lastArea=null;
+  _measure.forEach(r=>{
+    if(r.area!==lastArea){ html+=`<div class="ms-grp-title">📍 ${esc(r.area||'未分區')}</div>`; lastArea=r.area; }
+    const t=MS_TYPES[r.type]||MS_TYPES.floor, c=msCalc(r);
+    let dims='';
+    if(t.dims.length>=1) dims+=`<input type="number" inputmode="decimal" min="0" step="1" placeholder="${t.dims[0]}" value="${esc(r.a)}" oninput="measureSet('${r.id}','a',this.value)"><span class="ms-unit">cm</span>`;
+    if(t.dims.length>=2) dims+=`<span class="ms-x-sign">×</span><input type="number" inputmode="decimal" min="0" step="1" placeholder="${t.dims[1]}" value="${esc(r.b)}" oninput="measureSet('${r.id}','b',this.value)"><span class="ms-unit">cm</span>`;
+    dims+=`${t.dims.length?'<span class="ms-x-sign">×</span>':'<span class="ms-unit">數量</span>'}<input type="number" inputmode="decimal" min="0" step="1" placeholder="數量" value="${esc(r.n)}" oninput="measureSet('${r.id}','n',this.value)" style="width:42px" title="數量/面數">`;
+    html+=`<div class="ms-row" data-id="${r.id}">
+      <div class="ms-row-top">
+        <select class="ms-area" onchange="measureAreaChange('${r.id}',this)">${areaOpts(r.area)}</select>
+        <select class="ms-type" onchange="measureSet('${r.id}','type',this.value)">
+          ${Object.entries(MS_TYPES).map(([k,v])=>`<option value="${k}"${k===r.type?' selected':''}>${v.label}</option>`).join('')}
+        </select>
+      </div>
+      <div class="ms-dims">${dims}
+        <span class="ms-out"><b>${c.val}</b><span>${c.unit}</span>${c.m2?`<span>· ${c.m2}m²</span>`:''}</span>
+      </div>
+      <div class="ms-row-acts">
+        <input type="text" class="ms-note" placeholder="備註（例：電視牆）" value="${esc(r.note)}" oninput="measureSet('${r.id}','note',this.value)">
+        <button class="ms-btn use" onclick="measureUse('${r.id}',this)">→ 報價</button>
+        <button class="ms-btn del" onclick="measureDelRow('${r.id}')" title="刪除">×</button>
+      </div>
+    </div>`;
+  });
+  html+='<button class="ms-add" onclick="measureAddRow()">＋ 新增一列</button>';
+  body.innerHTML=html;
+  measureRenderFoot();
+}
+function measureAreaChange(id, sel){
+  if(sel.value==='__c__'){
+    const v=prompt('輸入自訂區域名稱：');
+    const r=_measure.find(x=>x.id===id);
+    if(v&&v.trim()){ r.area=v.trim(); } else { sel.value=r.area; return; }
+  } else measureSet(id,'area',sel.value);
+  // 依區域重新分組排序
+  const order={}; AREA_NAMES.forEach((a,i)=>order[a]=i);
+  _measure.sort((x,y)=>(order[x.area]??99)-(order[y.area]??99));
+  measureRender(); measureSave();
+}
+
+function measureRenderFoot(){
+  const foot=document.getElementById('ms-foot'); if(!foot) return;
+  let ping=0,m2=0,len=0,cnt=0;
+  _measure.forEach(r=>{ const c=msCalc(r); ping+=c.ping; m2+=c.m2; if(c.unit==='m') len+=c.val; if(c.unit==='式') cnt+=c.val; });
+  const chips=[];
+  if(m2>0)  chips.push(`<span class="ms-chip">${m2.toFixed(2)} m²</span>`);
+  if(len>0) chips.push(`<span class="ms-chip">${len.toFixed(2)} m</span>`);
+  if(cnt>0) chips.push(`<span class="ms-chip">${cnt} 式</span>`);
+  foot.innerHTML=`<div class="ms-sum">
+    <span>合計</span><b>${ping.toFixed(2)} 坪</b>${chips.join('')}
+    <button class="ms-btn" style="margin-left:auto" onclick="measureFillArea()" title="把合計坪數填進上方「坪數」欄">↑ 填入坪數</button>
+  </div>`;
+}
+function measureFillArea(){
+  const ping=_measure.reduce((a,r)=>a+msCalc(r).ping,0);
+  if(ping<=0){ alert('目前沒有可換算的坪數'); return; }
+  document.getElementById('area').value=ping.toFixed(1);
+  recalc();
+}
+
+// 「→ 報價」：選一個分類，把這列加成報價項目
+let _msUseId=null;
+function measureUse(id, btn){
+  _msUseId=id; msClosePick();
+  const pop=document.createElement('div');
+  pop.className='ms-pick-popup'; pop.id='ms-pick-popup';
+  let h='<div class="msp-t">送到哪個分類？</div>';
+  GROUPS.forEach(g=>{
+    if(g.id==='E'||g.id==='F') return;
+    const secs=SECTIONS.filter(x=>x.group===g.id&&x.id!=='E01');
+    if(!secs.length) return;
+    h+=`<div class="msp-t" style="padding-top:8px">${g.icon} ${g.label}</div>`;
+    secs.forEach(sec=>{
+      h+=`<button onclick="msDoUse('${sec.id}')"><span class="msp-id">${sec.dispId||sec.id}</span>${sec.label}</button>`;
+    });
+  });
+  pop.innerHTML=h;
+  document.body.appendChild(pop);
+  const rect=btn.getBoundingClientRect();
+  pop.style.top=Math.max(8, Math.min(rect.bottom+4, window.innerHeight-pop.offsetHeight-8))+'px';
+  pop.style.left=Math.max(8, rect.right-pop.offsetWidth)+'px';
+  setTimeout(()=>document.addEventListener('click', _msPickHandler),0);
+}
+function _msPickHandler(e){ if(!e.target.closest('#ms-pick-popup')) msClosePick(); }
+function msClosePick(){ document.getElementById('ms-pick-popup')?.remove(); document.removeEventListener('click',_msPickHandler); }
+function msDoUse(secId){
+  const r=_measure.find(x=>x.id===_msUseId); msClosePick();
+  if(!r) return;
+  const c=msCalc(r), t=MS_TYPES[r.type]||MS_TYPES.floor;
+  const sec=SECTIONS.find(x=>x.id===secId);
+  const name=`${r.area}${t.label}`;
+  const note=[r.note, c.m2?`${c.m2}m²`:''].filter(Boolean).join('　');
+  // 區域標示：該分類若還沒標過這個區域，先插一列區域標示
+  const tbody=document.getElementById('tbody-'+secId);
+  const hasArea=[...tbody.querySelectorAll('tr')].some(tr=>tr.dataset.areaLabel===r.area);
+  if(!hasArea && r.area && secId!=='A03') insertAreaLabel(secId, r.area);
+  if(secId==='A03'){
+    a03AddItemInGroup(secId, Object.keys(A03_CATS)[0], { item:name, qty:c.val, unit:c.unit, note });
+  } else {
+    addRow(secId, { item:name, qty:c.val, unit:c.unit, note });
+  }
+  // 項目名稱 / 單位進自訂項目庫，下次直接選得到
+  libAdd('items',secId,name); libAdd('units',secId,c.unit);
+  recalc();
+  const body=document.getElementById('body-'+secId), caret=document.getElementById('caret-'+secId);
+  if(body && body.style.display==='none'){ body.style.display=''; caret?.classList.add('open'); }
+  document.getElementById('sec-'+secId)?.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+// 存檔 / 載入（跟著報價一起存，雲端同步自動沿用）
+function measureSave(){ try{ localStorage.setItem('ms_draft', JSON.stringify(_measure)); }catch(e){} }
+function measureLoad(data){
+  _measure = Array.isArray(data) ? data.map(r=>({...msNewRow(), ...r})) : [];
+  measureRender();
+}
+function measureInit(){
+  if(!_measure.length){
+    try{ const d=JSON.parse(localStorage.getItem('ms_draft')||'[]'); if(Array.isArray(d)) _measure=d.map(r=>({...msNewRow(),...r})); }catch(e){}
+  }
+  measureRender();
+  try{ if(localStorage.getItem('ms_open')==='1') measureToggle(true); }catch(e){}
+}
+
 // ══ 自訂項目庫（items / specs / units / A03 子項目）：跨報價、跨裝置通用 ══
 // 存於 localStorage custom_lib_v1，並同步到 Firebase custom_lib
 const LIB_KEY='custom_lib_v1';
@@ -3129,6 +3448,7 @@ function loadQuote(data){
   // manual
   document.getElementById('client-name').value=data.client||'';
   if(!parseCaseNo(data.caseNo)) autoCaseNo(true);   // 舊紀錄沒有案號 → 依地址/日期產生
+  measureLoad(data.measure);
   document.getElementById('client-phone').value=data.phone||'';
   document.getElementById('client-email').value=data.email||'';
   document.getElementById('project-addr').value=data.addr||'';
@@ -3250,6 +3570,7 @@ function clearAll(){
     .forEach(id=>{ document.getElementById(id).value=''; });
   applyDefaultQuoteDate(true);
   autoCaseNo(true);
+  _measure=[]; measureRender(); measureSave();
   document.getElementById('area').value=30;
   clearSig(); recalc();
 }
@@ -3451,6 +3772,7 @@ document.getElementById('quote-date').textContent='報價日期：'+todayStr();
 applyDefaultQuoteDate(false);
 autoCaseNo();
 
+measureInit();                 // 量尺面板
 libApply(libMigrateLocal());   // 先套用本機的自訂項目庫
 libHarvestLocalHistory();      // 從存過的每一場報價裡補齊自訂項目
 buildSections();
@@ -3556,5 +3878,20 @@ function showInstallGuide(){
   #cost-dialog::backdrop{ background:rgba(0,0,0,0.45); }
   @media print { #cost-dialog { display:none !important; } }
 </style>
+<!-- ══ 量尺計算面板 ══ -->
+<button class="measure-tab" onclick="measureToggle(true)" title="量尺計算">📐 量尺</button>
+<aside class="measure-panel" id="measure-panel">
+  <div class="ms-head">
+    <div style="flex:1">
+      <div class="ms-head-title">📐 量尺計算</div>
+      <div class="ms-head-sub">輸入公分，自動換算坪數並送進報價</div>
+    </div>
+    <button class="ms-btn" onclick="measureAddRow()">＋ 新增</button>
+    <button class="ms-x" onclick="measureToggle(false)" title="關閉">×</button>
+  </div>
+  <div class="ms-body" id="ms-body"></div>
+  <div class="ms-foot" id="ms-foot"></div>
+</aside>
+
 </body>
 </html>
