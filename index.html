@@ -133,6 +133,25 @@ body {
 @media print { .list-wrap { display: none !important; } }
 
 /* 品牌折數後台 */
+.br-cat { margin-bottom: 18px; }
+.br-cat:last-child { margin-bottom: 4px; }
+.br-cat-hd {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 9px;
+  padding-bottom: 5px; border-bottom: 1px solid var(--border2);
+}
+.br-cat-name { font-size: 12.5px; font-weight: 700; letter-spacing: 0.04em; }
+.br-cat-n {
+  font-size: 10.5px; font-weight: 600; color: var(--text2);
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 999px; padding: 0 8px;
+}
+.br-cat-add {
+  margin-left: auto; font-size: 11px; font-weight: 600; padding: 3px 11px;
+  border-radius: 6px; border: 1px solid var(--border2); background: var(--surface);
+  color: var(--text2); cursor: pointer; font-family: inherit; white-space: nowrap;
+}
+.br-cat-add:hover { color: var(--green); border-color: var(--green-border); background: var(--green-dim); }
+.br-cat-empty { font-size: 12px; color: var(--text3); padding: 6px 2px 10px; }
 .br-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
 .br-row input[type=text] { flex: 1; min-width: 0; font-size: 13px; }
 .br-row input[type=number] { width: 78px; font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
@@ -3363,10 +3382,43 @@ function loadCustomLibFromCloud(){
 //  成本 = 定價 × 折數（例：TOTO 0.62）
 // ══════════════════════════════════════════════
 const BRAND_KEY='brand_rates_v1';
-const BRAND_DEFAULTS={ 'TOTO':0.62, 'KOHLER':0.55, 'caesar':0.65, 'OVO':0.6, 'Panasonic':0.75, '台達':0.8 };
+const BRAND_CATS=['衛浴','廚具','家電'];
+const BRAND_DEFAULTS={
+  '衛浴': { 'TOTO':0.62, 'KOHLER':0.55, 'caesar':0.65, 'OVO':0.6 },
+  '廚具': { '櫻花':0.7, '林內':0.7, 'SVAGO':0.65 },
+  '家電': { 'Panasonic':0.75, '台達':0.8, '大金':0.75 },
+};
+// 舊版是扁平的 {品牌:折數}，自動搬成三大類
+function migrateBrandRates(v){
+  if(!v||typeof v!=='object') return null;
+  const isNested=Object.values(v).some(x=>x&&typeof x==='object');
+  if(isNested){
+    const out={}; BRAND_CATS.forEach(c=>out[c]={...(v[c]||{})});
+    Object.entries(v).forEach(([k,o])=>{ if(o&&typeof o==='object'&&!BRAND_CATS.includes(k)) out['衛浴']={...out['衛浴'],...o}; });
+    return out;
+  }
+  const out={}; BRAND_CATS.forEach(c=>out[c]={});
+  const appliance=['panasonic','台達','大金','日立','hitachi','mitsubishi','三菱','lg','samsung','國際牌'];
+  const kitchen=['櫻花','林內','rinnai','svago','喜特麗','莊頭北','best','bosch','豪山'];
+  Object.entries(v).forEach(([k,rate])=>{
+    const lk=String(k).toLowerCase();
+    const cat = appliance.some(x=>lk.includes(x)) ? '家電' : kitchen.some(x=>lk.includes(x)) ? '廚具' : '衛浴';
+    out[cat][k]=+rate;
+  });
+  return out;
+}
 function getBrandRates(){
-  try{ const v=JSON.parse(localStorage.getItem(BRAND_KEY)||'null'); if(v&&typeof v==='object') return v; }catch(e){}
-  return {...BRAND_DEFAULTS};
+  try{
+    const v=migrateBrandRates(JSON.parse(localStorage.getItem(BRAND_KEY)||'null'));
+    if(v) return v;
+  }catch(e){}
+  return JSON.parse(JSON.stringify(BRAND_DEFAULTS));
+}
+// 攤平成 {品牌:折數}，用來比對規格欄
+function flatBrandRates(){
+  const r=getBrandRates(), out={};
+  BRAND_CATS.forEach(c=>Object.entries(r[c]||{}).forEach(([k,v])=>{ out[k]=+v; }));
+  return out;
 }
 function saveBrandRates(r){
   try{ localStorage.setItem(BRAND_KEY,JSON.stringify(r)); }catch(e){}
@@ -3375,16 +3427,19 @@ function saveBrandRates(r){
 // 規格文字 → 折數（不分大小寫；找不到回傳 null）
 function brandRateOf(spec){
   spec=(spec||'').trim(); if(!spec) return null;
-  const r=getBrandRates();
+  const r=flatBrandRates();
   if(r[spec]!=null) return +r[spec];
   const key=Object.keys(r).find(k=>k.toLowerCase()===spec.toLowerCase());
   return key?+r[key]:null;
 }
-function brandNameOf(spec){
-  spec=(spec||'').trim(); if(!spec) return '';
+// 這個品牌屬於哪一大類（顯示用）
+function brandCatOf(spec){
+  spec=(spec||'').trim().toLowerCase(); if(!spec) return '';
   const r=getBrandRates();
-  if(r[spec]!=null) return spec;
-  return Object.keys(r).find(k=>k.toLowerCase()===spec.toLowerCase())||'';
+  for(const c of BRAND_CATS){
+    if(Object.keys(r[c]||{}).some(k=>k.toLowerCase()===spec)) return c;
+  }
+  return '';
 }
 // 建列時產生「定價」小欄（有品牌才顯示）
 function brandListField(d){
@@ -3393,7 +3448,7 @@ function brandListField(d){
   return `<div class="list-wrap${on?' on':''}">
     <span class="lw-tag">定價</span>
     <input type="number" class="list-inp" inputmode="decimal" min="0" step="100" value="${(d&&d.list)||''}" placeholder="—" oninput="applyListPrice(this)">
-    <span class="lw-rate" title="此品牌折數">${on?'×'+rate:''}</span>
+    <span class="lw-rate" title="${on?brandCatOf(d.spec)+' '+(d.spec||'')+' '+Math.round(rate*100)+'折':'此品牌折數'}">${on?'×'+rate:''}</span>
   </div>`;
 }
 // 規格變更後，重新顯示／隱藏定價欄並重算成本
@@ -3405,7 +3460,10 @@ function syncBrandField(tr, recompute){
   const rate=brandRateOf(spec);
   wrap.classList.toggle('on', rate!=null);
   const rEl=wrap.querySelector('.lw-rate');
-  if(rEl) rEl.textContent = rate!=null?('×'+rate):'';
+  if(rEl){
+    rEl.textContent = rate!=null?('×'+rate):'';
+    rEl.title = rate!=null?`${brandCatOf(spec)} ${spec} ${Math.round(rate*100)}折`:'此品牌折數';
+  }
   if(recompute && rate!=null){
     const li=wrap.querySelector('.list-inp');
     if(li && parseFloat(li.value)>0) applyListPrice(li);
@@ -3442,49 +3500,72 @@ function showBrandAdmin(){
   if(!dlg){ alert('找不到品牌折數對話框'); return; }
   brBuild(); dlg.showModal();
 }
+const BRAND_ICONS={ '衛浴':'🚿', '廚具':'🍳', '家電':'🔌' };
+function brRowHtml(name, pct){
+  const esc=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  return `<div class="br-row">
+    <input type="text" value="${esc(name)}" placeholder="品牌名稱（要和規格欄一致）" data-br-name>
+    <input type="number" min="0" max="100" step="1" value="${pct}" data-br-rate>
+    <span class="br-suf">折　＝ ×${(pct/100).toFixed(2)}</span>
+    <button class="br-del" onclick="this.closest('.br-row').remove()" title="刪除">×</button>
+  </div>`;
+}
 function brBuild(){
   const body=document.getElementById('brand-body'); if(!body) return;
   const r=getBrandRates();
-  const esc=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
-  const keys=Object.keys(r);
-  body.innerHTML = (keys.length?keys:[]).map((k,i)=>`<div class="br-row" data-i="${i}">
-      <input type="text" value="${esc(k)}" placeholder="品牌名稱（要和規格欄一致）" data-br-name>
-      <input type="number" min="0" max="100" step="1" value="${+(r[k]*100).toFixed(0)}" data-br-rate>
-      <span class="br-suf">折　＝ ×${(+r[k]).toFixed(2)}</span>
-      <button class="br-del" onclick="this.closest('.br-row').remove()" title="刪除">×</button>
-    </div>`).join('')
-    || '<div style="color:var(--text3);font-size:13px;padding:16px 0;text-align:center">尚未設定品牌，按下方「＋ 新增品牌」</div>';
+  body.innerHTML = BRAND_CATS.map(cat=>{
+    const brands=Object.entries(r[cat]||{});
+    return `<div class="br-cat" data-cat="${cat}">
+      <div class="br-cat-hd">
+        <span class="br-cat-name">${BRAND_ICONS[cat]||''} ${cat}</span>
+        <span class="br-cat-n">${brands.length}</span>
+        <button class="br-cat-add" onclick="brAddRow('${cat}')">＋ 新增品牌</button>
+      </div>
+      <div class="br-cat-body">${
+        brands.map(([k,v])=>brRowHtml(k, +(v*100).toFixed(0))).join('')
+        || '<div class="br-cat-empty">尚無品牌</div>'
+      }</div>
+    </div>`;
+  }).join('');
   body.oninput=e=>{
     const row=e.target.closest('.br-row'); if(!row) return;
     const v=parseFloat(row.querySelector('[data-br-rate]').value);
     row.querySelector('.br-suf').textContent = isNaN(v)?'折':`折　＝ ×${(v/100).toFixed(2)}`;
   };
 }
-function brAddRow(){
-  const body=document.getElementById('brand-body');
-  if(body.querySelector('div[style]')) body.innerHTML='';
-  const div=document.createElement('div');
-  div.className='br-row';
-  div.innerHTML=`<input type="text" value="" placeholder="品牌名稱（要和規格欄一致）" data-br-name>
-    <input type="number" min="0" max="100" step="1" value="60" data-br-rate>
-    <span class="br-suf">折　＝ ×0.60</span>
-    <button class="br-del" onclick="this.closest('.br-row').remove()" title="刪除">×</button>`;
-  body.appendChild(div);
-  div.querySelector('input')?.focus();
+function brAddRow(cat){
+  const wrap=document.querySelector(`.br-cat[data-cat="${cat}"] .br-cat-body`); if(!wrap) return;
+  wrap.querySelector('.br-cat-empty')?.remove();
+  wrap.insertAdjacentHTML('beforeend', brRowHtml('', 60));
+  wrap.lastElementChild.querySelector('input')?.focus();
+  brCount();
+}
+function brCount(){
+  document.querySelectorAll('.br-cat').forEach(c=>{
+    const n=c.querySelectorAll('.br-row').length;
+    c.querySelector('.br-cat-n').textContent=n;
+  });
 }
 function brSave(){
-  const out={};
-  document.querySelectorAll('#brand-body .br-row').forEach(row=>{
-    const name=row.querySelector('[data-br-name]').value.trim();
-    const pct=parseFloat(row.querySelector('[data-br-rate]').value);
-    if(!name||isNaN(pct)||pct<=0) return;
-    out[name]= +(pct/100).toFixed(4);
+  const out={}; BRAND_CATS.forEach(c=>out[c]={});
+  let dup=[];
+  document.querySelectorAll('.br-cat').forEach(c=>{
+    const cat=c.dataset.cat;
+    c.querySelectorAll('.br-row').forEach(row=>{
+      const name=row.querySelector('[data-br-name]').value.trim();
+      const pct=parseFloat(row.querySelector('[data-br-rate]').value);
+      if(!name||isNaN(pct)||pct<=0) return;
+      // 同名品牌只能存在一處，避免比對時結果不定
+      const other=BRAND_CATS.find(x=>x!==cat && Object.keys(out[x]).some(k=>k.toLowerCase()===name.toLowerCase()));
+      if(other){ dup.push(`${name}（已在「${other}」）`); return; }
+      out[cat][name]= +(pct/100).toFixed(4);
+    });
   });
   saveBrandRates(out);
-  // 品牌名稱也加進各分類的規格選單，方便直接選
   refreshAllBrandRows();
   document.getElementById('brand-dialog').close();
-  alert('✅ 品牌折數已儲存\n規格欄選到這些品牌時，輸入定價就會自動算成本。');
+  alert('✅ 品牌折數已儲存'+(dup.length?`\n⚠️ 重複未存入：${dup.join('、')}`:'')
+    +'\n規格欄選到這些品牌時，輸入定價就會自動算成本。');
 }
 function syncAllBrandFields(){ document.querySelectorAll('tbody tr').forEach(tr=>syncBrandField(tr)); }
 function loadBrandRatesFromCloud(){
@@ -4083,15 +4164,15 @@ function showInstallGuide(){
     <button onclick="document.getElementById('brand-dialog').close()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:2px 8px;border-radius:6px">‹</button>
     <div style="flex:1">
       <div style="font-size:15px;font-weight:700">🏷️ 品牌折數</div>
-      <div style="font-size:11px;color:var(--text2)">規格欄選到品牌時，輸入定價自動算出成本</div>
+      <div style="font-size:11px;color:var(--text2)">衛浴／廚具／家電，規格欄選到品牌就自動算成本</div>
     </div>
     <button onclick="brSave()" style="background:var(--green);color:#0a1f12;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">💾 儲存</button>
   </div>
   <div id="brand-body" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px"></div>
   <div style="flex-shrink:0;border-top:1px solid var(--border2);padding:12px 16px;background:var(--surface2)">
-    <button class="btn btn-ghost" style="width:100%" onclick="brAddRow()">＋ 新增品牌</button>
-    <div style="font-size:11px;color:var(--text2);margin-top:8px;line-height:1.6">
-      折數填 <b>62</b> 代表 62 折（成本 = 定價 × 0.62）。品牌名稱要和規格欄裡的文字一樣，例如 <b>TOTO</b>、<b>KOHLER</b>。
+    <div style="font-size:11px;color:var(--text2);line-height:1.7">
+      折數填 <b>62</b> 代表 62 折（成本 = 定價 × 0.62）。品牌名稱要和規格欄裡的文字一樣，例如 <b>TOTO</b>、<b>櫻花</b>。<br>
+      三大類只是方便分類管理，<b>任何分類的項目</b>只要規格選到這裡的品牌都會自動套用。
     </div>
   </div>
 </dialog>
