@@ -113,6 +113,36 @@ body {
 /* ── LAYOUT ── */
 .container { max-width: 940px; margin: 0 auto; padding: 20px 16px 80px; }
 
+/* ══ 品牌折數：定價 → 成本 ══ */
+.list-wrap {
+  display: none; align-items: center; gap: 3px; margin-top: 3px;
+  font-size: 10px; color: var(--text2); white-space: nowrap;
+}
+.list-wrap.on { display: flex; }
+.list-wrap .lw-tag { color: var(--text3); font-size: 9.5px; letter-spacing: 0.03em; }
+.list-wrap input.list-inp {
+  width: 56px; font-size: 11px; padding: 2px 4px; text-align: right;
+  background: var(--surface); border: 1px solid var(--border2); border-radius: 4px;
+  color: var(--text); font-variant-numeric: tabular-nums; -moz-appearance: textfield;
+}
+.list-wrap input.list-inp::-webkit-inner-spin-button { display: none; }
+.list-wrap .lw-rate {
+  color: var(--amber); font-weight: 700; font-size: 9.5px;
+  background: var(--amber-dim); border-radius: 3px; padding: 0 4px; cursor: help;
+}
+@media print { .list-wrap { display: none !important; } }
+
+/* 品牌折數後台 */
+.br-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.br-row input[type=text] { flex: 1; min-width: 0; font-size: 13px; }
+.br-row input[type=number] { width: 78px; font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+.br-row .br-suf { font-size: 11px; color: var(--text2); white-space: nowrap; width: 66px; }
+.br-row .br-del {
+  background: none; border: none; cursor: pointer; color: var(--text3);
+  font-size: 17px; line-height: 1; padding: 2px 7px; border-radius: 5px; font-family: inherit;
+}
+.br-row .br-del:hover { color: var(--red); background: var(--red-dim); }
+
 /* ══ 量尺計算面板（固定於右側，捲動時跟著） ══ */
 .measure-tab {
   position: fixed; right: 0; top: 50%; transform: translateY(-50%);
@@ -129,7 +159,7 @@ body {
 body.measure-open .measure-tab { display: none; }
 
 .measure-panel {
-  position: fixed; top: 0; right: 0; bottom: 0; width: 376px; max-width: 100vw;
+  position: fixed; top: 0; right: 0; bottom: 0; width: 396px; max-width: 100vw;
   background: var(--surface); border-left: 1px solid var(--border2);
   box-shadow: -6px 0 28px rgba(0,0,0,0.12);
   z-index: 890; display: flex; flex-direction: column;
@@ -138,8 +168,8 @@ body.measure-open .measure-tab { display: none; }
 }
 .measure-panel.open { transform: none; }
 @media (min-width: 1360px) {
-  body.measure-open .container { margin-right: 376px; }
-  body.measure-open .topbar { padding-right: calc(376px + 16px); }
+  body.measure-open .container { margin-right: 396px; }
+  body.measure-open .topbar { padding-right: calc(396px + 16px); }
 }
 .ms-head {
   display: flex; align-items: center; gap: 10px; flex-shrink: 0;
@@ -165,8 +195,18 @@ body.measure-open .measure-tab { display: none; }
 }
 .ms-row-top { display: flex; align-items: center; gap: 5px; margin-bottom: 6px; }
 .ms-row-top select, .ms-row-top input { font-size: 12px; padding: 5px 7px; }
-.ms-area { flex: 1; min-width: 0; }
-.ms-type { width: 74px; flex-shrink: 0; }
+.ms-area { flex: 1; min-width: 60px; }
+.ms-type { width: 70px; flex-shrink: 0; }
+.ms-waste {
+  width: 70px; flex-shrink: 0; font-size: 11px !important;
+  padding-left: 4px !important; padding-right: 2px !important;
+  color: var(--text3); text-align-last: center;
+}
+.ms-waste.on { color: var(--amber); border-color: rgba(160,120,64,0.4); background: var(--amber-dim); font-weight: 700; }
+.ms-k {
+  color: var(--amber) !important; font-weight: 700; font-size: 10px !important;
+  background: var(--amber-dim); border-radius: 4px; padding: 0 4px;
+}
 .ms-dims { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
 .ms-dims input[type=number] {
   width: 58px; font-size: 12px; padding: 5px 5px; text-align: right;
@@ -1139,6 +1179,7 @@ body { padding-bottom: env(safe-area-inset-bottom); }
   <div class="topbar-actions">
     <button class="btn btn-blue" onclick="showSync()">☁️ 跨裝置</button>
     <button class="btn btn-ghost" onclick="showCostAdmin()">🔧 成本管理</button>
+    <button class="btn btn-ghost" onclick="showBrandAdmin()">🏷️ 品牌折數</button>
     <button class="btn btn-ghost" onclick="showTemplates()">📁 模板</button>
     <button class="btn btn-ghost" onclick="showHistory()">📋 歷史報價</button>
     <button class="btn btn-amber" onclick="saveQuote()">💾 存檔</button>
@@ -1858,8 +1899,8 @@ function addRow(secId, data){
     ${itemTd}
     <td><input class="qty-inp" type="number" value="${d.qty||1}" min="0.1" step="${secId==='A08'?'0.1':'0.5'}" onchange="recalc()" style="width:56px"></td>
     <td>${unitSel}</td>
-    <td class="price-col"><input class="price-inp" type="number" value="${d.price||3000}" min="0" step="100" onchange="recalc()" style="width:84px"></td>
-    <td class="cost-col"><input class="cost-inp" type="number" value="${defCost}" min="0" step="100" onchange="recalc()" style="width:84px;color:#e84e88;font-weight:700"></td>
+    <td class="price-col"><input class="price-inp" type="number" value="${d.price||3000}"${d.price?' data-touched="1"':''} min="0" step="100" onchange="recalc()" style="width:84px"></td>
+    <td class="cost-col"><input class="cost-inp" type="number" value="${defCost}" min="0" step="100" onchange="recalc()" style="width:84px;color:#e84e88;font-weight:700">${brandListField(d)}</td>
     <td class="sub-cell${cls}">NT$\u00a00</td>
     <td class="spec-col" style="min-width:120px">${secId==='A01'
       ? `<input type="text" class="note-inp spec-sel" placeholder="說明（選填）..." value="${d.note||d.spec||''}" style="width:100%;font-size:12px;color:var(--text2);background:transparent;border:none;border-bottom:1px solid var(--border2);outline:none;padding:3px 0" onchange="recalc()">`
@@ -1878,6 +1919,7 @@ function addRow(secId, data){
     if(rmBtn2) rmBtn2.disabled=true;
   }
   setupRowDrag(tr);
+  syncBrandField(tr);
   recalc();
 }
 
@@ -1952,8 +1994,8 @@ function a03AddItemInGroup(secId, cat, d){
     <td style="min-width:150px"><select class="a03-sub-sel item-sel" onchange="applyPresetCost(this);recalc()" style="width:100%">${subOpts}</select></td>
     <td><input class="qty-inp" type="number" value="${d.qty||1}" min="0.1" step="0.5" onchange="recalc()" style="width:56px"></td>
     <td>${unitSel}</td>
-    <td class="price-col"><input class="price-inp" type="number" value="${d.price||0}" min="0" step="100" onchange="recalc()" style="width:84px"></td>
-    <td class="cost-col"><input class="cost-inp" type="number" value="${defCost}" min="0" step="100" onchange="recalc()" style="width:84px;color:#e84e88;font-weight:700"></td>
+    <td class="price-col"><input class="price-inp" type="number" value="${d.price||0}"${d.price?' data-touched="1"':''} min="0" step="100" onchange="recalc()" style="width:84px"></td>
+    <td class="cost-col"><input class="cost-inp" type="number" value="${defCost}" min="0" step="100" onchange="recalc()" style="width:84px;color:#e84e88;font-weight:700">${brandListField(d)}</td>
     <td class="sub-cell${cls}">NT$ 0</td>
     <td class="spec-col">${specSel}</td>
     <td class="action-td"><button class="lock-btn" onclick="toggleLock(this,'${secId}')" title="🔒 鎖定保留此列">🔓</button><button class="rm-btn" onclick="a03RemoveRow(this,'${secId}','${cat}')" title="刪除">×</button></td>`;
@@ -1967,6 +2009,7 @@ function a03AddItemInGroup(secId, cat, d){
     tr.querySelector('.rm-btn').disabled=true;
   }
   setupRowDrag(tr);
+  syncBrandField(tr);
   recalc();
 }
 function a03RemoveRow(btn, secId, cat){
@@ -2071,6 +2114,7 @@ function getRowDataForLock(tr, secId){
     qty:parseFloat(qtyEl?.value)||1,
     cost:parseFloat(costEl?.value)||0,
     unit:unitVal, locked:true,
+    list:parseFloat(tr.querySelector('.list-inp')?.value)||0,
     note:tr.querySelector('.note-inp')?.value||''
   };
 }
@@ -2167,6 +2211,7 @@ function onSpecChange(sel){
   const isCustom = sel.value === '__custom__';
   cs.style.display = isCustom ? 'block' : 'none';
   if(isCustom){ cs.value=''; cs.focus(); }
+  else syncBrandField(sel.closest('tr'), true);
 }
 
 // 確認自訂項目 → 加入下拉選單並切換回 select
@@ -2195,6 +2240,7 @@ function confirmCustomItem(input){
 function confirmCustomSpec(input){
   const val = input.value.trim();
   if(!val) return;
+  setTimeout(()=>syncBrandField(input.closest('tr'), true),0);
   const td = input.closest('td');
   const sel = td.querySelector('.spec-sel');
   const secId = input.closest('tbody').id.replace('tbody-','');
@@ -2581,6 +2627,7 @@ function getQuoteData(){
         qty:parseFloat(qtyEl2.value)||1,
         cost:parseFloat(costEl2?.value)||0,
         unit:unitSel?.value,
+        list:parseFloat(tr.querySelector('.list-inp')?.value)||0,
         note:tr.querySelector('.note-inp')?.value||''
       });
     });
@@ -2981,18 +3028,20 @@ const MS_TYPES = {
   len:    { label:'長度', dims:['長'],      unit:'m'  },
   count:  { label:'數量', dims:[],          unit:'式' },
 };
-let _measure = [];        // [{id, area, type, a, b, n, note}]
+const MS_WASTE = [[1,'—'],[1.05,'+5%'],[1.1,'+10%'],[1.15,'+15%'],[1.2,'+20%'],[1.25,'+25%'],[1.3,'+30%']];
+let _measure = [];        // [{id, area, type, a, b, n, k, note}]  k = 損耗係數
 
-function msNewRow(){ return { id:Date.now()+Math.random().toString(36).slice(2,6), area:AREA_NAMES[0], type:'floor', a:'', b:'', n:1, note:'' }; }
+function msNewRow(){ return { id:Date.now()+Math.random().toString(36).slice(2,6), area:AREA_NAMES[0], type:'floor', a:'', b:'', n:1, k:1, note:'' }; }
 
 // 一列的計算結果
 function msCalc(r){
   const a=parseFloat(r.a)||0, b=parseFloat(r.b)||0, n=parseFloat(r.n)||1;   // a,b 為 mm
-  if(r.type==='count'){ const v=n; return { val:v, qty:msRound(v), unit:'式', m2:0, ping:0 }; }
-  if(r.type==='len'){ const v=+(a/1000*n).toFixed(2); return { val:v, qty:msRound(v), unit:'m', m2:0, ping:0 }; }
+  const k=parseFloat(r.k)||1;                                              // 損耗／備料係數
+  if(r.type==='count'){ const v=n; return { val:v, k, qty:msRound(v*k), unit:'式', m2:0, ping:0 }; }
+  if(r.type==='len'){ const v=+(a/1000*n).toFixed(2); return { val:v, k, qty:msRound(v*k), unit:'m', m2:0, ping:0 }; }
   const m2 = (a/1000)*(b/1000)*n;
   const ping = +(m2*PING_PER_M2).toFixed(2);
-  return { val:ping, qty:msRound(ping), unit:'坪', m2:+m2.toFixed(2), ping };
+  return { val:ping, k, qty:msRound(ping*k), unit:'坪', m2:+m2.toFixed(2), ping };
 }
 
 function measureToggle(open){
@@ -3009,7 +3058,10 @@ function measureAddRow(area){
   const r=msNewRow();
   if(area) r.area=area;
   // 沿用上一列的區域，連續量同一個空間時比較順手
-  else if(_measure.length) r.area=_measure[_measure.length-1].area;
+  else if(_measure.length){
+    const last=_measure[_measure.length-1];
+    r.area=last.area; r.type=last.type; r.k=last.k;   // 沿用上一列的區域／類型／損耗
+  }
   _measure.push(r);
   measureRender(); measureSave();
   setTimeout(()=>{
@@ -3033,7 +3085,8 @@ function measureRenderOut(id){
 // 大字＝進位後要送進報價的數量；小字＝實際量測值
 function msOutHtml(c){
   const raw = c.unit==='式' ? '' : `<span>實 ${c.val}${c.m2?` · ${c.m2}m²`:''}</span>`;
-  return `<b>${msFmtQty(c.val)}</b><span>${c.unit}</span>${raw}`;
+  const kk  = c.k>1 ? `<span class="ms-k">×${c.k}</span>` : '';
+  return `<b>${c.qty}</b><span>${c.unit}</span>${kk}${raw}`;
 }
 function measureRender(){
   const body=document.getElementById('ms-body'); if(!body) return;
@@ -3061,6 +3114,11 @@ function measureRender(){
         <select class="ms-type" onchange="measureSet('${r.id}','type',this.value)">
           ${Object.entries(MS_TYPES).map(([k,v])=>`<option value="${k}"${k===r.type?' selected':''}>${v.label}</option>`).join('')}
         </select>
+        <select class="ms-waste${(parseFloat(r.k)||1)>1?' on':''}" title="損耗／備料（磁磚、木地板常用 +20%）" onchange="measureWasteChange('${r.id}',this)">
+          ${MS_WASTE.map(([v,t])=>`<option value="${v}"${Math.abs((parseFloat(r.k)||1)-v)<1e-9?' selected':''}>${t}</option>`).join('')}
+          ${MS_WASTE.some(([v])=>Math.abs((parseFloat(r.k)||1)-v)<1e-9)?'':`<option value="${r.k}" selected>+${Math.round((r.k-1)*100)}%</option>`}
+          <option value="__c__">✏️ 自訂…</option>
+        </select>
       </div>
       <div class="ms-dims">${dims}
         <span class="ms-out">${msOutHtml(c)}</span>
@@ -3075,6 +3133,16 @@ function measureRender(){
   html+='<button class="ms-add" onclick="measureAddRow()">＋ 新增一列</button>';
   body.innerHTML=html;
   measureRenderFoot();
+}
+function measureWasteChange(id, sel){
+  const r=_measure.find(x=>x.id===id); if(!r) return;
+  if(sel.value==='__c__'){
+    const v=prompt('輸入損耗百分比（例：20 代表 +20%）：', String(Math.round(((parseFloat(r.k)||1)-1)*100)));
+    const num=parseFloat(v);
+    if(v===null||isNaN(num)||num<0){ sel.value=r.k; return; }
+    r.k=+(1+num/100).toFixed(4);
+  } else r.k=parseFloat(sel.value)||1;
+  measureRender(); measureSave();
 }
 function measureAreaChange(id, sel){
   if(sel.value==='__c__'){
@@ -3139,8 +3207,7 @@ function msDoUse(secId){
   const c=msCalc(r), t=MS_TYPES[r.type]||MS_TYPES.floor;
   const sec=SECTIONS.find(x=>x.id===secId);
   const name=`${r.area}${t.label}`;
-  const exact = c.unit==='式' ? '' : `實測 ${c.val}${c.unit}${c.m2?` / ${c.m2}m²`:''}`;
-  const note=[r.note, exact].filter(Boolean).join('　');
+  const note=r.note||'';   // 只帶使用者寫的備註，不附實測數字
   // 區域標示：該分類若還沒標過這個區域，先插一列區域標示
   const tbody=document.getElementById('tbody-'+secId);
   const hasArea=[...tbody.querySelectorAll('tr')].some(tr=>tr.dataset.areaLabel===r.area);
@@ -3289,6 +3356,145 @@ function loadCustomLibFromCloud(){
     if(localMore) try{ _d.ref('custom_lib').set(lib).catch(()=>{}); }catch(e){}
   };
   try{ _d.ref('custom_lib').on('value',snap=>merge(snap.exists()?snap.val():{})); }catch(e){}
+}
+
+// ══════════════════════════════════════════════
+//  品牌折數：規格選到品牌 → 輸入定價 → 自動算成本
+//  成本 = 定價 × 折數（例：TOTO 0.62）
+// ══════════════════════════════════════════════
+const BRAND_KEY='brand_rates_v1';
+const BRAND_DEFAULTS={ 'TOTO':0.62, 'KOHLER':0.55, 'caesar':0.65, 'OVO':0.6, 'Panasonic':0.75, '台達':0.8 };
+function getBrandRates(){
+  try{ const v=JSON.parse(localStorage.getItem(BRAND_KEY)||'null'); if(v&&typeof v==='object') return v; }catch(e){}
+  return {...BRAND_DEFAULTS};
+}
+function saveBrandRates(r){
+  try{ localStorage.setItem(BRAND_KEY,JSON.stringify(r)); }catch(e){}
+  const _d=_db(); if(_d) try{ _d.ref('brand_rates').set(r).catch(()=>{}); }catch(e){}
+}
+// 規格文字 → 折數（不分大小寫；找不到回傳 null）
+function brandRateOf(spec){
+  spec=(spec||'').trim(); if(!spec) return null;
+  const r=getBrandRates();
+  if(r[spec]!=null) return +r[spec];
+  const key=Object.keys(r).find(k=>k.toLowerCase()===spec.toLowerCase());
+  return key?+r[key]:null;
+}
+function brandNameOf(spec){
+  spec=(spec||'').trim(); if(!spec) return '';
+  const r=getBrandRates();
+  if(r[spec]!=null) return spec;
+  return Object.keys(r).find(k=>k.toLowerCase()===spec.toLowerCase())||'';
+}
+// 建列時產生「定價」小欄（有品牌才顯示）
+function brandListField(d){
+  const rate=brandRateOf(d&&d.spec);
+  const on=rate!=null;
+  return `<div class="list-wrap${on?' on':''}">
+    <span class="lw-tag">定價</span>
+    <input type="number" class="list-inp" inputmode="decimal" min="0" step="100" value="${(d&&d.list)||''}" placeholder="—" oninput="applyListPrice(this)">
+    <span class="lw-rate" title="此品牌折數">${on?'×'+rate:''}</span>
+  </div>`;
+}
+// 規格變更後，重新顯示／隱藏定價欄並重算成本
+function syncBrandField(tr, recompute){
+  if(!tr) return;
+  const wrap=tr.querySelector('.list-wrap'); if(!wrap) return;
+  const specSel=tr.querySelector('.spec-sel');
+  const spec=specSel?.value==='__custom__'?(tr.querySelector('.custom-spec')?.value||''):(specSel?.value||'');
+  const rate=brandRateOf(spec);
+  wrap.classList.toggle('on', rate!=null);
+  const rEl=wrap.querySelector('.lw-rate');
+  if(rEl) rEl.textContent = rate!=null?('×'+rate):'';
+  if(recompute && rate!=null){
+    const li=wrap.querySelector('.list-inp');
+    if(li && parseFloat(li.value)>0) applyListPrice(li);
+  }
+}
+// 輸入定價 → 成本 = 定價 × 折數；單價為空或 0 時一併帶入定價
+function applyListPrice(inp){
+  const tr=inp.closest('tr'); if(!tr) return;
+  const specSel=tr.querySelector('.spec-sel');
+  const spec=specSel?.value==='__custom__'?(tr.querySelector('.custom-spec')?.value||''):(specSel?.value||'');
+  const rate=brandRateOf(spec);
+  const list=parseFloat(inp.value)||0;
+  if(rate==null || list<=0) return;
+  const costEl=tr.querySelector('.cost-inp');
+  if(costEl && !costEl.disabled) costEl.value=Math.round(list*rate);
+  const priceEl=tr.querySelector('.price-inp');
+  // 單價還沒手動改過 → 先帶入定價當起點，之後可自由調整
+  if(priceEl && !priceEl.disabled && !priceEl.readOnly && !priceEl.dataset.touched) priceEl.value=list;
+  recalc();
+}
+// 折數改過之後，整張表重新套用
+// 手動改過單價就記下來，之後輸入定價不會覆蓋
+document.addEventListener('input', e=>{
+  if(e.target.classList?.contains('price-inp')) e.target.dataset.touched='1';
+}, true);
+function refreshAllBrandRows(){
+  document.querySelectorAll('tbody tr').forEach(tr=>{ if(tr.querySelector('.list-wrap')) syncBrandField(tr, true); });
+  recalc();
+}
+
+// ── 品牌折數後台 ──
+function showBrandAdmin(){
+  const dlg=document.getElementById('brand-dialog');
+  if(!dlg){ alert('找不到品牌折數對話框'); return; }
+  brBuild(); dlg.showModal();
+}
+function brBuild(){
+  const body=document.getElementById('brand-body'); if(!body) return;
+  const r=getBrandRates();
+  const esc=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const keys=Object.keys(r);
+  body.innerHTML = (keys.length?keys:[]).map((k,i)=>`<div class="br-row" data-i="${i}">
+      <input type="text" value="${esc(k)}" placeholder="品牌名稱（要和規格欄一致）" data-br-name>
+      <input type="number" min="0" max="100" step="1" value="${+(r[k]*100).toFixed(0)}" data-br-rate>
+      <span class="br-suf">折　＝ ×${(+r[k]).toFixed(2)}</span>
+      <button class="br-del" onclick="this.closest('.br-row').remove()" title="刪除">×</button>
+    </div>`).join('')
+    || '<div style="color:var(--text3);font-size:13px;padding:16px 0;text-align:center">尚未設定品牌，按下方「＋ 新增品牌」</div>';
+  body.oninput=e=>{
+    const row=e.target.closest('.br-row'); if(!row) return;
+    const v=parseFloat(row.querySelector('[data-br-rate]').value);
+    row.querySelector('.br-suf').textContent = isNaN(v)?'折':`折　＝ ×${(v/100).toFixed(2)}`;
+  };
+}
+function brAddRow(){
+  const body=document.getElementById('brand-body');
+  if(body.querySelector('div[style]')) body.innerHTML='';
+  const div=document.createElement('div');
+  div.className='br-row';
+  div.innerHTML=`<input type="text" value="" placeholder="品牌名稱（要和規格欄一致）" data-br-name>
+    <input type="number" min="0" max="100" step="1" value="60" data-br-rate>
+    <span class="br-suf">折　＝ ×0.60</span>
+    <button class="br-del" onclick="this.closest('.br-row').remove()" title="刪除">×</button>`;
+  body.appendChild(div);
+  div.querySelector('input')?.focus();
+}
+function brSave(){
+  const out={};
+  document.querySelectorAll('#brand-body .br-row').forEach(row=>{
+    const name=row.querySelector('[data-br-name]').value.trim();
+    const pct=parseFloat(row.querySelector('[data-br-rate]').value);
+    if(!name||isNaN(pct)||pct<=0) return;
+    out[name]= +(pct/100).toFixed(4);
+  });
+  saveBrandRates(out);
+  // 品牌名稱也加進各分類的規格選單，方便直接選
+  refreshAllBrandRows();
+  document.getElementById('brand-dialog').close();
+  alert('✅ 品牌折數已儲存\n規格欄選到這些品牌時，輸入定價就會自動算成本。');
+}
+function syncAllBrandFields(){ document.querySelectorAll('tbody tr').forEach(tr=>syncBrandField(tr)); }
+function loadBrandRatesFromCloud(){
+  const _d=_db(); if(!_d) return;
+  _d.ref('brand_rates').once('value').then(snap=>{
+    if(snap.exists()){
+      try{ localStorage.setItem(BRAND_KEY,JSON.stringify(snap.val())); }catch(e){}
+      refreshAllBrandRows();
+    }
+  }).catch(()=>{});
 }
 
 // ══ COST PRESETS（成本管理後台）══
@@ -3459,6 +3665,7 @@ function loadQuote(data){
   document.getElementById('client-name').value=data.client||'';
   if(!parseCaseNo(data.caseNo)) autoCaseNo(true);   // 舊紀錄沒有案號 → 依地址/日期產生
   measureLoad(data.measure);
+  setTimeout(syncAllBrandFields, 0);
   document.getElementById('client-phone').value=data.phone||'';
   document.getElementById('client-email').value=data.email||'';
   document.getElementById('project-addr').value=data.addr||'';
@@ -3791,6 +3998,7 @@ loadFromCloud().then(()=>{
   startCloudListener(); // Listen for updates from other devices
   loadCostPresetsFromCloud();
   loadCustomLibFromCloud();
+  loadBrandRatesFromCloud();
   libHarvestCloudHistory();    // 其他裝置存過的報價也一起掃
 });
 
@@ -3869,6 +4077,30 @@ function showInstallGuide(){
 
 
 </script>
+<!-- 品牌折數後台 -->
+<dialog id="brand-dialog" style="width:min(560px,100vw);max-height:85dvh;border:1px solid var(--border2);border-radius:14px;background:var(--surface);color:var(--text);padding:0;overflow:hidden;flex-direction:column">
+  <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border2);flex-shrink:0">
+    <button onclick="document.getElementById('brand-dialog').close()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:2px 8px;border-radius:6px">‹</button>
+    <div style="flex:1">
+      <div style="font-size:15px;font-weight:700">🏷️ 品牌折數</div>
+      <div style="font-size:11px;color:var(--text2)">規格欄選到品牌時，輸入定價自動算出成本</div>
+    </div>
+    <button onclick="brSave()" style="background:var(--green);color:#0a1f12;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">💾 儲存</button>
+  </div>
+  <div id="brand-body" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px"></div>
+  <div style="flex-shrink:0;border-top:1px solid var(--border2);padding:12px 16px;background:var(--surface2)">
+    <button class="btn btn-ghost" style="width:100%" onclick="brAddRow()">＋ 新增品牌</button>
+    <div style="font-size:11px;color:var(--text2);margin-top:8px;line-height:1.6">
+      折數填 <b>62</b> 代表 62 折（成本 = 定價 × 0.62）。品牌名稱要和規格欄裡的文字一樣，例如 <b>TOTO</b>、<b>KOHLER</b>。
+    </div>
+  </div>
+</dialog>
+<style>
+  #brand-dialog[open]{ display:flex; position:fixed; inset:0; margin:auto; }
+  #brand-dialog::backdrop{ background:rgba(0,0,0,0.45); }
+  @media print { #brand-dialog { display:none !important; } }
+</style>
+
 <!-- 成本管理後台：native dialog -->
 <dialog id="cost-dialog" style="width:min(680px,100vw);max-height:90dvh;height:90dvh;border:1px solid var(--border2);border-radius:14px;background:var(--surface);color:var(--text);padding:0;overflow:hidden;flex-direction:column">
   <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border2);flex-shrink:0;background:var(--surface)">
@@ -3894,7 +4126,7 @@ function showInstallGuide(){
   <div class="ms-head">
     <div style="flex:1">
       <div class="ms-head-title">📐 量尺計算</div>
-      <div class="ms-head-sub">輸入毫米 mm，自動換算坪數（進位至 0.5）</div>
+      <div class="ms-head-sub">輸入毫米 mm，換算坪數並加損耗、進位至 0.5</div>
     </div>
     <button class="ms-btn" onclick="measureAddRow()">＋ 新增</button>
     <button class="ms-x" onclick="measureToggle(false)" title="關閉">×</button>
