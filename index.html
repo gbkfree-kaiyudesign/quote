@@ -169,7 +169,7 @@ body.measure-open .measure-tab { display: none; }
 .ms-type { width: 74px; flex-shrink: 0; }
 .ms-dims { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
 .ms-dims input[type=number] {
-  width: 54px; font-size: 12px; padding: 5px 5px; text-align: right;
+  width: 58px; font-size: 12px; padding: 5px 5px; text-align: right;
   font-variant-numeric: tabular-nums; -moz-appearance: textfield;
 }
 .ms-dims input[type=number]::-webkit-inner-spin-button { display: none; }
@@ -2971,6 +2971,9 @@ function printClient(){
 //  輸入公分 → 自動換算 m² / 坪 / 米，可一鍵送進任一報價分類
 // ══════════════════════════════════════════════
 const PING_PER_M2 = 1/3.305785;           // 1 m² = 0.3025 坪
+// 送進報價時一律向上進位到 0.5 的倍數（顯示整數或 .5）
+function msRound(v){ return Math.ceil((+v||0)*2)/2; }
+function msFmtQty(v){ const r=msRound(v); return Number.isInteger(r)?String(r):r.toFixed(1); }
 const MS_TYPES = {
   floor:  { label:'地坪', dims:['長','寬'], unit:'坪' },
   wall:   { label:'壁面', dims:['長','高'], unit:'坪' },
@@ -2984,11 +2987,12 @@ function msNewRow(){ return { id:Date.now()+Math.random().toString(36).slice(2,6
 
 // 一列的計算結果
 function msCalc(r){
-  const a=parseFloat(r.a)||0, b=parseFloat(r.b)||0, n=parseFloat(r.n)||1;
-  if(r.type==='count') return { val:n, unit:'式', m2:0, ping:0 };
-  if(r.type==='len')   return { val:+(a/100*n).toFixed(2), unit:'m', m2:0, ping:0 };
-  const m2 = (a/100)*(b/100)*n;
-  return { val:+(m2*PING_PER_M2).toFixed(2), unit:'坪', m2:+m2.toFixed(2), ping:+(m2*PING_PER_M2).toFixed(2) };
+  const a=parseFloat(r.a)||0, b=parseFloat(r.b)||0, n=parseFloat(r.n)||1;   // a,b 為 mm
+  if(r.type==='count'){ const v=n; return { val:v, qty:msRound(v), unit:'式', m2:0, ping:0 }; }
+  if(r.type==='len'){ const v=+(a/1000*n).toFixed(2); return { val:v, qty:msRound(v), unit:'m', m2:0, ping:0 }; }
+  const m2 = (a/1000)*(b/1000)*n;
+  const ping = +(m2*PING_PER_M2).toFixed(2);
+  return { val:ping, qty:msRound(ping), unit:'坪', m2:+m2.toFixed(2), ping };
 }
 
 function measureToggle(open){
@@ -3023,9 +3027,14 @@ function measureSet(id, key, val){
 function measureRenderOut(id){
   const r=_measure.find(x=>x.id===id); if(!r) return;
   const out=document.querySelector(`.ms-row[data-id="${id}"] .ms-out`);
-  if(out){ const c=msCalc(r); out.innerHTML=`<b>${c.val}</b><span>${c.unit}</span>${c.m2?`<span>· ${c.m2}m²</span>`:''}`; }
+  if(out) out.innerHTML=msOutHtml(msCalc(r));
 }
 
+// 大字＝進位後要送進報價的數量；小字＝實際量測值
+function msOutHtml(c){
+  const raw = c.unit==='式' ? '' : `<span>實 ${c.val}${c.m2?` · ${c.m2}m²`:''}</span>`;
+  return `<b>${msFmtQty(c.val)}</b><span>${c.unit}</span>${raw}`;
+}
 function measureRender(){
   const body=document.getElementById('ms-body'); if(!body) return;
   if(!_measure.length){
@@ -3043,8 +3052,8 @@ function measureRender(){
     if(r.area!==lastArea){ html+=`<div class="ms-grp-title">📍 ${esc(r.area||'未分區')}</div>`; lastArea=r.area; }
     const t=MS_TYPES[r.type]||MS_TYPES.floor, c=msCalc(r);
     let dims='';
-    if(t.dims.length>=1) dims+=`<input type="number" inputmode="decimal" min="0" step="1" placeholder="${t.dims[0]}" value="${esc(r.a)}" oninput="measureSet('${r.id}','a',this.value)"><span class="ms-unit">cm</span>`;
-    if(t.dims.length>=2) dims+=`<span class="ms-x-sign">×</span><input type="number" inputmode="decimal" min="0" step="1" placeholder="${t.dims[1]}" value="${esc(r.b)}" oninput="measureSet('${r.id}','b',this.value)"><span class="ms-unit">cm</span>`;
+    if(t.dims.length>=1) dims+=`<input type="number" inputmode="decimal" min="0" step="10" placeholder="${t.dims[0]}" value="${esc(r.a)}" oninput="measureSet('${r.id}','a',this.value)"><span class="ms-unit">mm</span>`;
+    if(t.dims.length>=2) dims+=`<span class="ms-x-sign">×</span><input type="number" inputmode="decimal" min="0" step="10" placeholder="${t.dims[1]}" value="${esc(r.b)}" oninput="measureSet('${r.id}','b',this.value)"><span class="ms-unit">mm</span>`;
     dims+=`${t.dims.length?'<span class="ms-x-sign">×</span>':'<span class="ms-unit">數量</span>'}<input type="number" inputmode="decimal" min="0" step="1" placeholder="數量" value="${esc(r.n)}" oninput="measureSet('${r.id}','n',this.value)" style="width:42px" title="數量/面數">`;
     html+=`<div class="ms-row" data-id="${r.id}">
       <div class="ms-row-top">
@@ -3054,7 +3063,7 @@ function measureRender(){
         </select>
       </div>
       <div class="ms-dims">${dims}
-        <span class="ms-out"><b>${c.val}</b><span>${c.unit}</span>${c.m2?`<span>· ${c.m2}m²</span>`:''}</span>
+        <span class="ms-out">${msOutHtml(c)}</span>
       </div>
       <div class="ms-row-acts">
         <input type="text" class="ms-note" placeholder="備註（例：電視牆）" value="${esc(r.note)}" oninput="measureSet('${r.id}','note',this.value)">
@@ -3130,15 +3139,16 @@ function msDoUse(secId){
   const c=msCalc(r), t=MS_TYPES[r.type]||MS_TYPES.floor;
   const sec=SECTIONS.find(x=>x.id===secId);
   const name=`${r.area}${t.label}`;
-  const note=[r.note, c.m2?`${c.m2}m²`:''].filter(Boolean).join('　');
+  const exact = c.unit==='式' ? '' : `實測 ${c.val}${c.unit}${c.m2?` / ${c.m2}m²`:''}`;
+  const note=[r.note, exact].filter(Boolean).join('　');
   // 區域標示：該分類若還沒標過這個區域，先插一列區域標示
   const tbody=document.getElementById('tbody-'+secId);
   const hasArea=[...tbody.querySelectorAll('tr')].some(tr=>tr.dataset.areaLabel===r.area);
   if(!hasArea && r.area && secId!=='A03') insertAreaLabel(secId, r.area);
   if(secId==='A03'){
-    a03AddItemInGroup(secId, Object.keys(A03_CATS)[0], { item:name, qty:c.val, unit:c.unit, note });
+    a03AddItemInGroup(secId, Object.keys(A03_CATS)[0], { item:name, qty:c.qty, unit:c.unit, note });
   } else {
-    addRow(secId, { item:name, qty:c.val, unit:c.unit, note });
+    addRow(secId, { item:name, qty:c.qty, unit:c.unit, note });
   }
   // 項目名稱 / 單位進自訂項目庫，下次直接選得到
   libAdd('items',secId,name); libAdd('units',secId,c.unit);
@@ -3884,7 +3894,7 @@ function showInstallGuide(){
   <div class="ms-head">
     <div style="flex:1">
       <div class="ms-head-title">📐 量尺計算</div>
-      <div class="ms-head-sub">輸入公分，自動換算坪數並送進報價</div>
+      <div class="ms-head-sub">輸入毫米 mm，自動換算坪數（進位至 0.5）</div>
     </div>
     <button class="ms-btn" onclick="measureAddRow()">＋ 新增</button>
     <button class="ms-x" onclick="measureToggle(false)" title="關閉">×</button>
