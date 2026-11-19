@@ -1877,7 +1877,8 @@ function addRow(secId, data){
   // spec — detect if saved value is custom
   const isCustomSpec = d.spec && !sec.specs.includes(d.spec);
   if(isCustomSpec){ sec.specs.push(d.spec); libAdd('specs',secId,d.spec); }
-  const specOpts = sec.specs.map(sp=>`<option${d.spec===sp?' selected':''}>${sp}</option>`).join('');
+  const specOpts = sec.specs.map(sp=>`<option${d.spec===sp?' selected':''}>${sp}</option>`).join('')
+    + brandOptGroup(sec.specs, d.spec);
   const specSel = `<select class="spec-sel" onchange="onSpecChange(this);recalc()" style="width:100%">
     ${specOpts}
     <option value="__custom__">自訂</option>
@@ -1996,7 +1997,8 @@ function a03AddItemInGroup(secId, cat, d){
   const subOpts=subItems.map(i=>`<option${d.item===i?' selected':''}>${i}</option>`).join('');
   // spec select — use category-specific options if available
   const catSpecList = A03_CAT_SPECS[cat] || sec.specs;
-  const specOpts = catSpecList.map(sp=>`<option${d.spec===sp?' selected':''}>${sp}</option>`).join('');
+  const specOpts = catSpecList.map(sp=>`<option${d.spec===sp?' selected':''}>${sp}</option>`).join('')
+    + brandOptGroup(catSpecList, d.spec);
   const specSel=`<select class="spec-sel" onchange="onSpecChange(this);recalc()" style="width:100%">${specOpts}<option value="__custom__">✏️ 自訂</option></select>
   <input type="text" class="custom-spec" placeholder="輸入後按 Enter 加入" style="display:none;margin-top:3px;width:100%" onkeydown="if(event.key==='Enter'){confirmCustomSpec(this);event.preventDefault();}" onblur="confirmCustomSpec(this)" onchange="recalc()">
   <input type="text" class="note-inp" placeholder="說明..." value="${d.note||''}" style="margin-top:3px;width:100%;font-size:11px;color:var(--text2);background:transparent;border:none;border-bottom:1px solid var(--border2);outline:none;padding:2px 0" onchange="recalc()">`;
@@ -3441,6 +3443,38 @@ function brandCatOf(spec){
   }
   return '';
 }
+// 規格選單末端的「品牌」分組：把品牌折數表裡的品牌都列出來
+function brandOptGroup(secSpecs, selected){
+  const have=new Set((secSpecs||[]).map(x=>String(x).toLowerCase()));
+  const names=Object.keys(flatBrandRates()).filter(b=>!have.has(b.toLowerCase()));
+  if(!names.length) return '';
+  const esc=v=>String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  return `<optgroup label="── 品牌 ──">${names.map(b=>`<option${selected===b?' selected':''}>${esc(b)}</option>`).join('')}</optgroup>`;
+}
+// 品牌表改過之後，把畫面上已存在的規格選單一起補上／清掉品牌選項
+function refreshBrandOptions(){
+  const names=Object.keys(flatBrandRates());
+  const lower=new Set(names.map(b=>b.toLowerCase()));
+  document.querySelectorAll('select.spec-sel').forEach(sel=>{
+    let grp=sel.querySelector('optgroup[label="── 品牌 ──"]');
+    // 已被刪除的品牌：從品牌分組移除（選中的那個保留，免得值不見）
+    if(grp) [...grp.querySelectorAll('option')].forEach(o=>{
+      if(!lower.has(o.value.toLowerCase()) && o.value!==sel.value) o.remove();
+    });
+    const existing=new Set([...sel.querySelectorAll('option')].map(o=>o.value.toLowerCase()));
+    const missing=names.filter(b=>!existing.has(b.toLowerCase()));
+    if(missing.length){
+      if(!grp){
+        grp=document.createElement('optgroup'); grp.label='── 品牌 ──';
+        const custom=[...sel.options].find(o=>o.value==='__custom__');
+        custom?sel.insertBefore(grp,custom):sel.appendChild(grp);
+      }
+      missing.forEach(b=>{ const o=document.createElement('option'); o.value=b; o.textContent=b; grp.appendChild(o); });
+    }
+    if(grp && !grp.querySelector('option')) grp.remove();
+  });
+}
+
 // 建列時產生「定價」小欄（有品牌才顯示）
 function brandListField(d){
   const rate=brandRateOf(d&&d.spec);
@@ -3562,6 +3596,7 @@ function brSave(){
     });
   });
   saveBrandRates(out);
+  refreshBrandOptions();
   refreshAllBrandRows();
   document.getElementById('brand-dialog').close();
   alert('✅ 品牌折數已儲存'+(dup.length?`\n⚠️ 重複未存入：${dup.join('、')}`:'')
@@ -3573,6 +3608,7 @@ function loadBrandRatesFromCloud(){
   _d.ref('brand_rates').once('value').then(snap=>{
     if(snap.exists()){
       try{ localStorage.setItem(BRAND_KEY,JSON.stringify(snap.val())); }catch(e){}
+      refreshBrandOptions();
       refreshAllBrandRows();
     }
   }).catch(()=>{});
